@@ -261,5 +261,13 @@
     "supporter2": "You choose when to ask for help. You can practise alone or with someone.",
     "supporter3": "In this demo, a supporter does not get their own account and cannot see your records.",
     "supporter4": "Before launch, SEDRA will agree the rules for consent and access, including for learners under 18."
+  },
+  "nav": {
+    "resources": "Resources",
+    "achievements": "Achievements"
+  },
+  "auth": {
+    "panelTitle": "Learn everyday skills, your way.",
+    "panelBody": "Short lessons, simple practice and support when you need it."
   }
 }

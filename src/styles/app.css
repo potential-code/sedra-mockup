@@ -34,7 +34,9 @@
   --ink: #1d2617;
   --ink-soft: #46523d;
 
-  --background: #ffffff;
+  /* Page surface: very light sage so white cards lift off it. */
+  --background: #f4f7ee;
+  --surface: #ffffff;
   --foreground: var(--ink);
   --card: #ffffff;
   --card-foreground: var(--ink);
@@ -62,6 +64,12 @@
   --notice-soft: #fbf3df;
 
   --font-family: "Noto Sans", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation: shadows tinted with SEDRA green, never pure black. */
+  --shadow-sm: 0 1px 2px rgb(45 64 25 / 0.06), 0 2px 6px rgb(45 64 25 / 0.06);
+  --shadow-md: 0 2px 4px rgb(45 64 25 / 0.06), 0 8px 24px rgb(45 64 25 / 0.1);
+  --shadow-lg: 0 4px 8px rgb(45 64 25 / 0.08), 0 18px 48px rgb(45 64 25 / 0.16);
+  --shadow-pop: 0 6px 14px rgb(45 64 25 / 0.12), 0 26px 60px rgb(45 64 25 / 0.2);
 }
 
 html[lang="ar"] {
@@ -96,6 +104,11 @@ html[data-contrast="high"] {
   --info-soft: #ffffff;
   --notice: #000000;
   --notice-soft: #ffffff;
+  --surface: #ffffff;
+  --shadow-sm: none;
+  --shadow-md: 0 0 0 2px #000000;
+  --shadow-lg: 0 0 0 2px #000000;
+  --shadow-pop: 0 0 0 3px #000000;
 }
 
 /* Text size control: 100 / 125 / 150 %. Everything is sized in rem. */
@@ -129,6 +142,12 @@ html[data-text="150"] {
   --color-sedra-brown: var(--sedra-brown);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
+  --color-surface: var(--surface);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-pop: var(--shadow-pop);
 
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
@@ -238,4 +257,73 @@ html[data-motion="reduce"] *::after {
   [dir="rtl"] & {
     transform: scaleX(-1);
   }
+}
+
+/* ---------- SEDRA brand motifs (from SEDRA's own materials) ----------
+   Tree mark only (no wordmark), static and faint: decoration, never behind body text.
+   Leaf border: the scalloped leaf strip from SEDRA lesson slides and email signature.
+   Brief §4: no decorative tree animation behind text, so these never animate. */
+
+/* Card that lifts on hover/focus (motion disabled by reduced-motion rules above). */
+@utility card-pop {
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  &:hover,
+  &:focus-within {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-pop);
+  }
+}
+
+/* Faint tree watermark, anchored bottom-end, bleeding off the edge. */
+@utility motif-tree {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline-end: -6%;
+    bottom: -12%;
+    width: min(70%, 34rem);
+    aspect-ratio: 676 / 464;
+    background: url("../assets/motifs/motif-tree-green.png") no-repeat center / contain;
+    opacity: 0.07;
+    pointer-events: none;
+  }
+}
+/* Same, white tree for dark green panels. */
+@utility motif-tree-light {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline-end: -10%;
+    bottom: -8%;
+    width: min(90%, 30rem);
+    aspect-ratio: 676 / 464;
+    background: url("../assets/motifs/motif-tree-white.png") no-repeat center / contain;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+}
+
+/* Leaf scallop border strip (decorative, aria-hidden element). */
+@utility leaf-border {
+  height: 1.5rem;
+  background: url("../assets/motifs/motif-leaf-border.png") repeat-x left top / auto 100%;
+}
+
+html[data-contrast="high"] .leaf-border,
+html[data-contrast="high"] .motif-tree::after,
+html[data-contrast="high"] .motif-tree-light::after {
+  display: none;
 }

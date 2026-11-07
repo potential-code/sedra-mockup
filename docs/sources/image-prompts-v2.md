@@ -3,6 +3,7 @@
 Use this file instead of PROMPTS.txt. Make the images in the Gemini app (gemini.google.com, Pro plan).
 
 For each image:
+
 1. New chat (or continue the same chat). **No attachment needed.**
 2. Paste the prompt.
 3. Download the image and save it in this folder with the exact SAVE AS name (PNG or JPG is fine).

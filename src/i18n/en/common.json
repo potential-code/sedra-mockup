@@ -47,5 +47,15 @@
     "home": "Go to home"
   },
   "logoAlt": "SEDRA Foundation",
-  "close": "Close"
+  "close": "Close",
+  "values": {
+    "label": "SEDRA values",
+    "inclusion": "Inclusion",
+    "noOneLeftBehind": "No One Left Behind",
+    "love": "Love"
+  },
+  "logout": "Log out",
+  "signedInAs": "Signed in as",
+  "menu": "Menu",
+  "closeMenu": "Close menu"
 }

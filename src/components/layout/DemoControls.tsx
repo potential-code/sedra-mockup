@@ -95,7 +95,7 @@ export function DemoControls() {
 export function DemoBanner() {
   const { t } = useTranslation()
   return (
-    <p className="m-0 max-w-none bg-sedra-pale-50 px-4 py-2 text-center text-sm text-ink">
+    <p className="m-0 max-w-none border-b border-sedra-pale bg-sedra-pale-100 px-4 py-1.5 text-center text-sm text-ink">
       <strong>{t('demo.label')}:</strong> {t('demo.banner')}
     </p>
   )

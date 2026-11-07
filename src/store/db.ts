@@ -68,6 +68,9 @@ function persist() {
   }
 }
 
+// Save the seed on first load so tools and other tabs see the same demo db.
+persist()
+
 export function getDb(): DemoDb {
   return state
 }

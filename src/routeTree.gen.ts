@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteImport } from './routes/_admin'
+import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as LearnerRouteImport } from './routes/_learner'
 import { Route as PublicRouteImport } from './routes/_public'
+import { Route as AuthWelcomeRouteImport } from './routes/_auth/welcome'
 import { Route as LearnerAchievementsRouteImport } from './routes/_learner/achievements'
 import { Route as LearnerHelpRouteImport } from './routes/_learner/help'
 import { Route as LearnerLearnRouteImport } from './routes/_learner/learn'
@@ -19,7 +21,6 @@ import { Route as LearnerPreferencesRouteImport } from './routes/_learner/prefer
 import { Route as LearnerResourcesRouteImport } from './routes/_learner/resources'
 import { Route as LearnerSessionsRouteImport } from './routes/_learner/sessions'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
-import { Route as PublicWelcomeRouteImport } from './routes/_public/welcome'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin/admin/index'
 import { Route as AdminAdminFutureRouteImport } from './routes/_admin/admin/future'
 import { Route as AdminAdminReportsRouteImport } from './routes/_admin/admin/reports'
@@ -36,6 +37,10 @@ const AdminRoute = AdminRouteImport.update({
   id: '/_admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LearnerRoute = LearnerRouteImport.update({
   id: '/_learner',
   getParentRoute: () => rootRouteImport,
@@ -43,6 +48,11 @@ const LearnerRoute = LearnerRouteImport.update({
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthWelcomeRoute = AuthWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => AuthRoute,
 } as any)
 const LearnerAchievementsRoute = LearnerAchievementsRouteImport.update({
   id: '/achievements',
@@ -77,11 +87,6 @@ const LearnerSessionsRoute = LearnerSessionsRouteImport.update({
 const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => PublicRoute,
-} as any)
-const PublicWelcomeRoute = PublicWelcomeRouteImport.update({
-  id: '/welcome',
-  path: '/welcome',
   getParentRoute: () => PublicRoute,
 } as any)
 const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
@@ -145,13 +150,13 @@ const LearnerCoursesCourseIdUnitsUnitIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/welcome': typeof AuthWelcomeRoute
   '/achievements': typeof LearnerAchievementsRoute
   '/help': typeof LearnerHelpRoute
   '/learn': typeof LearnerLearnRoute
   '/preferences': typeof LearnerPreferencesRoute
   '/resources': typeof LearnerResourcesRoute
   '/sessions': typeof LearnerSessionsRoute
-  '/welcome': typeof PublicWelcomeRoute
   '/admin/future': typeof AdminAdminFutureRoute
   '/admin/reports': typeof AdminAdminReportsRoute
   '/admin/resources': typeof AdminAdminResourcesRoute
@@ -166,13 +171,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
+  '/welcome': typeof AuthWelcomeRoute
   '/achievements': typeof LearnerAchievementsRoute
   '/help': typeof LearnerHelpRoute
   '/learn': typeof LearnerLearnRoute
   '/preferences': typeof LearnerPreferencesRoute
   '/resources': typeof LearnerResourcesRoute
   '/sessions': typeof LearnerSessionsRoute
-  '/welcome': typeof PublicWelcomeRoute
   '/admin/future': typeof AdminAdminFutureRoute
   '/admin/reports': typeof AdminAdminReportsRoute
   '/admin/resources': typeof AdminAdminResourcesRoute
@@ -188,15 +193,16 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_admin': typeof AdminRouteWithChildren
+  '/_auth': typeof AuthRouteWithChildren
   '/_learner': typeof LearnerRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
+  '/_auth/welcome': typeof AuthWelcomeRoute
   '/_learner/achievements': typeof LearnerAchievementsRoute
   '/_learner/help': typeof LearnerHelpRoute
   '/_learner/learn': typeof LearnerLearnRoute
   '/_learner/preferences': typeof LearnerPreferencesRoute
   '/_learner/resources': typeof LearnerResourcesRoute
   '/_learner/sessions': typeof LearnerSessionsRoute
-  '/_public/welcome': typeof PublicWelcomeRoute
   '/_public/': typeof PublicIndexRoute
   '/_admin/admin/future': typeof AdminAdminFutureRoute
   '/_admin/admin/reports': typeof AdminAdminReportsRoute
@@ -214,13 +220,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/welcome'
     | '/achievements'
     | '/help'
     | '/learn'
     | '/preferences'
     | '/resources'
     | '/sessions'
-    | '/welcome'
     | '/admin/future'
     | '/admin/reports'
     | '/admin/resources'
@@ -235,13 +241,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/welcome'
     | '/achievements'
     | '/help'
     | '/learn'
     | '/preferences'
     | '/resources'
     | '/sessions'
-    | '/welcome'
     | '/admin/future'
     | '/admin/reports'
     | '/admin/resources'
@@ -256,15 +262,16 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_admin'
+    | '/_auth'
     | '/_learner'
     | '/_public'
+    | '/_auth/welcome'
     | '/_learner/achievements'
     | '/_learner/help'
     | '/_learner/learn'
     | '/_learner/preferences'
     | '/_learner/resources'
     | '/_learner/sessions'
-    | '/_public/welcome'
     | '/_public/'
     | '/_admin/admin/future'
     | '/_admin/admin/reports'
@@ -281,6 +288,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
   LearnerRoute: typeof LearnerRouteWithChildren
   PublicRoute: typeof PublicRouteWithChildren
 }
@@ -292,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_learner': {
@@ -307,6 +322,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof PublicRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_auth/welcome': {
+      id: '/_auth/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof AuthWelcomeRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_learner/achievements': {
       id: '/_learner/achievements'
@@ -355,13 +377,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
-      parentRoute: typeof PublicRoute
-    }
-    '/_public/welcome': {
-      id: '/_public/welcome'
-      path: '/welcome'
-      fullPath: '/welcome'
-      preLoaderRoute: typeof PublicWelcomeRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_admin/admin/': {
@@ -470,6 +485,16 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface AuthRouteChildren {
+  AuthWelcomeRoute: typeof AuthWelcomeRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthWelcomeRoute: AuthWelcomeRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 interface LearnerRouteChildren {
   LearnerAchievementsRoute: typeof LearnerAchievementsRoute
   LearnerHelpRoute: typeof LearnerHelpRoute
@@ -497,12 +522,10 @@ const LearnerRouteWithChildren =
   LearnerRoute._addFileChildren(LearnerRouteChildren)
 
 interface PublicRouteChildren {
-  PublicWelcomeRoute: typeof PublicWelcomeRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
-  PublicWelcomeRoute: PublicWelcomeRoute,
   PublicIndexRoute: PublicIndexRoute,
 }
 
@@ -511,6 +534,7 @@ const PublicRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
   LearnerRoute: LearnerRouteWithChildren,
   PublicRoute: PublicRouteWithChildren,
 }

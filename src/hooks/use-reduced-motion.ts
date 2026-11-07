@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { usePrefs } from '@/store/actions'
 
-/** True when the learner turned motion off, or (on 'system') the OS asks for reduced motion. */
+/** True when the device asks for reduced motion or the learner turned motion off. */
 export function useReducedMotion(): boolean {
   const { reducedMotion } = usePrefs()
   const [system, setSystem] = useState(
@@ -15,7 +15,8 @@ export function useReducedMotion(): boolean {
     mq.addEventListener('change', on)
     return () => mq.removeEventListener('change', on)
   }, [])
-  if (reducedMotion === 'on') return true
-  if (reducedMotion === 'off') return false
-  return system
+  // Brief §3: respect system reduced motion. The device setting always wins; the learner
+  // preference can only add 'reduce', never override the device.
+  if (system) return true
+  return reducedMotion === 'on'
 }
