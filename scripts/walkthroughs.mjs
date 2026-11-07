@@ -142,7 +142,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     await page.waitForTimeout(300)
     const vPause = await vid.evaluate((v) => v.paused)
     R.ok(vPause, 'Pause leaves video paused', `paused=${vPause}`)
-    await page.getByRole('button', { name: 'Replay from the start' }).click()
+    await page.getByRole('button', { name: 'Replay', exact: true }).click()
     await page.waitForTimeout(600)
     m = await page.evaluate(() => window.__media)
     const vRep = await vid.evaluate((v) => ({ paused: v.paused, t: v.currentTime }))

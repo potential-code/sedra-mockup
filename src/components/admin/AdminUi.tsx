@@ -266,7 +266,7 @@ export function FieldCode({ code }: { code: string }) {
   return (
     <code
       aria-hidden="true"
-      className="ltr-isolate ms-2 rounded bg-sedra-pale-50 px-1.5 py-0.5 text-xs font-normal text-ink-soft"
+      className="ltr-isolate ms-2 rounded bg-sedra-pale-50 px-1.5 py-0.5 text-xs font-normal text-ink-soft [overflow-wrap:anywhere]"
     >
       {code}
     </code>

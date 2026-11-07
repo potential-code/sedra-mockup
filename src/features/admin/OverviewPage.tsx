@@ -95,7 +95,7 @@ export function OverviewPage() {
       <p className="mt-8">
         <Link
           to="/admin/learners"
-          className="inline-flex min-h-12 items-center font-semibold text-sedra-green underline underline-offset-4"
+          className="inline-flex min-h-12 min-w-12 items-center font-semibold text-sedra-green underline underline-offset-4"
         >
           {t('overview.viewLearners')}
         </Link>
@@ -157,7 +157,7 @@ function SupportTable() {
                     <Link
                       to="/admin/learners/$learnerId"
                       params={{ learnerId: r.learnerId }}
-                      className="inline-flex min-h-12 items-center font-semibold text-sedra-green underline underline-offset-4"
+                      className="inline-flex min-h-12 min-w-12 items-center font-semibold text-sedra-green underline underline-offset-4"
                     >
                       <span className="ltr-isolate">{r.learnerId}</span>
                     </Link>

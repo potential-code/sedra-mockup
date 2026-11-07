@@ -134,7 +134,7 @@ function LearnerRow({ l }: { l: AdminLearner }) {
         <Link
           to="/admin/learners/$learnerId"
           params={{ learnerId: l.id }}
-          className="inline-flex min-h-12 flex-col justify-center font-semibold text-sedra-green underline underline-offset-4"
+          className="inline-flex min-h-12 min-w-12 flex-col justify-center font-semibold text-sedra-green underline underline-offset-4"
         >
           <span className="ltr-isolate">{l.id}</span>
           <span dir="auto">{l.name}</span>
@@ -200,7 +200,7 @@ function LearnerCard({ l }: { l: AdminLearner }) {
         <Link
           to="/admin/learners/$learnerId"
           params={{ learnerId: l.id }}
-          className="inline-flex min-h-12 items-center gap-2 text-sedra-green underline underline-offset-4"
+          className="inline-flex min-h-12 min-w-12 items-center gap-2 text-sedra-green underline underline-offset-4"
         >
           <span className="ltr-isolate">{l.id}</span>
           <span dir="auto">{l.name}</span>

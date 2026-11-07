@@ -177,7 +177,10 @@ export function WelcomePage() {
             })}
           </ul>
           <p className="m-0 text-base">
-            <Link to="/" className="font-semibold text-sedra-green underline">
+            <Link
+              to="/"
+              className="inline-flex min-h-12 min-w-12 items-center font-semibold text-sedra-green underline"
+            >
               {t('common:back')}
             </Link>
           </p>

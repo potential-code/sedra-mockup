@@ -78,7 +78,10 @@ export function ReadAloud({
     return showOffHint ? (
       <p className="m-0 flex flex-wrap items-center gap-2 text-base text-ink-soft">
         <span>{t('readAloud.off')}</span>
-        <Link to="/preferences" className="font-semibold text-sedra-green underline">
+        <Link
+          to="/preferences"
+          className="inline-flex min-h-12 items-center font-semibold text-sedra-green underline"
+        >
           {t('readAloud.openPrefs')}
         </Link>
       </p>
