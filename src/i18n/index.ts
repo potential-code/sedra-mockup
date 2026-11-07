@@ -4,24 +4,26 @@ import { initReactI18next, useTranslation } from 'react-i18next'
 import arAdmin from './ar/admin.json'
 import arCommon from './ar/common.json'
 import arLearner from './ar/learner.json'
+import arUnit from './ar/unit.json'
 import enAdmin from './en/admin.json'
 import enCommon from './en/common.json'
 import enLearner from './en/learner.json'
+import enUnit from './en/unit.json'
 
 /**
  * Translation keys for all labels, feedback, alt text and announcements (brief §4).
- * Namespaces: common (shell), learner (learner screens), admin (admin screens).
+ * Namespaces: common (shell), learner (learner screens), unit (unit page), admin (admin screens).
  * Lesson content lives in src/content as Localized { en, ar } objects.
  */
 void i18n.use(initReactI18next).init({
   resources: {
-    en: { common: enCommon, learner: enLearner, admin: enAdmin },
-    ar: { common: arCommon, learner: arLearner, admin: arAdmin },
+    en: { common: enCommon, learner: enLearner, unit: enUnit, admin: enAdmin },
+    ar: { common: arCommon, learner: arLearner, unit: arUnit, admin: arAdmin },
   },
   lng: 'en',
   fallbackLng: false,
   defaultNS: 'common',
-  ns: ['common', 'learner', 'admin'],
+  ns: ['common', 'learner', 'unit', 'admin'],
   interpolation: { escapeValue: false },
   returnNull: false,
 })

@@ -22,7 +22,7 @@ export const PERSONAS: Persona[] = [
       ar: 'الزيارة الأولى. اختر طريقة التعلّم التي تناسبك، ثم ابدأ.',
     },
     home: '/preferences',
-    avatar: 'images/persona-new-learner.png',
+    avatar: 'images/persona-new-learner.webp',
   },
   {
     id: 'noor',
@@ -33,7 +33,7 @@ export const PERSONAS: Persona[] = [
       ar: 'متعلّمة عائدة. تابعي من حيث توقّفتِ.',
     },
     home: '/learn',
-    avatar: 'images/persona-noor.png',
+    avatar: 'images/persona-noor.webp',
   },
   {
     id: 'admin',
@@ -44,7 +44,7 @@ export const PERSONAS: Persona[] = [
       ar: 'البرامج والمتعلّمون والجلسات والتقارير. بيانات وهمية فقط.',
     },
     home: '/admin',
-    avatar: 'images/persona-admin.png',
+    avatar: 'images/persona-admin.webp',
   },
 ]
 
