@@ -1,0 +1,943 @@
+SEDRA Foundation platform mockup brief
+Developer instructions and video production scripts
+Prepared for Aliyah Rodrigues • Aliya@potential.com
+Vera • vera@potential.com
+From Rawzaba Alhalabi • Potential.com
+7 November 2026 • Version 1
+Build this experience
+Create a bilingual SEDRA learning mockup for people of determination aged 13–35. Make learning as easy to navigate as a short-video app: one clear task at a time, a prominent next step and reliable replay. Every learner must be able to use buttons instead of gestures and text instead of audio. Accessibility must shape the lessons, interactions and navigation throughout.
+Aliya owns the platform build and content entry. Vera owns production of the two selected 30-second sample videos, captions and transcripts, then hands those assets to Aliya. All 16 units below have complete English scripts and checks. Only LS02 and HF01 require actual video production for this mockup; the remaining videos are pending production and must be labelled accurately.
+What the document contains
+1  Scope, ownership and delivery sequence
+2  Screen specifications and learner journeys
+3  Accessibility and bilingual interaction rules
+4  Course map and content behaviour
+5  Sixteen ready-to-enter unit specifications
+6  Two detailed sample video production briefs
+7  External video, admin data, acceptance checks and sources
+Confirmed context
+SEDRA requested Life Skills and Hospitality for All, English and Arabic, short interactive learning, Zoom sessions and recordings. The initial community is approximately 30–50 learners. The source examples cover Healthy Communication and Introduction to Hospitality; they are sample courses within the two programmes, not complete programme curricula. Rawzaba will propose a walkthrough by the middle of next week. No client meeting date or commercial commitment is established.
+1 Scope and responsibilities
+Owner
+Required action
+Ready when
+Aliya
+Build all specified screens; load all 16 unit scripts, summaries and checks; implement both languages and preferences; embed LS02 and HF01 after Vera delivers.
+Learner and admin walkthroughs work on mobile and desktop.
+Vera
+Produce LS02 Stop Think Do and HF01 A warm welcome. Deliver 30-second clean masters, captioned previews, caption files, transcripts, thumbnails and editable project assets.
+Timing, language, captions and accessibility checks pass; assets sent to Aliya.
+Rawzaba
+Review demo and coordinate the SEDRA walkthrough.
+Scope and presentation accepted internally.
+SEDRA reviewers
+Validate vocabulary, practical tasks, accessibility and Arabic adaptation with representative learners.
+Feedback captured before any production launch.
+Build sequence
+1. Set up SEDRA branding, bilingual labels and demo role switch. Create fictional learners only.
+2. Implement learner routes and accessibility preferences first. Use the unit storyboard and transcript panels while video files are pending.
+3. Load both eight-unit courses and all checks. Use the exact unit IDs below to connect assets and progress.
+4. Vera produces the two specified samples in parallel. Aliya can build without waiting for the videos.
+5. Replace the matching pending video panels with approved assets; never repeat a sample video across unrelated units.
+6. Validate keyboard, screen reader, RTL, captions, navigation and saved progress; run the two walkthroughs in section 9.
+Working mockup and later production
+Working in the mockup: navigation, language switch, preference controls, unit navigation, checks and feedback, progress saved locally, two sample-video players, transcript views and illustrative admin filters. Give the demo a Reset demo data action. Clearly disclose that local demo progress is not a production learner record.
+Demonstrate but do not imply live integration: invitations, account verification, Zoom booking/attendance, recording ingestion, support notifications, administrative permissions and report export. Label simulated success messages. Production requires secure accounts, approved consent and supporter-access flows, content review, hosting, integration configuration, permissions and learner testing.
+Keep AI assistance, employer/internship access, mentorship, paid membership and regional expansion on an admin-only Future options page. These are not core navigation or prerequisites for learning. Do not infer ability or assign a learning path from a disability label.
+2 Screens and journeys
+Screen and route
+Contents and action
+Interaction and example copy
+Public home /
+SEDRA logo, brief welcome, two programme cards, Sign in, language, accessibility.
+Learn everyday skills. Practise hospitality. Learn at your own pace. No automatic carousel.
+Welcome /welcome
+Demo sign-in or learner invitation entry; labelled fields, password reveal and help.
+Welcome to SEDRA learning. Need help signing in? Demo action opens fictional profile; real emails are not sent.
+Preferences /preferences
+English/Arabic, Standard/Simplified view, text size, contrast, captions, reduced motion and optional read-aloud.
+How would you like to learn? Every choice can be changed later; no medical details required.
+Dashboard /learn
+Continue learning first; enrolled programme cards; next session; achievements; Help.
+Welcome, Noor. Your next step: Stop Think Do. Continue learning.
+Programme /programmes/life-skills and /hospitality
+Programme purpose, course title, eight-unit list and progress.
+Healthy Communication / Introduction to Hospitality. Each unit has a 30-second video plus practice; total time varies.
+Unit /courses/{course}/units/{id}
+Title, Unit x of 8, play/pause/replay, captions, transcript, check, activity and Next.
+Watch or read. Try one question. Practise if you wish. No countdown or automatic advance.
+Sessions /sessions
+Programme filter; clear session cards; booking details; separate recordings tab.
+Next live session: date and time shown in UAE time. Join session / View recording. Seed dates are marked demo.
+Resources /resources
+Searchable HTML summaries, visual playbook and external video card; downloads secondary.
+Read the Stop Think Do guide. No PDF is required to finish a lesson.
+Achievements /achievements
+Personal milestones and course completion summary.
+You practised a new skill. Continue when you are ready. Static badge; sound and animation off.
+Help /help
+Read or hear navigation tips; request support demo form; visible Back to learning.
+I need help with: signing in / a lesson / a live session. Your request is saved in this demo only.
+Admin /admin
+Overview, learners, programmes/content, sessions, resources, reports.
+Separate explicit demo role switch; no real learner data or access privileges implied.
+Core journeys
+New learner: Home → Welcome → Preferences → Dashboard → Programme → Unit → Check → optional practice → Next. Returning learner: Continue learning restores the same unit and step, with media paused. Programme switching never resets progress. Help returns to the original place.
+Recorded session: Dashboard → Sessions → Recordings → choose a recording → captions/transcript/resources. Viewing a recording is separate from course completion. No missed-session penalty.
+Supporter assistance: allow a learner to request help and demonstrate a supporter alongside them; do not create a guardian dashboard that exposes records automatically. Before production, SEDRA must approve consent and access rules, including its process for minors.
+3 Navigation and accessibility
+One task per screen
+Mobile: single-column card, player above a sticky action area. Bottom navigation contains Home, Learn, Sessions and Help, each with icon and text. Keep the unit sequence visible as Unit 2 of 8. Desktop uses the same sequence with a compact course outline. Simplified view hides optional resource cards and secondary statistics; essential controls and help remain.
+A swipe may navigate between unit overview cards only. Always provide Previous unit and Next unit buttons; never require a swipe, drag, long press, double tap, fast response or precise pointer movement. Checks remain in place until the learner selects an action. Moving away from unfinished work prompts Keep learning or Leave and save. All media pauses when a unit loses focus.
+Area
+Build requirement and acceptance check
+Touch and layout
+Use at least 48 by 48 CSS pixel primary controls and 8-pixel spacing. At 320 CSS pixels wide, no horizontal page scrolling. Verify 200% text zoom and 400% browser zoom without hidden actions.
+Reading
+Default learner body text 18 px, generous line spacing and left alignment in English/right in Arabic. Text controls 100%, 125%, 150%. Use brief sentences, everyday words and labelled illustrations. Never justify learner text.
+Contrast
+Use #4b662f on white for headings and white on #4b662f for primary actions. Measure every final pair. Target at least 4.5:1 normal text, 3:1 large text and essential controls; pale green is a panel colour, not small text on white. Offer black/white high contrast.
+Keyboard
+Everything works using Tab, Shift Tab, Enter, Space and arrows where appropriate. Skip to main content first. Visible focus ring; logical sequence; no keyboard traps. Focus returns to the opener after a dialog closes.
+Screen reader
+Semantic headings, landmarks and labelled form controls. Announce progress and feedback politely without reading the whole screen repeatedly. Radio groups have question legends; disabled controls explain why. Label each player and icon.
+Media
+No autoplay. Captions on by default; transcript and image descriptions adjacent. Pause, replay, volume, speed and full-screen controls reachable by keyboard. Avoid flashing, loud surprises and distracting music. Essential visual actions also appear in narration or descriptive transcript.
+Checks
+Untimed, unlimited attempts, no negative points. Wrong answers retain the screen and show a useful hint. Never use colour alone for correctness. Provide button choices for sorting and matching; optional typing only.
+Preferences
+Persist language, text size, contrast, captions and reduced-motion preferences. Respect system reduced motion. Read-aloud is optional and user-initiated, with stop controls; it must not conflict with screen-reader speech.
+Emotional safety
+Recognise that feelings vary. Do not force smiling, eye contact, touch, breathing exercises or personal disclosures. Accept spoken words, gestures and communication aids. A learner can choose a comfortable way to participate.
+Errors
+Plain language beside the field plus an error summary; preserve entered text. Example: Choose one answer, then select Check answer. No silent failure or vanishing message.
+These are implementation acceptance targets. The mockup must not display a certified accessibility or compliance claim. Test with SEDRA participants with varied communication, sensory, motor and cognitive access needs; do not assume one configuration fits everyone.
+4 Language branding and content rules
+English and Arabic
+Both interfaces must work in the mockup. Aliya should maintain translation keys for all labels, lesson text, questions, feedback, alt text and announcements. Set lang and dir per locale; use logical CSS properties; preserve the unit and progress when switching. Mirror directional arrows, not video content, logos, numerals inside media or player controls. Isolate URLs and IDs as left-to-right text.
+English
+Arabic
+Continue learning
+متابعة التعلّم
+Next
+التالي
+Back
+رجوع
+Play video
+تشغيل الفيديو
+Replay
+إعادة المشاهدة
+Read transcript
+قراءة النص
+Check answer
+تحقّق من الإجابة
+Try again
+حاول مرة أخرى
+I need help
+أحتاج إلى مساعدة
+My progress
+تقدّمي
+Life Skills
+المهارات الحياتية
+Hospitality for All
+الضيافة للجميع
+The English unit copy below is the content-entry master. Before SEDRA presentation, prepare equivalent simple Modern Standard Arabic text and have SEDRA review terminology, checks and narration; do not leave English body text under an Arabic UI. Vera produces the two English sample masters first. Arabic captions/transcripts and any Arabic narration version must be reviewed and separately timed; never speed up Arabic speech to fit. The two selected units include suggested Arabic voiceover for that review. Do not promise 16 produced bilingual videos for this mockup.
+SEDRA visual system
+Colour
+Role
+#4b662f
+Primary action, headings, key text on white
+#becc96
+Light panel background with dark text
+#98ac3c
+Decorative accent and nonessential progress illustration
+#6d923d
+Secondary accent; contrast-check before text use
+#86754c
+Brand accent and logo colour; contrast-check small text
+Use the original supplied bilingual logo without recolouring or stretching. Use a white background and clear space. No decorative tree animation behind text. Show diverse young people and adults respectfully; avoid pity framing or disability stereotypes. Font: clear sans serif with an Arabic family such as Noto Sans Arabic, subject to available licensed assets.
+Course behaviour used by every unit
+Each unit contains a 30-second video, the summary below, one untimed check and an optional practice action. The 30 seconds describes media duration, not time allowed for the whole unit. Transcript or storyboard access is an equal learning route. Expose Next after the answer has been reviewed, including after an incorrect answer; allow learner choice to retry or continue with support. Record check outcome separately from completion. Completion requires Watch or read done plus Check reviewed; optional practice can be Done / Later / With help and does not block progress. Allow replay and revisiting all units. No watch-percentage gate or expired access.
+For pending videos show Video being prepared with the complete storyboard and Read lesson action. Do not show a broken player, pretend placeholder content is a produced video, or substitute the external YouTube video for all units. Eight units per course give four minutes of planned video, plus checks and practice at the learner’s own pace.
+5 Course and unit matrix
+Unit numbering below is the new digital adaptation. It does not reproduce the historical Unit 1 and Unit 2 references in the Life Skills study-guide slide. Retire the source’s 2025 dates and September 16 deadline from the mockup; do not turn them into live course restrictions. Preserve four optional Life Skills milestones without imposing its historical timetable.
+ID
+Unit title
+Source pages
+Media status
+LS01
+What is healthy communication
+Life Skills pp 1–4
+Script ready; video pending
+LS02
+Stop Think Do
+Life Skills pp 5 and 11
+Produce sample
+LS03
+Choose a calming pause
+Life Skills p 6
+Script ready; video pending
+LS04
+Lena feels left out
+Life Skills pp 7–8
+Script ready; video pending
+LS05
+Think of possible reasons
+Life Skills p 9
+Script ready; video pending
+LS06
+Choose a kind and safe action
+Life Skills pp 10–11
+Script ready; video pending
+LS07
+Why the steps help
+Life Skills p 12
+Script ready; video pending
+LS08
+My communication playbook
+Life Skills pp 2 and 13–15
+Script ready; video pending
+HF01
+A warm welcome
+Hospitality pp 4–5
+Produce sample
+HF02
+Where hospitality happens
+Hospitality p 6
+Script ready; video pending
+HF03
+Why hospitality matters
+Hospitality pp 5 and 7
+Script ready; video pending
+HF04
+Listen and offer help
+Hospitality p 5 examples
+Script ready; video pending
+HF05
+Think about an experience
+Hospitality p 8
+Script ready; video pending
+HF06
+Notice helpful interactions
+Hospitality p 9 video activity
+Script ready; video pending
+HF07
+Practise and sort
+Hospitality pp 10–11
+Script ready; video pending
+HF08
+Use hospitality today
+Hospitality p 12 wrap-up and practice
+Script ready; video pending
+Life Skills course: Healthy Communication. Badges after LS02, LS04, LS06 and LS08: Paused and noticed / Recognised a feeling / Tried a kind response / Built a reminder. Hospitality course: Introduction to Hospitality. Show personal progress and a completion acknowledgement after HF08; do not imply a professional qualification or readiness for unsupervised employment.
+Summaries below are also the simplified text alternatives. Storyboard narration is the verbatim English transcript. Each storyboard has four 7.5-second scenes, totalling 30 seconds. Speak naturally and leave quiet visual holds; do not stretch words unnaturally to fill a scene. Checks and practical activities occur after the media, with no time limit.
+LS01 What is healthy communication
+Source: Life Skills pp 1–4  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Recognise respectful sharing of thoughts and feelings.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Communication means sharing thoughts, feelings or information.
+Sharing thoughts and feelings
+Two peers exchange labelled speech cards.
+7.5–15 s
+We can use words, signs, pictures or a communication aid.
+Many ways to communicate
+Show speech, gesture and a picture board equally.
+15–22.5 s
+Healthy communication helps us share and listen with respect.
+Share and listen
+One person communicates; the other waits.
+22.5–30 s
+Take your time. Your message matters.
+Your message matters
+Hold an uncluttered scene with both peers.
+Accessible summary
+Communication means sharing thoughts, feelings or information. We can use words, signs, pictures or a communication aid. Healthy communication helps us share and listen with respect. Take your time. Your message matters.
+Knowledge check
+Which is healthy communication?
+A. Listening and taking turns
+B. Speaking over someone
+C. Ignoring their message
+Correct answer: A. Listening and taking turns.
+Correct feedback: Yes. Listening gives another person time to share.
+Try-again feedback: Think about giving each person a turn. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose a word, picture or gesture to share how you feel. You may pass.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+LS02 Stop Think Do
+Source: Life Skills pp 5 and 11  |  Duration: 30 seconds  |  VERA SAMPLE VIDEO
+Learning objective: Identify the three steps before responding.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+A big feeling can make it hard to choose what to do.
+A big feeling
+Lena stands still with a labelled upset feeling card.
+7.5–15 s
+Stop. Pause and notice how you feel.
+1 Stop
+Lena pauses; show a stop symbol and word.
+15–22.5 s
+Think. What could you say or do that is kind and safe?
+2 Think
+Two choices appear: ask calmly or take a break.
+22.5–30 s
+Do. Try your choice. You can stop and think again.
+3 Do
+Lena chooses a calm conversation; hold final steps.
+Accessible summary
+A big feeling can make it hard to choose what to do. Stop. Pause and notice how you feel. Think. What could you say or do that is kind and safe? Do. Try your choice. You can stop and think again.
+Knowledge check
+What comes after Stop?
+A. Do
+B. Think
+C. Shout
+Correct answer: B. Think.
+Correct feedback: Yes. Think about your choices before you act.
+Try-again feedback: The steps are Stop, Think, Do. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Point to or say the three steps. Choose a safe example to practise, or practise with a supporter.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+LS03 Choose a calming pause
+Source: Life Skills p 6  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Select a comfortable way to pause.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+When a feeling is strong, you can pause before acting.
+Pause
+A person sits comfortably in a quiet space.
+7.5–15 s
+You might breathe gently or count backwards slowly.
+Breathe or count
+Show two labelled choice cards, no forced countdown.
+15–22.5 s
+You might move in a comfortable way or notice your surroundings.
+Move or notice
+Seated movement and looking at an object are equal options.
+22.5–30 s
+Choose what helps you. You can ask someone for support.
+Choose your way
+Person selects a preferred card; supporter stays nearby.
+Accessible summary
+When a feeling is strong, you can pause before acting. You might breathe gently or count backwards slowly. You might move in a comfortable way or notice your surroundings. Choose what helps you. You can ask someone for support.
+Knowledge check
+What can you do before acting on a strong feeling?
+A. Rush into an argument
+B. Pause in a way that helps you
+C. Ignore everyone forever
+Correct answer: B. Pause in a way that helps you.
+Correct feedback: Yes. A pause gives you time to choose.
+Try-again feedback: You can pause, count, move comfortably or ask for help. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose one calming option. Practise only if comfortable; no exercise or breathing task is compulsory.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+LS04 Lena feels left out
+Source: Life Skills pp 7–8  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Notice a feeling without judging it.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Lena hears that Maya went to the movies with other friends.
+Lena hears some news
+Lena hears a simple conversation; no hostile acting.
+7.5–15 s
+Lena was not invited. She feels hurt and confused.
+Hurt and confused
+Show labelled feeling cards, not facial expression alone.
+15–22.5 s
+She stops and notices her feelings before she responds.
+Notice the feeling
+Lena pauses; the background stays still.
+22.5–30 s
+People can feel differently. Every feeling deserves care.
+Feelings can differ
+Offer sad, angry, confused and another feeling cards.
+Accessible summary
+Lena hears that Maya went to the movies with other friends. Lena was not invited. She feels hurt and confused. She stops and notices her feelings before she responds. People can feel differently. Every feeling deserves care.
+Knowledge check
+Which feeling might Lena have?
+A. Hurt
+B. Confused
+C. Either can make sense
+Correct answer: C. Either can make sense.
+Correct feedback: Yes. People may have more than one feeling.
+Try-again feedback: There is no single feeling everyone must have. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose a possible feeling for Lena. Sharing your own experience is optional.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+LS05 Think of possible reasons
+Source: Life Skills p 9  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Consider more than one explanation before judging.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Lena does not yet know why she was not invited.
+We do not know yet
+Lena looks at a question card.
+7.5–15 s
+There could be different reasons. She can ask Maya.
+Ask before judging
+Two blank reason cards appear beside a question.
+15–22.5 s
+She thinks about a kind question instead of an angry message.
+Think of a kind question
+Compare labelled calm question and angry message cards.
+22.5–30 s
+She can say, I felt left out. Can we talk?
+Can we talk?
+Lena chooses a speech or communication-aid card.
+Accessible summary
+Lena does not yet know why she was not invited. There could be different reasons. She can ask Maya. She thinks about a kind question instead of an angry message. She can say, I felt left out. Can we talk?
+Knowledge check
+What is a helpful next thought?
+A. Maya must hate me
+B. I can ask what happened
+C. I must shout now
+Correct answer: B. I can ask what happened.
+Correct feedback: Yes. Asking can help Lena understand what happened.
+Try-again feedback: Lena does not know the reason yet. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose two possible explanations: limited seats / a family plan / another reason. These are possibilities, not facts about Maya.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+LS06 Choose a kind and safe action
+Source: Life Skills pp 10–11  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Choose a calm response to a friendship problem.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Lena has paused and thought about her choices.
+Ready to choose
+Show Stop and Think already checked with text.
+7.5–15 s
+She chooses to speak with Maya calmly.
+Talk calmly
+Two peers have comfortable space; no required eye contact.
+15–22.5 s
+I felt left out, Lena says. Can you tell me what happened?
+Share and ask
+Display a short communication card.
+22.5–30 s
+If talking feels hard, she can take a break or ask for help.
+A break or help is okay
+Show break and supporter options without failure signs.
+Accessible summary
+Lena has paused and thought about her choices. She chooses to speak with Maya calmly. I felt left out, Lena says. Can you tell me what happened? If talking feels hard, she can take a break or ask for help.
+Knowledge check
+Which action could help?
+A. Send an angry message
+B. Talk calmly or ask for support
+C. Push Maya
+Correct answer: B. Talk calmly or ask for support.
+Correct feedback: Yes. Calm communication and support can help.
+Try-again feedback: Choose an action that is kind and safe. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Practise the sentence with a partner, a picture card or a communication aid. Solo practice is also fine.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+LS07 Why the steps help
+Source: Life Skills p 12  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Connect Stop Think Do to constructive choices.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Stopping gives us a moment before we act.
+A moment to pause
+Show a pause card.
+7.5–15 s
+Thinking helps us notice choices and possible results.
+Notice choices
+A simple fork offers talk or break.
+15–22.5 s
+Doing a kind, safe action can help solve a problem.
+Try a safe action
+Two peers discuss a problem respectfully.
+22.5–30 s
+We can practise again. Small steps help us learn.
+Practise again
+Return to the three labelled steps; no score ranking.
+Accessible summary
+Stopping gives us a moment before we act. Thinking helps us notice choices and possible results. Doing a kind, safe action can help solve a problem. We can practise again. Small steps help us learn.
+Knowledge check
+Why can Stop Think Do help?
+A. It guarantees nobody feels sad
+B. It gives time to choose an action
+C. It makes everyone agree
+Correct answer: B. It gives time to choose an action.
+Correct feedback: Yes. The steps give us time to choose.
+Try-again feedback: The steps help with choices; they cannot control other people. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose one situation where taking a pause could help. You may use Lena’s example instead of a personal story.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+LS08 My communication playbook
+Source: Life Skills pp 2 and 13–15  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Create a simple reminder for future practice.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Keep a small reminder of Stop, Think, Do.
+My reminder
+A three-card playbook opens.
+7.5–15 s
+Choose one way to pause that feels comfortable.
+My pause
+Select count, break, gentle breath or support.
+15–22.5 s
+Choose a kind phrase or picture to ask for help.
+My help message
+Show Can we talk? and I need help cards.
+22.5–30 s
+You can return to this guide and practise at your own pace.
+Learn at your pace
+Save reminder button; four quiet badge outlines.
+Accessible summary
+Keep a small reminder of Stop, Think, Do. Choose one way to pause that feels comfortable. Choose a kind phrase or picture to ask for help. You can return to this guide and practise at your own pace.
+Knowledge check
+What belongs in your playbook?
+A. A helpful pause and a kind message
+B. A deadline to stop feeling upset
+C. A rule to always agree
+Correct answer: A. A helpful pause and a kind message.
+Correct feedback: Yes. A reminder can help you practise.
+Try-again feedback: Choose a tool you can use when you need support. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Select one pause card and one communication card, then Save my reminder. Offer printable and HTML versions; no personal disclosure required.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Last unit: return to course summary and personal achievement.
+HF01 A warm welcome
+Source: Hospitality pp 4–5  |  Duration: 30 seconds  |  VERA SAMPLE VIDEO
+Learning objective: Recognise hospitality as helping people feel welcome safe and comfortable.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Hospitality means helping people feel welcome, safe and comfortable.
+Welcome • Safe • Comfortable
+Adult guest enters a clear reception area.
+7.5–15 s
+Say hello in a way that works for you.
+Hello
+Host uses speech or a welcome card; no forced smile.
+15–22.5 s
+Ask, How can I help? Then give the guest time to respond.
+How can I help?
+Host waits; guest points to a direction symbol.
+22.5–30 s
+A kind welcome can make a difference.
+A kind welcome
+Host offers directions respectfully; hold final scene.
+Accessible summary
+Hospitality means helping people feel welcome, safe and comfortable. Say hello in a way that works for you. Ask, How can I help? Then give the guest time to respond. A kind welcome can make a difference.
+Knowledge check
+Which action shows hospitality?
+A. Ignoring a guest
+B. Offering a welcome and help
+C. Rushing a guest
+Correct answer: B. Offering a welcome and help.
+Correct feedback: Yes. A welcome and an offer of help show hospitality.
+Try-again feedback: Think about helping someone feel welcome and comfortable. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Practise a greeting with words, a gesture or a communication card. Eye contact and smiling are optional.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+HF02 Where hospitality happens
+Source: Hospitality p 6  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Identify everyday hospitality settings.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Hospitality can happen at home when someone visits.
+At home
+Host welcomes a visitor at the door.
+7.5–15 s
+It can happen in hotels, malls and theme parks.
+In many places
+Three labelled setting cards appear slowly.
+15–22.5 s
+It also happens in cinemas and hospitals.
+Cinema • Hospital
+Two clear setting cards; no rapid cuts.
+22.5–30 s
+In each place, people can offer a welcome and help.
+Welcome and help
+Return to one shared help symbol.
+Accessible summary
+Hospitality can happen at home when someone visits. It can happen in hotels, malls and theme parks. It also happens in cinemas and hospitals. In each place, people can offer a welcome and help.
+Knowledge check
+Where can hospitality happen?
+A. Only in hotels
+B. At home and in many public places
+C. Only at a restaurant
+Correct answer: B. At home and in many public places.
+Correct feedback: Yes. Hospitality can happen in everyday places.
+Try-again feedback: Think about a visit at home as well as public places. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose a setting card: home / hotel / mall / theme park / cinema / hospital. Say or select one welcome action there.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+HF03 Why hospitality matters
+Source: Hospitality pp 5 and 7  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Explain one benefit of welcoming behaviour.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+A welcome can help a visitor feel included.
+Feel included
+A visitor joins a reception calmly.
+7.5–15 s
+Listening and helping can create a good experience.
+A good experience
+A host listens and offers a map.
+15–22.5 s
+Kind actions can build trust and bring people together.
+Build trust
+Two people collaborate without physical contact.
+22.5–30 s
+Good experiences can also help a business grow.
+Help people and businesses
+A guest chooses to return; no sales promises.
+Accessible summary
+A welcome can help a visitor feel included. Listening and helping can create a good experience. Kind actions can build trust and bring people together. Good experiences can also help a business grow.
+Knowledge check
+Why is hospitality important?
+A. It helps people feel welcome and cared for
+B. It means always saying yes
+C. It means doing everything quickly
+Correct answer: A. It helps people feel welcome and cared for.
+Correct feedback: Yes. Hospitality helps people feel welcome and cared for.
+Try-again feedback: Focus on how the person feels, not speed or agreeing to everything. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose a benefit card: feel welcome / build trust / good experience. Explain using a word, picture or example.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+HF04 Listen and offer help
+Source: Hospitality p 5 examples  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Choose a respectful offer of assistance.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+A guest may need directions, a drink or information.
+What does the guest need?
+Guest looks at a simple map.
+7.5–15 s
+Ask what they need and allow time for an answer.
+Ask and wait
+Host offers a question card and waits.
+15–22.5 s
+Listen to the answer before offering help.
+Listen first
+Guest indicates the direction symbol.
+22.5–30 s
+Offer useful help. If you are unsure, ask a colleague.
+Offer help
+Host points to a map or a help desk; no grabbing.
+Accessible summary
+A guest may need directions, a drink or information. Ask what they need and allow time for an answer. Listen to the answer before offering help. Offer useful help. If you are unsure, ask a colleague.
+Knowledge check
+A guest looks unsure. What could you do?
+A. Take their arm without asking
+B. Ask if they would like help
+C. Speak over them
+Correct answer: B. Ask if they would like help.
+Correct feedback: Yes. Asking respects the guest’s choice.
+Try-again feedback: Let the guest tell you what they need. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Practise How can I help? Give the other person time to answer in their preferred way.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+HF05 Think about an experience
+Source: Hospitality p 8  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Recognise how interactions may feel.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Think about a visit, or use an imaginary example.
+Choose an example
+Show real or imaginary example buttons.
+7.5–15 s
+What helped the person feel welcome or happy?
+What felt welcoming?
+A host gives clear information.
+15–22.5 s
+Was anything upsetting or uncomfortable? Feelings can differ.
+Feelings can differ
+Offer labelled comfortable and uncomfortable cards.
+22.5–30 s
+You can share one thought, or choose to pass.
+Share or pass
+No public leaderboard or compulsory recording.
+Accessible summary
+Think about a visit, or use an imaginary example. What helped the person feel welcome or happy? Was anything upsetting or uncomfortable? Feelings can differ. You can share one thought, or choose to pass.
+Knowledge check
+Do people always feel the same about an interaction?
+A. Yes, always
+B. No, feelings can differ
+C. Only staff feelings matter
+Correct answer: B. No, feelings can differ.
+Correct feedback: Yes. Different people may experience a situation differently.
+Try-again feedback: Listen to the person instead of guessing how they feel. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose good / uncomfortable / enjoyable for a fictional visit. Optional short text or spoken discussion; no sensitive details stored.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+HF06 Notice helpful interactions
+Source: Hospitality p 9 video activity  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Identify a positive and a negative interaction.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Notice what people do during a visit.
+Watch one interaction
+Two short fictional reception scenes.
+7.5–15 s
+In one example, the host listens and gives clear directions.
+Listens and helps
+Guest points to map; host responds.
+15–22.5 s
+In another, the host ignores the guest asking for help.
+Ignores a request
+Quiet scene without humiliating performance.
+22.5–30 s
+Which action helps the guest feel welcome?
+Choose the helpful action
+Display labelled choice cards side by side.
+Accessible summary
+Notice what people do during a visit. In one example, the host listens and gives clear directions. In another, the host ignores the guest asking for help. Which action helps the guest feel welcome?
+Knowledge check
+Which interaction is positive?
+A. Listening and offering directions
+B. Ignoring a request for help
+C. Rushing someone away
+Correct answer: A. Listening and offering directions.
+Correct feedback: Yes. Listening and offering useful help is positive hospitality.
+Try-again feedback: Look for an action that responds to what the guest needs. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Select Helpful or Not helpful for two cards: Gives clear directions / Ignores the guest. Use buttons, not drag-and-drop.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+HF07 Practise and sort
+Source: Hospitality pp 10–11  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Practise a welcome and classify hospitality actions.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Practise a short welcome with a partner, or on your own.
+Practise your way
+Host and guest role cards; solo option visible.
+7.5–15 s
+Take turns offering help and responding as a guest.
+Take turns
+Two brief calm exchanges.
+15–22.5 s
+Notice how the interaction felt. You can choose a feeling card.
+How did it feel?
+Offer comfortable, unsure and another feeling cards.
+22.5–30 s
+Sort actions into helpful and not helpful. Ask for support anytime.
+Helpful or not helpful
+Tap-to-select sorting cards with text labels.
+Accessible summary
+Practise a short welcome with a partner, or on your own. Take turns offering help and responding as a guest. Notice how the interaction felt. You can choose a feeling card. Sort actions into helpful and not helpful. Ask for support anytime.
+Knowledge check
+A host waits while a guest responds. Is this helpful?
+A. Helpful
+B. Not helpful
+C. It only matters if they speak quickly
+Correct answer: A. Helpful.
+Correct feedback: Yes. Waiting gives the guest time to communicate.
+Try-again feedback: People may need different amounts of time to respond. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Roleplay Hello. How can I help? Then classify Waits for a response as Helpful and Interrupts the guest as Not helpful. No negative roleplay is compulsory.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Next opens the following unit in this course, paused at the start.
+HF08 Use hospitality today
+Source: Hospitality p 12 wrap-up and practice  |  Duration: 30 seconds  |  VIDEO PENDING PRODUCTION
+Learning objective: Recall the meaning and choose an everyday action.
+Time
+Exact narration
+On-screen text and visual direction
+0–7.5 s
+Hospitality helps people feel welcome, safe and comfortable.
+Welcome • Safe • Comfortable
+Three labelled reminder cards.
+7.5–15 s
+You can practise at home or in the community.
+Practise in daily life
+Home and community setting choices.
+15–22.5 s
+Choose a small action, such as a greeting or offering directions.
+Choose one kind action
+A greeting card and a map card.
+22.5–30 s
+Reflect on what happened. You can share next time if you wish.
+Reflect and share if you wish
+Save practice plan, not an employment certificate.
+Accessible summary
+Hospitality helps people feel welcome, safe and comfortable. You can practise at home or in the community. Choose a small action, such as a greeting or offering directions. Reflect on what happened. You can share next time if you wish.
+Knowledge check
+Which is a good practice plan?
+A. Offer a greeting or help when appropriate
+B. Promise to do anything a guest asks
+C. Force someone to accept help
+Correct answer: A. Offer a greeting or help when appropriate.
+Correct feedback: Yes. A small respectful action is a good way to practise.
+Try-again feedback: Choose a welcome action that respects the other person. You can replay, read the lesson, try again or continue with support.
+Practical activity
+Choose greet / offer directions / listen. Mark Planned, Done, Later or With help. Invite a brief optional example at the next session.
+Next step: Check answer → feedback → optional Try again → Next. Save Watch/read done, Check reviewed and practice status separately. Last unit: return to course summary and personal achievement.
+6 Vera sample video production
+Produce exactly two 30-second sample videos: LS02 and HF01. The four scene blocks in each unit are the approved English script and master timing. No extra intro or closing logo sequence may extend the runtime. Use calm illustrated scenes with believable young-adult characters and simple, stable framing; the result must be suitable across the 13–35 age range. Do not use a babyish presenter, rapid montage, pity narrative or exaggerated emotional acting.
+Technical and creative delivery
+Item
+Instruction
+Master
+1080 by 1920 portrait, 9:16, MP4 H.264, 25 or 30 fps constant; exactly 30.0 seconds. Keep project editable and provide a clean master without burned-in captions.
+Accessible preview
+Separate captioned MP4 preview. Captions on an opaque dark panel with white text, maximum two lines, at least about 54 px at 1080 width; inspect on a real phone. Do not cover faces, communication aids or essential gestures.
+Composition
+Keep essential text/actions in the central safe area, at least 100 px from side edges and 250 px above bottom. SEDRA logo small in a quiet top corner; no animated watermark. End cards must hold within the last scene.
+Voice
+Warm, clear, natural English; approximately 80–110 spoken words per minute over actual speech, with pauses. Narration and silence together fill 30 seconds. No urgent delivery, exaggerated cheer, background music or sound-dependent meaning.
+Captions
+Deliver UTF-8 WebVTT and SRT with accurate punctuation and scene-aligned timings. Caption every spoken word; add any meaningful non-speech sound if used. Sync to final waveform, not an automated first pass.
+Text alternative
+Deliver a verbatim transcript plus descriptive transcript including any essential visual action absent from speech. Include a short thumbnail description and the unit’s accessible summary.
+Review
+Check pronunciation, pace, duration, text size, visual comfort, logo, caption accuracy and factual fidelity. SEDRA should review representation and accessibility. Correct assets before final handoff.
+File names and handoff
+Use SEDRA_LS02_EN_v1_clean.mp4 and SEDRA_HF01_EN_v1_clean.mp4. For each prefix deliver _captioned.mp4, .vtt, .srt, _transcript.txt, _descriptive_transcript.txt, _thumbnail.png and editable project/source assets. Use matching AR suffixes for approved Arabic assets. If Arabic narration is commissioned, deliver a separately recorded and timed AR master, not English audio labelled Arabic.
+Vera sends Aliya a delivery message listing unit ID, language, version, duration, asset links, caption status and review status. Aliya acknowledges receipt, checks playback and captions, and embeds each video only in its matching unit. Keep a previous version until the new version passes QA. Do not expose private asset URLs or editing permissions in the learner UI.
+7 Sample LS02 production detail
+Purpose: demonstrate the Stop Think Do method before the Lena scenario. Use a school-age or young-adult Lena illustration, with a neutral setting and no distressing conflict. Select a consistent character design for LS02 and subsequent Life Skills storyboards.
+Time
+Direction for Vera
+0–7.5
+Medium shot of Lena. A card labelled A big feeling appears beside her; do not rely on facial expression. Voiceover: A big feeling can make it hard to choose what to do. Hold after the sentence.
+7.5–15
+Stable framing. Lena pauses. Introduce a stop icon with 1 Stop. Voiceover: Stop. Pause and notice how you feel. Do not animate a mandatory breathing exercise.
+15–22.5
+Show two simple choices: ask calmly / take a break. Text: 2 Think. Voiceover: Think. What could you say or do that is kind and safe? Keep choices visible long enough to recognise.
+22.5–30
+Lena selects a calm conversation card. Text: 3 Do, then three small labelled step cards. Voiceover: Do. Try your choice. You can stop and think again. Hold final scene; do not auto-loop.
+Caption timing and transcript
+Use the exact English narration in LS02 as the transcript. Initial caption windows are below; adjust within their scene to match recorded speech, preserving readable holds and gaps. Do not show an entire long scene caption at once.
+Window
+Caption
+00:00.000–00:03.500
+A big feeling can make it hard
+00:03.500–00:07.500
+to choose what to do.
+00:07.500–00:11.000
+Stop. Pause
+00:11.000–00:15.000
+and notice how you feel.
+00:15.000–00:18.500
+Think. What could you say or do
+00:18.500–00:22.500
+that is kind and safe?
+00:22.500–00:26.000
+Do. Try your choice.
+00:26.000–00:30.000
+You can stop and think again.
+Descriptive transcript addition: Lena pauses. Two cards offer ask calmly or take a break. She chooses a calm conversation. The final cards read Stop, Think, Do. Thumbnail alt text: Three labelled cards show Stop Think Do.
+Suggested Arabic narration for SEDRA review
+قد يجعل الشعور القوي اختيار ما نفعله أمراً صعباً.
+توقّف. تمهّل ولاحظ شعورك.
+فكّر. ماذا يمكنك أن تقول أو تفعل بطريقة لطيفة وآمنة؟
+افعل. جرّب اختيارك. يمكنك أن تتوقّف وتفكّر من جديد.
+Arabic on-screen labels: شعور قوي / ١ توقّف / ٢ فكّر / ٣ افعل. Record a timing rehearsal before generating Arabic scenes; shorten with SEDRA approval rather than accelerating. Aliya uses separate language tracks and reviewed Arabic checks.
+8 Sample HF01 production detail
+Purpose: introduce hospitality as welcome, safety and comfort. Use an adult host and adult guest at a clear, uncluttered reception. Both have agency; no physical assistance, touch, forced eye contact or mandatory smile. A greeting card or communication aid is as valid as speech.
+Time
+Direction for Vera
+0–7.5
+Wide or medium stable shot: guest enters reception. Text: Welcome • Safe • Comfortable. Voiceover: Hospitality means helping people feel welcome, safe and comfortable.
+7.5–15
+Host greets using speech or a visible welcome card. Text: Hello. Voiceover: Say hello in a way that works for you. Hold a comfortable pause.
+15–22.5
+Host offers a question card; guest has time to indicate a direction symbol. Text: How can I help? Voiceover: Ask, How can I help? Then give the guest time to respond.
+22.5–30
+Host indicates directions on a simple map without grabbing or moving the guest. Text: A kind welcome. Voiceover: A kind welcome can make a difference. Hold the final scene.
+Caption timing and transcript
+Window
+Caption
+00:00.000–00:03.500
+Hospitality means helping people
+00:03.500–00:07.500
+feel welcome, safe and comfortable.
+00:07.500–00:11.000
+Say hello in a way
+00:11.000–00:15.000
+that works for you.
+00:15.000–00:18.500
+Ask, How can I help?
+00:18.500–00:22.500
+Then give the guest time to respond.
+00:22.500–00:26.000
+A kind welcome
+00:26.000–00:30.000
+can make a difference.
+Verbatim transcript: join the four HF01 voiceover lines in order. Descriptive transcript addition: A guest enters reception. The host offers a welcome card and waits. The guest indicates a direction symbol. The host points to a map. Thumbnail alt text: A host offers a welcome card to a guest at reception.
+Suggested Arabic narration for SEDRA review
+الضيافة هي مساعدة الناس على الشعور بالترحيب والأمان والراحة.
+ألقِ التحية بالطريقة التي تناسبك.
+اسأل: كيف يمكنني مساعدتك؟ ثم امنح الضيف وقتاً للرد.
+قد تصنع التحية اللطيفة فرقاً.
+Arabic on-screen labels: ترحيب / أمان / راحة / مرحباً / كيف يمكنني مساعدتك؟ / ترحيب لطيف. Apply the same voice, caption, safe-area and review rules as LS02. No other hospitality scenario should be substituted into HF01 without updating the check and source mapping.
+9 External video and admin build
+User supplied YouTube resource
+Create resource EXT01, titled Video shared by SEDRA project team. Put it in Healthy Communication → Resources and expose a secondary Watch additional video link after LS01. This is a neutral placement alongside the Life Skills source’s video slot on page 3; it is not a claim that this URL is that original video. The content, runtime and captions require human review before learner release. In the internal mockup mark it External resource pending content and accessibility review. Do not describe its subject without viewing it.
+Original URL: https://youtu.be/gu8gSuF_lvw?si=u4CazJuaYQFaetTl
+Embed URL: https://www.youtube.com/embed/gu8gSuF_lvw
+Fallback label: Open video on YouTube
+Aliya: use a responsive embed with an accessible iframe title and no autoplay. Keep keyboard access to and from the player, a visible external-link fallback and a Back to course control. Do not require full viewing or make this third-party resource part of course completion. It is separate from the two new 30-second sample videos and is not subject to their duration.
+Before learner release, Aliya and Vera review the complete video, age suitability, relevance, rights/embedding availability, English/Arabic captions and descriptive alternative. Rename and place it according to verified content. If it is relevant to hospitality, also link it beside HF06, with an appropriate activity after review. If content or accessibility cannot be validated, keep the embedded resource in internal review only and give learners the accessible in-platform LS01/LS02 summaries and HF06 storyboard instead. Do not invent a transcript of the external video.
+Admin content and reporting
+Overview cards: 40 enrolled, 28 active in the last seven days, 12 Healthy Communication completions, 8 Hospitality completions and 3 open support requests. All are illustrative. Define active as opened a unit or session in seven days; enrolment in both programmes counts once in total learners. Example enrolments: 30 Life Skills, 24 Hospitality, including 14 in both = 40 unique people. Do not add programme totals as unique participants.
+Learner table: fictional ID/name, programme enrolments, unit progress, latest activity, reviewed check outcomes and support flag. Filter by programme and progress. Individual view shows units completed and practice status; no medical diagnosis or public ranking. Display time in UAE time. Provide a simulated CSV export with a clear Demo data label.
+Content editor fields: programme_id, course_id, unit_id, order, language, title, objective, source_pages, video_url, duration_seconds, captions_url, transcript, summary, image_alt, question, options, correct_option, feedback_correct, feedback_retry, practice_prompt, media_status and review_status. Require title, language, summary, check and text alternative before publishing. Set unit videos to 30 seconds and reject a mismatched asset ID.
+Sessions editor: programme, title, date/time/timezone, access link, attendance status and recording status. Seed one upcoming Life Skills session and one Hospitality session, both labelled Demo. Provide captioned recording and transcript placeholders explicitly marked Pending recording; no false automated recording upload. Production Zoom attendance and recording publishing require configuration and review.
+10 Acceptance and handover
+Test
+Expected result
+Learner walkthrough A
+Choose English, increase text size, open LS02, play/pause/replay, read transcript, answer B, see feedback, mark practice Later, continue to LS03, refresh and resume.
+Learner walkthrough B
+Choose Arabic and RTL, open HF01, use keyboard only to read the alternative, choose correct answer, return to dashboard and switch programme without lost progress.
+Incorrect answer
+HF01 answer A gives a useful hint, offers replay/read/retry, retains selection and does not announce failure or deduct points. Next remains possible after reviewing feedback.
+Keyboard and screen reader
+Reach every control in logical order; visible focus and appropriate labels; no player trap; feedback announced once; dialogs restore focus.
+Visual access
+Contrast measured; text and layout survive zoom; no information encoded only by colour; touch controls work on a phone; RTL labels do not overlap.
+Media and captions
+LS02 and HF01 each measure 30 seconds, use correct content and language, captions synchronise, transcript matches audio, playback never starts automatically.
+Alternative access
+A learner can complete using text/storyboard and button choices without hearing audio, swiping, dragging, speaking or waiting for a pending video.
+Admin data
+Totals reconcile, filters work, all learner data is fictional and exports say Demo. Learner routes do not display admin or sensitive fields.
+External resource
+EXT01 retains exact supplied URL, embed and fallback; review status is visible internally; inaccessible or unreviewed content is not required for completion.
+SEDRA validation
+Try both tracks with representative learners and supporters, record barriers and preferred adaptations, revise and retest before production approval.
+Final delivery checklist
+Aliya: send the demo link, learner/admin access instructions, screen list, completed test results and outstanding integration items to Rawzaba.
+Vera: send the two video packages to Aliya with unit IDs and version manifest. Include transcripts, caption files, thumbnails and editable source projects.
+Aliya: confirm the correct assets are embedded and playable in LS02/HF01, then share the integrated build for internal review.
+Both: do not call pending content, integrations or accessibility certification complete. Escalate content or access barriers with the affected unit/screen and a proposed remedy.
+11 Source record and asset references
+Primary content: SEDRA Foundation Life Skills Lesson Plan(1).pdf, 16 pages, Healthy Communication; and SEDRA Foundation - Hospitality For All Lesson Plan(1).pdf, 14 pages, Introduction to Hospitality. Page references in the unit map are PDF positions. Closing hospitality pages 13–14 contain no extracted lesson text. The proposed digital activities and narration adapt the source concepts; they are not quotations of a finished SEDRA course.
+Meeting: SEDRA FOUNDATION meeting, 27 October 2026, notes and full transcript. https://chatgpt.com/space/page_e50c8d25b5b88191a23fd942f55af800
+Email: Fatma Bafagih, 6 November 2026, Re: SEDRA Foundation x Potential.com — Next steps. Vera was copied on the lesson-plan/branding thread. Use that thread for the original source attachments if team access to the links below is unavailable.
+CRM: SEDRA Foundation - Accessible Life Skills & Hospitality Learning Platform; Qualified, Rawzaba owner. Materials received; next action mockup and proposed walkthrough, no award or budget agreed.
+Life Skills lesson plan: https://chatgpt.com/library?file_id=libfile_6823947f615c8191a9205530e74967dc&account_id=6570d0b7-1521-4785-852e-8c295fcfa187
+Hospitality lesson plan: https://chatgpt.com/library?file_id=libfile_a5d78413023481918681d96894a83a9d&account_id=6570d0b7-1521-4785-852e-8c295fcfa187
+SEDRA logo: https://chatgpt.com/library?file_id=libfile_56d5750d86b481918635be10101771ba&account_id=6570d0b7-1521-4785-852e-8c295fcfa187
+Brand palette: https://chatgpt.com/library?file_id=libfile_4c78d11e3e908191852bb14f6e565164&account_id=6570d0b7-1521-4785-852e-8c295fcfa187
+These reference links retain existing account permissions; they do not grant Aliya or Vera access. Vera can forward the original client source attachments to Aliya through the existing team workflow.

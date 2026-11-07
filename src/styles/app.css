@@ -1,0 +1,232 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource/noto-sans/400.css";
+@import "@fontsource/noto-sans/500.css";
+@import "@fontsource/noto-sans/600.css";
+@import "@fontsource/noto-sans/700.css";
+@import "@fontsource/noto-sans-arabic/400.css";
+@import "@fontsource/noto-sans-arabic/500.css";
+@import "@fontsource/noto-sans-arabic/600.css";
+@import "@fontsource/noto-sans-arabic/700.css";
+
+/*
+  SEDRA visual system (brief §4). Measured contrast on white:
+    #4b662f 6.48:1  primary action, headings, key text on white; white on it for buttons
+    #6d923d 3.60:1  secondary accent: large text (>=24px or 18.66px bold) and non-text only
+    #98ac3c 2.53:1  decorative accent, non-essential progress illustration only, never text
+    #86754c 4.50:1  brand accent / logo colour; borderline, avoid for small text
+    #becc96 1.71:1  light panel background, always with dark text (--ink)
+  Body text uses --ink (near black). Pale green is a panel colour, never small text on white.
+*/
+:root {
+  --radius: 0.875rem;
+
+  --sedra-green: #4b662f;
+  --sedra-green-800: #3c5225;
+  --sedra-green-700: #44602a;
+  --sedra-mid: #6d923d;
+  --sedra-lime: #98ac3c;
+  --sedra-pale: #becc96;
+  --sedra-pale-50: #f3f6ea;
+  --sedra-pale-100: #e6edd5;
+  --sedra-brown: #86754c;
+
+  --ink: #1d2617;
+  --ink-soft: #46523d;
+
+  --background: #ffffff;
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --card-foreground: var(--ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--ink);
+  --primary: var(--sedra-green);
+  --primary-foreground: #ffffff;
+  --secondary: var(--sedra-pale-50);
+  --secondary-foreground: var(--ink);
+  --muted: var(--sedra-pale-50);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--sedra-pale-100);
+  --accent-foreground: var(--ink);
+  --destructive: #a1291f;
+  --border: #c9d3b8;
+  --input: #8b9a7a;
+  --ring: var(--ink);
+
+  /* status: always icon + text, never colour alone */
+  --success: #2f5a1b;
+  --success-soft: #e7f0dc;
+  --info: #1f4e79;
+  --info-soft: #e5eef7;
+  --notice: #6b4f12;
+  --notice-soft: #fbf3df;
+
+  --font-family: "Noto Sans", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+}
+
+html[lang="ar"] {
+  --font-family: "Noto Sans Arabic", "Noto Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Black/white high contrast option (brief §3 Contrast). */
+html[data-contrast="high"] {
+  --sedra-green: #000000;
+  --sedra-green-800: #000000;
+  --sedra-green-700: #000000;
+  --sedra-mid: #000000;
+  --sedra-lime: #000000;
+  --sedra-pale: #ffffff;
+  --sedra-pale-50: #ffffff;
+  --sedra-pale-100: #ffffff;
+  --sedra-brown: #000000;
+  --ink: #000000;
+  --ink-soft: #000000;
+  --background: #ffffff;
+  --foreground: #000000;
+  --primary: #000000;
+  --secondary: #ffffff;
+  --muted: #ffffff;
+  --muted-foreground: #000000;
+  --accent: #ffffff;
+  --border: #000000;
+  --input: #000000;
+  --success: #000000;
+  --success-soft: #ffffff;
+  --info: #000000;
+  --info-soft: #ffffff;
+  --notice: #000000;
+  --notice-soft: #ffffff;
+}
+
+/* Text size control: 100 / 125 / 150 %. Everything is sized in rem. */
+html {
+  font-size: 100%;
+}
+html[data-text="125"] {
+  font-size: 125%;
+}
+html[data-text="150"] {
+  font-size: 150%;
+}
+
+@theme inline {
+  --font-sans: var(--font-family);
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: calc(var(--radius) - 2px);
+  --radius-xl: var(--radius);
+  --radius-2xl: calc(var(--radius) + 4px);
+
+  --color-sedra-green: var(--sedra-green);
+  --color-sedra-green-800: var(--sedra-green-800);
+  --color-sedra-green-700: var(--sedra-green-700);
+  --color-sedra-mid: var(--sedra-mid);
+  --color-sedra-lime: var(--sedra-lime);
+  --color-sedra-pale: var(--sedra-pale);
+  --color-sedra-pale-50: var(--sedra-pale-50);
+  --color-sedra-pale-100: var(--sedra-pale-100);
+  --color-sedra-brown: var(--sedra-brown);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-notice: var(--notice);
+  --color-notice-soft: var(--notice-soft);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    /* Brief §3 Reading: default learner body 18px, generous line spacing, never justified. */
+    font-size: 1.125rem;
+    line-height: 1.65;
+    text-align: start;
+  }
+  h1,
+  h2,
+  h3 {
+    color: var(--sedra-green);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  p,
+  li {
+    text-align: start;
+    max-width: 70ch;
+  }
+  /* Visible focus ring everywhere (brief §3 Keyboard). Dark ring + white halo works on any fill. */
+  :focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 3px #ffffff;
+    border-radius: 6px;
+  }
+  /* URLs and IDs stay left-to-right inside Arabic text (brief §4). */
+  .ltr-isolate {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+}
+
+/* Reduced motion: system setting OR learner preference turns all motion off. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= 48rem) {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* Directional icons (arrows, chevrons) mirror in RTL; media, logos and player controls do not. */
+@utility rtl-mirror {
+  [dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+}

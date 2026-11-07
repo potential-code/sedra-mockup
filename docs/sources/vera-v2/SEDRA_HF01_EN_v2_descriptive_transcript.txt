@@ -1,0 +1,17 @@
+SEDRA HF01 A warm welcome (English, v2)
+Descriptive transcript
+
+[00.0–07.5 s] A guest enters reception. Labels read: Welcome, Safe, Comfortable.
+Narrator: Hospitality means helping people feel welcome, safe and comfortable.
+
+[07.5–15.0 s] The host offers a welcome card that reads Hello, and waits.
+Narrator: Say hello in a way that works for you.
+
+[15.0–22.5 s] The host offers a card that reads How can I help? The guest indicates a direction symbol.
+Narrator: Ask, How can I help? Then give the guest time to respond.
+
+[22.5–30.0 s] The host points to a simple map. Label: A kind welcome. The final scene holds.
+Narrator: A kind welcome can make a difference.
+
+Thumbnail alt text: A host offers a welcome card to a guest at reception.
+Narration: synthetic voice (Kokoro TTS, voice af_heart). No music or sound effects.

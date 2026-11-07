@@ -1,0 +1,50 @@
+{
+  "brand": "SEDRA learning",
+  "skipToMain": "Skip to main content",
+  "continueLearning": "Continue learning",
+  "next": "Next",
+  "back": "Back",
+  "playVideo": "Play video",
+  "replay": "Replay",
+  "readTranscript": "Read transcript",
+  "checkAnswer": "Check answer",
+  "tryAgain": "Try again",
+  "needHelp": "I need help",
+  "myProgress": "My progress",
+  "lifeSkills": "Life Skills",
+  "hospitalityForAll": "Hospitality for All",
+  "nav": {
+    "label": "Main",
+    "home": "Home",
+    "learn": "Learn",
+    "sessions": "Sessions",
+    "help": "Help"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "ar": "العربية",
+    "switchTo": "Switch language"
+  },
+  "preferences": "Preferences",
+  "signOut": "Sign out",
+  "demo": {
+    "banner": "Demo mockup. Fictional data. Progress is saved in this browser only and is not a production learner record.",
+    "mode": "Demo mode",
+    "switchUser": "Switch demo user",
+    "reset": "Reset demo data",
+    "resetConfirmTitle": "Reset demo data?",
+    "resetConfirmBody": "All demo progress and records go back to the start. Your preferences stay.",
+    "resetDone": "Demo data reset.",
+    "cancel": "Cancel",
+    "confirm": "Reset",
+    "label": "Demo"
+  },
+  "footer": "Proposed experience for SEDRA review. Illustrative demo data. No accessibility or compliance certification is claimed.",
+  "notFound": {
+    "title": "Page not found",
+    "body": "This page does not exist in the demo.",
+    "home": "Go to home"
+  },
+  "logoAlt": "SEDRA Foundation"
+}
