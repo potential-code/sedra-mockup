@@ -106,10 +106,15 @@ export function PracticePanel({ unit }: { unit: Unit }) {
     updateUnitProgress(unit.id, { practiceChoices: next })
   }
 
+  const maxPick = unit.id === 'LS05' ? 2 : undefined
+
   function toggleChoice(i: number) {
     let next: number[]
     if (unit.practice.multiple) {
-      next = picked.includes(i) ? picked.filter((x) => x !== i) : [...picked, i]
+      if (picked.includes(i)) next = picked.filter((x) => x !== i)
+      // LS05 brief: "Choose two possible explanations".
+      else if (maxPick && picked.length >= maxPick) return
+      else next = [...picked, i]
     } else {
       next = picked.includes(i) ? [] : [i]
     }
@@ -141,7 +146,11 @@ export function PracticePanel({ unit }: { unit: Unit }) {
       {!isPlaybook && !sortCards && choices.length > 0 && (
         <fieldset className="m-0 border-0 p-0">
           <legend className="mb-2 p-0 font-semibold">
-            {unit.practice.multiple ? t('practice.chooseMany') : t('practice.chooseOne')}
+            {maxPick
+              ? t('practice.chooseTwo')
+              : unit.practice.multiple
+                ? t('practice.chooseMany')
+                : t('practice.chooseOne')}
           </legend>
           <div className="grid gap-2 sm:grid-cols-2">
             {choices.map((c, i) => (

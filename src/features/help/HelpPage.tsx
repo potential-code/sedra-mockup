@@ -67,7 +67,6 @@ function SupportForm() {
     e.preventDefault()
     const next: typeof errors = {}
     if (!topic) next.topic = t('help.errorTopic')
-    if (!message.trim()) next.message = t('help.errorMessage')
     setErrors(next)
     if (next.topic || next.message || !topic) {
       requestAnimationFrame(() => summaryRef.current?.focus())

@@ -59,11 +59,11 @@ export function LearnerShell() {
         </div>
       </header>
 
-      <main id="main" tabIndex={-1} className="flex-1 pb-28 outline-none md:pb-10">
+      <main id="main" tabIndex={-1} className="flex-1 pb-6 outline-none md:pb-10">
         <Outlet />
       </main>
 
-      <footer className="hidden border-t py-4 md:block">
+      <footer className="border-t py-4 pb-24 md:pb-4">
         <p className="container-page m-0 max-w-none text-sm text-ink-soft">{t('footer')}</p>
       </footer>
 

@@ -19,10 +19,10 @@ const buttonVariants = cva(
       // Brief §3: primary controls at least 48x48 CSS px; 8px spacing between targets.
       size: {
         default: "min-h-12 px-5 py-2 text-base has-[>svg]:px-4",
-        sm: "min-h-11 gap-1.5 px-4 text-base has-[>svg]:px-3",
+        sm: "min-h-12 gap-1.5 px-4 text-base has-[>svg]:px-3",
         lg: "min-h-14 px-7 text-lg has-[>svg]:px-6",
         icon: "size-12",
-        "icon-sm": "size-11",
+        "icon-sm": "size-12",
       },
     },
     defaultVariants: {

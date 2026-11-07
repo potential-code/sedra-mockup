@@ -41,7 +41,7 @@
     "play": "Play video",
     "pause": "Pause video",
     "playAgain": "Play again",
-    "replay": "Replay from the start",
+    "replay": "Replay",
     "captions": "Captions",
     "captionsTrack": "English captions",
     "mute": "Mute",
@@ -102,7 +102,8 @@
       "done": "Done",
       "later": "Later",
       "with-help": "With help"
-    }
+    },
+    "chooseTwo": "Choose two. Select a card again to change it."
   },
   "playbook": {
     "pauseLegend": "My pause card",
@@ -151,7 +152,10 @@
     "title": "You finished {{course}}",
     "body": "This shows your personal progress. You can revisit any unit at any time.",
     "bodyHospitality": "This shows your personal progress. It is not a professional qualification. You can revisit any unit at any time.",
-    "achievements": "My achievements"
+    "achievements": "My achievements",
+    "notYetTitle": "Last unit reviewed",
+    "notYetBody_one": "1 unit in this course is not finished yet. Open the course summary to see which one. Continue when you are ready.",
+    "notYetBody_other": "{{count}} units in this course are not finished yet. Open the course summary to see which ones. Continue when you are ready."
   },
   "extraVideo": "Watch additional video",
   "outline": {

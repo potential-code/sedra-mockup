@@ -23,7 +23,7 @@ export const Storyboard = forwardRef<HTMLHeadingElement, Props>(function Storybo
   headingRef,
 ) {
   const { t } = useTranslation('unit')
-  const { l } = useLocalized()
+  const { l, lang } = useLocalized()
 
   return (
     <section aria-labelledby={`${unit.id}-read`} className="flex flex-col gap-4">
@@ -39,7 +39,11 @@ export const Storyboard = forwardRef<HTMLHeadingElement, Props>(function Storybo
             <h4 className="m-0 text-lg font-bold text-ink">
               {t('read.scene', { n: i + 1 })}{' '}
               <span className="font-normal text-ink-soft">
-                (<span className="ltr-isolate">{s.time}</span>)
+                (
+                <span className="ltr-isolate">
+                  {lang === 'ar' ? s.time.replace(/ s$/, ' ث') : s.time}
+                </span>
+                )
               </span>
             </h4>
             <dl className="m-0 mt-2 grid gap-2">

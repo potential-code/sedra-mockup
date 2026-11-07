@@ -30,6 +30,7 @@ import { usePageTitle } from '@/hooks/use-page-title'
 import { useLocalized } from '@/i18n'
 import {
   getUnitProgress,
+  isUnitComplete,
   setLastLocation,
   updateUnitProgress,
   useLearner,
@@ -290,7 +291,16 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
           </section>
 
           {step !== 'media' && progress.checkReviewed && (
-            <AfterReview unit={unit} course={course} isLast={isLast} simplified={simplified} />
+            <AfterReview
+              unit={unit}
+              course={course}
+              isLast={isLast}
+              simplified={simplified}
+              unitComplete={isUnitComplete(progress)}
+              unfinishedInCourse={
+                units.filter((u) => !isUnitComplete(getUnitProgress(learner, u.id))).length
+              }
+            />
           )}
 
           {/* Sticky action area: the one prominent next step (brief §3 mobile layout). */}
@@ -411,11 +421,16 @@ function AfterReview({
   course,
   isLast,
   simplified,
+  unitComplete,
+  unfinishedInCourse,
 }: {
   unit: Unit
   course: Course
   isLast: boolean
   simplified: boolean
+  /** Brief §4: complete = watch or read done + check reviewed. */
+  unitComplete: boolean
+  unfinishedInCourse: number
 }) {
   const { t } = useTranslation('unit')
   const { l } = useLocalized()
@@ -423,7 +438,7 @@ function AfterReview({
 
   return (
     <div className="flex flex-col gap-3">
-      {unit.badge && (
+      {unit.badge && unitComplete && (
         <section
           aria-labelledby="badge-title"
           className="flex items-start gap-3 rounded-2xl border-2 border-sedra-green bg-white p-4"
@@ -443,12 +458,16 @@ function AfterReview({
           className="flex flex-col gap-2 rounded-2xl bg-sedra-pale-50 p-4"
         >
           <h2 id="complete-title" className="m-0 text-xl">
-            {t('complete.title', { course: l(course.title) })}
+            {unfinishedInCourse === 0
+              ? t('complete.title', { course: l(course.title) })
+              : t('complete.notYetTitle')}
           </h2>
           <p className="m-0">
-            {unit.programmeId === 'hospitality'
-              ? t('complete.bodyHospitality')
-              : t('complete.body')}
+            {unfinishedInCourse > 0
+              ? t('complete.notYetBody', { count: unfinishedInCourse })
+              : unit.programmeId === 'hospitality'
+                ? t('complete.bodyHospitality')
+                : t('complete.body')}
           </p>
           <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline">
@@ -469,6 +488,7 @@ function AfterReview({
       {unit.id === 'LS01' && !simplified && (
         <Link
           to="/resources"
+          hash="ext01"
           className="inline-flex min-h-12 items-center gap-2 self-start font-semibold text-sedra-green underline underline-offset-4"
         >
           <ExternalLink aria-hidden="true" className="size-5" />
