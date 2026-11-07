@@ -82,6 +82,11 @@ export function setLastLocation(loc: LastLocation, programme: ProgrammeId) {
   patchLearner((l) => ({ ...l, lastLocation: loc, lastProgramme: programme }))
 }
 
+/** Remember the programme the learner last opened (bottom nav 'Learn' follows it). */
+export function setLastProgramme(programme: ProgrammeId) {
+  patchLearner((l) => (l.lastProgramme === programme ? l : { ...l, lastProgramme: programme }))
+}
+
 export function setOnboarded() {
   patchLearner((l) => ({ ...l, onboarded: true }))
 }

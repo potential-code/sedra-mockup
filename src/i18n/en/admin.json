@@ -1,1 +1,391 @@
-{}
+{
+  "nav": {
+    "overview": "Overview",
+    "learners": "Learners",
+    "content": "Programmes & content",
+    "sessions": "Sessions",
+    "resources": "Resources",
+    "reports": "Reports",
+    "future": "Future options"
+  },
+  "shell": {
+    "badge": "Admin · demo role",
+    "navLabel": "Admin"
+  },
+  "common": {
+    "demo": "Demo",
+    "illustrative": "Illustrative demo data",
+    "simulated": "Simulated",
+    "required": "required",
+    "cancel": "Cancel",
+    "uaeTime": "(UAE time)",
+    "opensNewTab": "(opens in a new tab)"
+  },
+  "programme": {
+    "life-skills": "Life Skills",
+    "hospitality": "Hospitality for All"
+  },
+  "course": {
+    "healthy-communication": "Healthy Communication",
+    "intro-hospitality": "Introduction to Hospitality"
+  },
+  "media": {
+    "sample": "Sample video (v2)",
+    "pending": "Video pending production"
+  },
+  "review": {
+    "awaiting": "Awaiting SEDRA review",
+    "draft": "Draft (demo)",
+    "in-review": "In review (demo)",
+    "approved": "Approved in demo"
+  },
+  "overview": {
+    "title": "Overview",
+    "intro": "A summary of the fictional learners in this demo. All numbers are illustrative.",
+    "totalsHeading": "Demo totals",
+    "cards": {
+      "enrolled": "Enrolled learners",
+      "active": "Active in the last seven days",
+      "hcCompletions": "Healthy Communication completions",
+      "hfCompletions": "Hospitality completions",
+      "openSupport": "Open support requests"
+    },
+    "cardHints": {
+      "enrolled": "Unique people. Enrolment in both programmes counts once.",
+      "active": "Opened a unit or session in the last seven days.",
+      "hcCompletions": "Completed all 8 units of Healthy Communication (Life Skills).",
+      "hfCompletions": "Completed all 8 units of Introduction to Hospitality.",
+      "openSupport": "Requests saved in this demo, including any sent from the Help page."
+    },
+    "definitionsHeading": "How these numbers are counted",
+    "activeTerm": "Active:",
+    "activeDefinition": "the learner opened a unit or a session in the last seven days.",
+    "countOnce": "Enrolment in both programmes counts once.",
+    "breakdownFormula": "{{ls}} + {{hf}} − {{both}} = {{total}}",
+    "breakdownText": "{{ls}} Life Skills enrolments plus {{hf}} Hospitality enrolments, minus {{both}} learners enrolled in both, equals {{total}} unique learners. Programme totals are not added together as people.",
+    "viewLearners": "View the learner table",
+    "timeNote": "Demo reference time: {{date}} (UAE time)."
+  },
+  "support": {
+    "heading": "Support requests",
+    "intro": "Requests saved in this demo only. No notification is sent to anyone.",
+    "tableLabel": "Support requests table",
+    "caption": "Support requests (demo). Times are shown in UAE time.",
+    "cols": {
+      "request": "Request",
+      "topic": "Topic",
+      "learner": "Learner",
+      "received": "Received",
+      "status": "Status"
+    },
+    "topics": {
+      "signing-in": "Signing in",
+      "lesson": "A lesson",
+      "live-session": "A live session"
+    },
+    "status": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "fromDemoLearner": "Demo learner (Help page)",
+    "empty": "No support requests in this demo."
+  },
+  "learners": {
+    "title": "Learners",
+    "intro": "Fictional learners for this demo. No medical details, diagnoses or rankings are recorded.",
+    "filters": {
+      "legend": "Filter learners",
+      "programme": "Programme",
+      "progress": "Progress",
+      "programmeOptions": {
+        "all": "All programmes",
+        "life-skills": "Life Skills",
+        "hospitality": "Hospitality for All",
+        "both": "Enrolled in both"
+      },
+      "progressOptions": {
+        "all": "All progress",
+        "not-started": "Not started",
+        "in-progress": "In progress",
+        "completed": "Completed a course"
+      }
+    },
+    "showing": "Showing {{shown}} of {{total}} learners.",
+    "tableLabel": "Learner table",
+    "caption": "Fictional learners (demo). Latest activity is shown in UAE time.",
+    "cols": {
+      "learner": "ID and name",
+      "programmes": "Programme enrolments",
+      "progress": "Unit progress",
+      "latest": "Latest activity",
+      "checks": "Reviewed check outcomes",
+      "support": "Support"
+    },
+    "unitsOf": "{{course}}: {{done}} of 8 units",
+    "activeYes": "Active in the last seven days",
+    "activeNo": "Not active in the last seven days",
+    "checksSummary": "{{reviewed}} reviewed, {{firstTry}} correct on first try",
+    "supportOpen": "Open request",
+    "supportNone": "No open request",
+    "empty": "No learners match these filters. Choose different filters."
+  },
+  "learnerDetail": {
+    "back": "Back to learners",
+    "title": "Learner: {{name}}",
+    "fictional": "Fictional learner (demo)",
+    "unitsHeading": "Units completed",
+    "unitsDone": "{{done}} of {{total}} units completed",
+    "courseComplete": "Course completed",
+    "practiceHeading": "Practice status",
+    "practiceNote": "Practice is optional and never blocks progress.",
+    "practiceDone": "Done",
+    "practiceLater": "Later",
+    "practiceWithHelp": "With help",
+    "activityHeading": "Activity and support",
+    "privacy": "This view shows learning progress only. It has no medical details, no diagnosis and no ranking against other learners.",
+    "notFoundTitle": "Learner not found",
+    "notFoundBody": "There is no demo learner with this ID."
+  },
+  "content": {
+    "title": "Programmes & content",
+    "intro": "Both demo courses and all 16 units. Open a unit to edit its draft.",
+    "reviewNote": "English text is the content-entry master. Arabic text is a draft for SEDRA review. Only LS02 and HF01 have produced English sample videos.",
+    "notLoaded": "Course content is not loaded yet.",
+    "courseMeta": "{{units}} units.",
+    "tableLabel": "{{course}} units table",
+    "caption": "{{course}}: units, languages, media and review status (demo).",
+    "cols": {
+      "unit": "Unit",
+      "languages": "Languages",
+      "media": "Media status",
+      "review": "Review status",
+      "action": "Action"
+    },
+    "unitOrder": "Unit {{order}} of 8",
+    "langEn": "English: text and check",
+    "langEnVideo": "English: text, check and video",
+    "langAr": "Arabic: draft text, needs review",
+    "edit": "Edit {{id}}"
+  },
+  "editor": {
+    "back": "Back to programmes & content",
+    "title": "Edit {{id}}: {{title}}",
+    "intro": "Fields are filled from the current content. Changes are saved in this demo only.",
+    "demoTag": "Demo editor. Nothing is published.",
+    "notFoundTitle": "Unit not found",
+    "notFoundBody": "There is no unit with this ID in the demo content.",
+    "sections": {
+      "language": "Draft language",
+      "identifiers": "Identifiers",
+      "lesson": "Lesson text",
+      "media": "Video and captions",
+      "alternatives": "Text alternatives",
+      "check": "Check",
+      "practice": "Practice",
+      "review": "Review"
+    },
+    "lang": {
+      "en": "English",
+      "ar": "Arabic"
+    },
+    "languageHint": "Switch to edit the other language. Your text in each language is kept.",
+    "lastSaved": "Last saved in this demo: {{date}} (UAE time).",
+    "notSaved": "No demo draft saved yet for this language.",
+    "identifiersHint": "Identifiers connect assets and progress. They cannot be changed here.",
+    "alternativesHint": "A transcript and image description are an equal way to learn. Both are required.",
+    "optionsLegend": "Answer options",
+    "optionLetter": "Option {{letter}}",
+    "chooseOne": "Choose one",
+    "reviewHint": "Review status in this demo only. SEDRA reviewers approve content before any launch.",
+    "fields": {
+      "programme_id": "Programme ID",
+      "course_id": "Course ID",
+      "unit_id": "Unit ID",
+      "order": "Order",
+      "language": "Language",
+      "title": "Title",
+      "objective": "Objective",
+      "source_pages": "Source pages",
+      "video_url": "Video file",
+      "duration_seconds": "Video length in seconds",
+      "captions_url": "Captions file",
+      "transcript": "Transcript",
+      "summary": "Summary",
+      "image_alt": "Image description",
+      "question": "Question",
+      "options_A": "Option A",
+      "options_B": "Option B",
+      "options_C": "Option C",
+      "correct_option": "Correct option",
+      "feedback_correct": "Feedback when correct",
+      "feedback_retry": "Feedback to try again",
+      "practice_prompt": "Practice prompt",
+      "media_status": "Media status",
+      "review_status": "Review status"
+    },
+    "hints": {
+      "video_url": "The file name must contain the unit ID {{id}}. Leave empty while the video is pending.",
+      "duration_seconds": "Unit videos are 30 seconds.",
+      "captions_url": "The file name must contain the unit ID {{id}}."
+    },
+    "errors": {
+      "title": "Enter a title.",
+      "language": "Choose English or Arabic.",
+      "summary": "Enter a summary.",
+      "question": "Enter the check question.",
+      "option": "Enter the text for this option.",
+      "correct": "Choose the correct option.",
+      "imageAlt": "Enter an image description.",
+      "transcript": "Enter a transcript.",
+      "duration": "Unit videos must be 30 seconds.",
+      "assetId": "Asset ID does not match this unit.",
+      "sampleNeedsVideo": "A sample video needs a video file. Or set media status to Video pending production."
+    },
+    "errorSummary": "There are {{n}} things to fix before publishing",
+    "errorSummaryHelp": "Your text is kept. Select an item to go to it.",
+    "saveDraft": "Save draft (demo)",
+    "publish": "Publish (demo)",
+    "savedToast": "Saved in this demo only. Nothing is published.",
+    "publishToast": "Simulated: all publishing checks passed.",
+    "simulated": "Simulated. Drafts stay in this browser. Real publishing needs content review, hosting and permissions."
+  },
+  "sessions": {
+    "title": "Sessions",
+    "intro": "Demo live sessions. Times are shown in UAE time.",
+    "integrationNote": "Production Zoom attendance and recording publishing require configuration and review. In this demo, nothing is booked, synced or uploaded.",
+    "when": "Date and time",
+    "demoLink": "demo link",
+    "fields": {
+      "programme": "Programme",
+      "titleEn": "Title in English",
+      "titleAr": "Title in Arabic",
+      "dateTimeLegend": "Date, time and timezone",
+      "date": "Date",
+      "time": "Time",
+      "timezone": "Timezone",
+      "accessLink": "Access link",
+      "attendance": "Attendance status",
+      "recording": "Recording status"
+    },
+    "attendance": {
+      "upcoming": "Upcoming",
+      "attended": "Attended (demo record)",
+      "not-attended": "Not attended (no penalty)"
+    },
+    "recording": {
+      "pending": "Pending recording",
+      "available": "Marked available (demo label, no file)"
+    },
+    "placeholdersLabel": "Recording placeholders for {{title}}",
+    "captionedRecording": "Captioned recording",
+    "transcript": "Transcript",
+    "pendingRecording": "Pending recording",
+    "edit": "Edit session",
+    "editTitle": "Edit session: {{title}}",
+    "editIntro": "Changes are saved in this demo only.",
+    "timezoneHint": "UAE time (UTC+4).",
+    "accessLinkHint": "Starts with https://. No meeting is created.",
+    "attendanceHint": "Entered by hand in this demo. No Zoom attendance sync.",
+    "recordingHint": "Changing this does not upload a recording.",
+    "save": "Save session (demo)",
+    "savedToast": "Session saved in this demo only.",
+    "savedDescription": "Simulated. No Zoom booking, invitation or recording upload happened.",
+    "errors": {
+      "title": "Enter a title.",
+      "dateTime": "Enter a valid date and time.",
+      "link": "Enter a link that starts with https://."
+    }
+  },
+  "resources": {
+    "title": "Resources",
+    "intro": "External and in-platform resources, with their internal review status.",
+    "ext": {
+      "reviewStatus": "External resource pending content and accessibility review",
+      "placement": "Placement",
+      "placementValue": "{{course}} → Resources, with a secondary “Watch additional video” link after LS01.",
+      "originalUrl": "Original URL",
+      "embedUrl": "Embed URL",
+      "fallbackLabel": "Fallback label",
+      "completion": "Course completion",
+      "notRequired": "Not required for completion",
+      "reviewNote": "Before learner release, review the full video, age suitability, relevance, rights, English and Arabic captions and a descriptive alternative. Its subject is not described until it has been viewed.",
+      "showPreview": "Show embed preview",
+      "hidePreview": "Hide embed preview",
+      "iframeTitle": "Embedded video: {{title}} (internal review preview)"
+    },
+    "internal": {
+      "heading": "In-platform resources",
+      "intro": "HTML summaries learners can read on any device. No PDF is required to finish a lesson.",
+      "status": "HTML summary available",
+      "download": "Downloads are secondary and optional.",
+      "items": {
+        "stopThinkDo": {
+          "title": "Stop Think Do guide",
+          "body": "The three steps from LS02 as a short readable guide."
+        },
+        "playbook": {
+          "title": "My communication playbook",
+          "body": "The learner’s pause card and communication card from LS08."
+        },
+        "hospitalityPlan": {
+          "title": "Hospitality practice plan",
+          "body": "One welcoming action to try today, from HF08."
+        }
+      }
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "intro": "A summary of the fictional demo data and a simulated export.",
+    "tableLabel": "Report summary table",
+    "caption": "Report summary (illustrative demo data).",
+    "cols": {
+      "measure": "Measure",
+      "value": "Value"
+    },
+    "rows": {
+      "enrolled": "Unique enrolled learners",
+      "lifeSkills": "Life Skills enrolments",
+      "hospitality": "Hospitality for All enrolments",
+      "both": "Learners enrolled in both programmes",
+      "active": "Active in the last seven days",
+      "hcCompletions": "Healthy Communication completions",
+      "hfCompletions": "Hospitality completions",
+      "openSupport": "Open support requests"
+    },
+    "exportHeading": "Export",
+    "exportBody": "Download the fictional learner table as {{file}}. The first line of the file says Demo data.",
+    "exportNote": "The file is created in your browser from demo data. No server, real learner record or live system is used.",
+    "export": "Export CSV (demo)",
+    "exportToast": "Simulated export: demo CSV downloaded.",
+    "exportDescription": "Created in this browser from fictional demo data only."
+  },
+  "future": {
+    "title": "Future options",
+    "intro": "Ideas to discuss with SEDRA later. Visible to admins only.",
+    "notCore": "Not part of core learning or prerequisites.",
+    "note": "None of these options appear in learner navigation, and none are needed to learn. Any option would need SEDRA approval, consent rules and learner testing first.",
+    "options": {
+      "ai": {
+        "title": "AI assistance",
+        "body": "Possible help with reading, summaries or practice ideas, chosen by the learner."
+      },
+      "employer": {
+        "title": "Employer and internship access",
+        "body": "Possible links to supported work experience, with learner consent."
+      },
+      "mentorship": {
+        "title": "Mentorship",
+        "body": "Possible pairing with a trained mentor for regular check-ins."
+      },
+      "membership": {
+        "title": "Paid membership",
+        "body": "Possible paid extras. Core learning would not depend on membership."
+      },
+      "regional": {
+        "title": "Regional expansion",
+        "body": "Possible use by partners in other regions, after local review."
+      }
+    }
+  }
+}

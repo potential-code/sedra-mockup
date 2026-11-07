@@ -36,7 +36,7 @@ export function AdminShell() {
             className="me-2 rounded-lg"
             aria-label={t('nav.overview', { defaultValue: 'Overview' })}
           >
-            <Logo className="h-12" />
+            <Logo className="h-16 md:h-20" />
           </Link>
           <p className="m-0 me-auto rounded-lg bg-sedra-pale-100 px-3 py-1 text-sm font-semibold text-ink">
             {t('shell.badge', { defaultValue: 'Admin · demo role' })}

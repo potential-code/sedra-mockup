@@ -1,0 +1,174 @@
+{
+  "unitOf": "Unit {{n}} of {{total}}",
+  "nav": {
+    "backToCourse": "Back to {{course}}",
+    "unitNav": "Units",
+    "previousUnit": "Previous unit",
+    "nextUnit": "Next unit",
+    "courseOverview": "Course overview",
+    "courseSummary": "Course summary",
+    "finishCourse": "Finish course"
+  },
+  "steps": {
+    "label": "Unit steps",
+    "media": "Watch or read",
+    "check": "Question",
+    "practice": "Practice",
+    "mediaTitle": "Watch or read",
+    "checkTitle": "Try one question",
+    "practiceTitle": "Practise if you wish",
+    "done": "Done",
+    "reviewed": "Reviewed",
+    "notYet": "Not yet",
+    "optional": "Optional"
+  },
+  "actions": {
+    "toQuestion": "Next: question",
+    "toPractice": "Practise (optional)",
+    "backToLesson": "Back to the lesson",
+    "backToQuestion": "Back to the question",
+    "checkHint": "Take your time. There is no time limit."
+  },
+  "media": {
+    "routeLabel": "How would you like to learn?",
+    "watch": "Watch video",
+    "markWatched": "I have watched",
+    "watchedStatus": "Watched. You can watch again at any time.",
+    "doneAnnounce": "Saved: watch or read done."
+  },
+  "player": {
+    "label": "Video: {{title}}",
+    "play": "Play video",
+    "pause": "Pause video",
+    "playAgain": "Play again",
+    "replay": "Replay from the start",
+    "captions": "Captions",
+    "captionsTrack": "English captions",
+    "mute": "Mute",
+    "volume": "Volume",
+    "speed": "Playback speed",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Exit full screen",
+    "position": "Video position",
+    "time": "Time",
+    "timeOf": "{{current}} of {{total}}"
+  },
+  "transcript": {
+    "descriptive": "Read descriptive transcript",
+    "loading": "Loading the text…"
+  },
+  "pending": {
+    "title": "Video being prepared",
+    "body": "The video for this unit is being prepared. Read the lesson below. It has the same steps.",
+    "bodyArabic": "The Arabic video is being prepared. Read the lesson below. It has the same steps."
+  },
+  "read": {
+    "action": "Read lesson",
+    "title": "Read the lesson",
+    "scene": "Scene {{n}}",
+    "narration": "What the voice says",
+    "onScreen": "Text on screen",
+    "visual": "What you see",
+    "markRead": "I have read this",
+    "doneStatus": "Read. You can read again at any time."
+  },
+  "summary": {
+    "title": "Summary",
+    "readAloud": "Read aloud",
+    "stop": "Stop reading",
+    "simulated": "Demo: read-aloud is simulated. The underlined sentence shows where the voice would be."
+  },
+  "check": {
+    "errorSummaryTitle": "There is a problem",
+    "errorChoose": "Choose one answer, then select Check answer.",
+    "yourChoice": "Your choice",
+    "correctTitle": "Well done",
+    "hintTitle": "Here is a hint",
+    "readLesson": "Read the lesson",
+    "continueWithSupport": "Continue with support",
+    "supportTitle": "You can continue",
+    "supportAnswer": "The answer is {{id}}: {{text}}",
+    "supportBody": "You can select Next when you are ready, or ask a supporter for help."
+  },
+  "practice": {
+    "chooseOne": "Choose one",
+    "chooseMany": "Choose one or more",
+    "statusLegend": "How did it go?",
+    "planFirst": "Choose an action first. Then you can mark it Planned, Done, Later or With help.",
+    "optionalNote": "Practice is optional. It does not stop you moving on.",
+    "saved": "Saved: {{status}}",
+    "status": {
+      "planned": "Planned",
+      "done": "Done",
+      "later": "Later",
+      "with-help": "With help"
+    }
+  },
+  "playbook": {
+    "pauseLegend": "My pause card",
+    "messageLegend": "My communication card",
+    "message": {
+      "talk": "Can we talk?",
+      "help": "I need help"
+    },
+    "save": "Save my reminder",
+    "chooseBoth": "Choose one pause card and one communication card, then select Save my reminder.",
+    "savedAnnounce": "Your reminder is saved.",
+    "cardTitle": "My reminder",
+    "steps": "Stop, Think, Do",
+    "myPause": "My pause:",
+    "myMessage": "My message:",
+    "print": "Print my reminder"
+  },
+  "sort": {
+    "helpful": "Helpful",
+    "notHelpful": "Not helpful",
+    "cards": {
+      "clearDirections": "Gives clear directions",
+      "ignores": "Ignores the guest",
+      "waits": "Waits for a response",
+      "interrupts": "Interrupts the guest"
+    },
+    "feedback": {
+      "clearDirections": "Yes. Clear directions help the guest.",
+      "ignores": "Yes. Ignoring a guest can make them feel unwelcome.",
+      "waits": "Yes. Waiting gives the guest time to answer.",
+      "interrupts": "Yes. Interrupting can make it hard for the guest to share."
+    },
+    "thinkAgain": "Think about how the guest feels. You can change your choice for \"{{card}}\".",
+    "feelingLegend": "How did the roleplay feel? (optional)",
+    "feelings": {
+      "comfortable": "Comfortable",
+      "unsure": "Unsure",
+      "another": "Another feeling"
+    }
+  },
+  "badge": {
+    "title": "Milestone: {{badge}}",
+    "body": "You practised a new skill. Continue when you are ready."
+  },
+  "complete": {
+    "title": "You finished {{course}}",
+    "body": "This shows your personal progress. You can revisit any unit at any time.",
+    "bodyHospitality": "This shows your personal progress. It is not a professional qualification. You can revisit any unit at any time.",
+    "achievements": "My achievements"
+  },
+  "extraVideo": "Watch additional video",
+  "outline": {
+    "title": "{{course}}: units",
+    "complete": "Complete",
+    "inProgress": "In progress",
+    "notStarted": "Not started"
+  },
+  "leave": {
+    "title": "Leave this unit?",
+    "body": "You have not finished this unit yet. Your progress is saved. You can come back at any time.",
+    "keep": "Keep learning",
+    "leave": "Leave and save"
+  },
+  "notFound": {
+    "title": "Unit not found",
+    "body": "We could not find this unit. Go back to your learning to choose a unit.",
+    "back": "Back to learning"
+  }
+}

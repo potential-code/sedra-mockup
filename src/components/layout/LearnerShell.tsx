@@ -30,7 +30,7 @@ export function LearnerShell() {
       <header className="border-b bg-white">
         <div className="container-page flex flex-wrap items-center gap-2 py-2">
           <Link to="/learn" className="me-auto rounded-lg" aria-label={t('nav.home')}>
-            <Logo className="h-12" />
+            <Logo className="h-16 md:h-20" />
           </Link>
           <nav aria-label={t('nav.label')} className="hidden md:block">
             <ul className="m-0 flex list-none gap-1 p-0">
