@@ -92,3 +92,28 @@ export function formatUaeDateTime(iso: string, lang: Lang): string {
 export function sortByStart(sessions: LiveSession[]): LiveSession[] {
   return [...sessions].sort((a, b) => a.startsAt.localeCompare(b.startsAt))
 }
+
+/** Programme status from its units: complete when all done, in progress once anything started. */
+export function programmeStatus(learner: LearnerState | null, units: Unit[]): UnitStatus {
+  if (units.length > 0 && completedCount(learner, units) === units.length) return 'complete'
+  return units.some((u) => unitStatus(getUnitProgress(learner, u.id)) !== 'notStarted')
+    ? 'inProgress'
+    : 'notStarted'
+}
+
+/** Parts for a calendar tile (UAE time). The full date stays in text next to the tile. */
+export function uaeDateParts(
+  iso: string,
+  lang: Lang,
+): { month: string; day: string; weekday: string; time: string } {
+  const locale = lang === 'ar' ? 'ar-AE' : 'en-AE'
+  const d = new Date(iso)
+  const part = (o: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat(locale, { ...o, timeZone: 'Asia/Dubai' }).format(d)
+  return {
+    month: part({ month: 'short' }),
+    day: part({ day: 'numeric' }),
+    weekday: part({ weekday: 'short' }),
+    time: part({ hour: 'numeric', minute: '2-digit' }),
+  }
+}

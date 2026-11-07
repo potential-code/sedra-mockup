@@ -3,15 +3,18 @@ import {
   AlertCircle,
   BookOpen,
   CheckCircle2,
+  Check as CheckIcon,
   HandHelping,
   Lightbulb,
   RotateCcw,
   Undo2,
 } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { announce } from '@/components/shared/LiveRegion'
 import { Button } from '@/components/ui/button'
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { useLocalized } from '@/i18n'
 import { cn } from '@/lib/utils'
 
@@ -54,6 +57,8 @@ export function KnowledgeCheck({
   const [outcome, setOutcome] = useState<CheckOutcome | undefined>(initialOutcome)
   const [error, setError] = useState(false)
   const [support, setSupport] = useState(false)
+  const [attempt, setAttempt] = useState(0)
+  const reduce = useReducedMotion()
   const ids = useId()
   const summaryRef = useRef<HTMLDivElement>(null)
   const supportRef = useRef<HTMLDivElement>(null)
@@ -83,6 +88,7 @@ export function KnowledgeCheck({
     }
     const result: CheckOutcome = selected === check.correct ? 'correct' : 'incorrect'
     setOutcome(result)
+    setAttempt((a) => a + 1)
     setSupport(false)
     onReview(selected, result)
     onDraftChange?.(selected, false)
@@ -102,14 +108,15 @@ export function KnowledgeCheck({
   }
 
   const correctOption = check.options.find((o) => o.id === check.correct)
+  const spring = { type: 'spring', stiffness: 260, damping: 24 } as const
 
   return (
-    <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+    <form onSubmit={submit} noValidate className="flex flex-col gap-5">
       {error && (
         <div
           ref={summaryRef}
           tabIndex={-1}
-          className="rounded-2xl border-2 border-destructive bg-white p-4"
+          className="rounded-2xl border-2 border-destructive bg-white p-4 shadow-sm"
         >
           <h3 id={`${ids}-summary-title`} className="m-0 flex items-center gap-2 text-lg">
             <AlertCircle aria-hidden="true" className="size-5 text-destructive" />
@@ -137,9 +144,10 @@ export function KnowledgeCheck({
         aria-describedby={error ? errorId : undefined}
         aria-invalid={error || undefined}
       >
-        <legend id={legendId} className="mb-3 p-0 text-xl font-bold text-ink">
+        <legend id={legendId} className="mb-1 p-0 text-2xl font-bold leading-snug text-ink">
           {l(check.question)}
         </legend>
+        <p className="m-0 mb-1 text-base text-ink-soft">{t('check.pick')}</p>
         {error && (
           <p id={errorId} className="m-0 flex items-start gap-2 font-semibold text-destructive">
             <AlertCircle aria-hidden="true" className="mt-1 size-5 shrink-0" />
@@ -153,11 +161,29 @@ export function KnowledgeCheck({
               key={o.id}
               htmlFor={`${ids}-${o.id}`}
               className={cn(
-                'flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border-2 bg-white px-4 py-3 text-lg',
-                'has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-ink has-[:focus-visible]:outline-offset-2',
-                checked ? 'border-sedra-green bg-sedra-pale-50' : 'border-input',
+                'group relative flex min-h-16 cursor-pointer items-center gap-3 rounded-2xl border-2 bg-white px-3 py-3 text-lg shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 sm:px-4',
+                'hover:border-sedra-green hover:shadow-md',
+                'has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink',
+                checked ? 'border-sedra-green bg-sedra-pale-50 shadow-md' : 'border-border',
               )}
             >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'hidden size-11 shrink-0 items-center justify-center rounded-xl text-lg font-bold transition-colors @xs:flex',
+                  checked
+                    ? 'bg-sedra-green text-white'
+                    : 'bg-sedra-pale-100 text-sedra-green group-hover:bg-sedra-pale',
+                )}
+              >
+                {o.id}
+              </span>
+              <span className="min-w-0 flex-1 font-medium">{l(o.text)}</span>
+              {checked && (
+                <span className="hidden shrink-0 rounded-full bg-white px-2.5 py-0.5 text-sm font-semibold text-sedra-green ring-1 ring-sedra-green min-[26rem]:inline">
+                  {t('check.yourChoice')}
+                </span>
+              )}
               <input
                 ref={i === 0 ? firstRadioRef : undefined}
                 id={`${ids}-${o.id}`}
@@ -166,46 +192,68 @@ export function KnowledgeCheck({
                 value={o.id}
                 checked={checked}
                 onChange={() => select(o.id)}
-                className="size-6 shrink-0 accent-sedra-green focus-visible:outline-none"
+                className={cn(
+                  'grid size-7 shrink-0 cursor-pointer appearance-none place-content-center rounded-full border-2 bg-white transition-colors focus-visible:outline-none',
+                  "before:size-3.5 before:scale-0 before:rounded-full before:bg-white before:transition-transform before:content-['']",
+                  'checked:border-sedra-green checked:bg-sedra-green checked:before:scale-100',
+                  checked ? 'border-sedra-green' : 'border-input',
+                )}
               />
-              <span aria-hidden="true" className="font-bold text-sedra-green">
-                {o.id}.
-              </span>
-              <span className="flex-1">{l(o.text)}</span>
-              {checked && (
-                <span className="text-base font-semibold text-sedra-green">
-                  {t('check.yourChoice')}
-                </span>
-              )}
             </label>
           )
         })}
       </fieldset>
 
-      <Button type="submit" size="lg" className="self-start">
+      <Button type="submit" size="lg" className="self-start shadow-md">
+        <CheckCircle2 aria-hidden="true" />
         {t('common:checkAnswer')}
       </Button>
 
       {outcome === 'correct' && (
-        <div className="flex items-start gap-3 rounded-2xl border-2 border-success bg-success-soft p-4">
-          <CheckCircle2 aria-hidden="true" className="mt-1 size-6 shrink-0 text-success" />
-          <div>
-            <h3 className="m-0 text-lg text-success">{t('check.correctTitle')}</h3>
-            <p className="m-0 mt-1">{l(check.feedbackCorrect)}</p>
+        <motion.div
+          key={`ok-${attempt}`}
+          initial={reduce ? false : { opacity: 0, y: 12, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={spring}
+          className="flex flex-col items-start gap-3 rounded-3xl border-2 border-success bg-success-soft p-3 shadow-md @md:flex-row @md:gap-4 @md:p-5"
+        >
+          <motion.span
+            aria-hidden="true"
+            initial={reduce ? false : { scale: 0, rotate: -45 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 14, delay: reduce ? 0 : 0.12 }}
+            className="flex size-14 shrink-0 items-center justify-center rounded-full bg-success text-white shadow-md"
+          >
+            <CheckIcon className="size-8" strokeWidth={3} />
+          </motion.span>
+          <div className="min-w-0">
+            <h3 className="m-0 text-2xl text-success">{t('check.correctTitle')}</h3>
+            <p className="m-0 mt-1 text-lg">{l(check.feedbackCorrect)}</p>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {outcome === 'incorrect' && (
-        <div className="flex flex-col gap-3 rounded-2xl border-2 border-notice bg-notice-soft p-4">
-          <div className="flex items-start gap-3">
-            <Lightbulb aria-hidden="true" className="mt-1 size-6 shrink-0 text-notice" />
-            <div>
-              <h3 className="m-0 text-lg text-notice">{t('check.hintTitle')}</h3>
-              <p className="m-0 mt-1">{l(check.feedbackRetry)}</p>
+        <motion.div
+          key={`hint-${attempt}`}
+          initial={reduce ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={spring}
+          className="flex flex-col gap-4 rounded-3xl border-2 border-notice/40 bg-notice-soft p-3 shadow-md @md:p-5"
+        >
+          <div className="flex flex-col items-start gap-3 @md:flex-row @md:gap-4">
+            <span
+              aria-hidden="true"
+              className="flex size-14 shrink-0 items-center justify-center rounded-full bg-white text-notice shadow-sm ring-2 ring-notice/30"
+            >
+              <Lightbulb className="size-7" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="m-0 text-2xl text-notice">{t('check.hintTitle')}</h3>
+              <p className="m-0 mt-1 text-lg">{l(check.feedbackRetry)}</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid gap-2 @xl:grid-cols-2">
             {onReplay && (
               <Button type="button" variant="outline" onClick={onReplay}>
                 <RotateCcw aria-hidden="true" />
@@ -226,8 +274,12 @@ export function KnowledgeCheck({
             </Button>
           </div>
           {support && correctOption && (
-            <div ref={supportRef} tabIndex={-1} className="rounded-xl border bg-white p-4">
-              <h4 id={`${ids}-support`} className="m-0 text-base font-bold text-ink">
+            <div
+              ref={supportRef}
+              tabIndex={-1}
+              className="rounded-2xl border bg-white p-4 shadow-sm"
+            >
+              <h4 id={`${ids}-support`} className="m-0 text-lg font-bold text-ink">
                 {t('check.supportTitle')}
               </h4>
               <p className="m-0 mt-1">
@@ -240,7 +292,7 @@ export function KnowledgeCheck({
               {supportExtra}
             </div>
           )}
-        </div>
+        </motion.div>
       )}
     </form>
   )

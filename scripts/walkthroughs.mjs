@@ -77,8 +77,8 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
   try {
     await signIn(page, 'Noor')
     await page.goto(url('/preferences'))
-    await page.getByRole('radio', { name: 'English' }).check()
-    await page.getByRole('radio', { name: '125%' }).check()
+    await page.getByRole('radio', { name: 'English' }).check({ force: true }) // visually hidden native radio inside a large label card
+    await page.getByRole('radio', { name: '125%' }).check({ force: true })
     await page.waitForTimeout(200)
     const html = await page.evaluate(() => ({
       lang: document.documentElement.lang,

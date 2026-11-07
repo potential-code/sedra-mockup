@@ -27,7 +27,8 @@
     "toPractice": "Practise (optional)",
     "backToLesson": "Back to the lesson",
     "backToQuestion": "Back to the question",
-    "checkHint": "Take your time. There is no time limit."
+    "checkHint": "Take your time. There is no time limit.",
+    "stepOf": "Step {{n}} of 3"
   },
   "media": {
     "routeLabel": "How would you like to learn?",
@@ -55,12 +56,16 @@
   },
   "transcript": {
     "descriptive": "Read descriptive transcript",
-    "loading": "Loading the text…"
+    "loading": "Loading the text…",
+    "title": "Text version",
+    "hint": "Choose a text version to read it here. It has everything the video shows and says."
   },
   "pending": {
     "title": "Video being prepared",
     "body": "The video for this unit is being prepared. Read the lesson below. It has the same steps.",
-    "bodyArabic": "The Arabic video is being prepared. Read the lesson below. It has the same steps."
+    "bodyArabic": "The Arabic video is being prepared. Read the lesson below. It has the same steps.",
+    "storyboard": "The lesson has {{count}} short scenes. Each scene is about 7 seconds.",
+    "chip": "30 second lesson"
   },
   "read": {
     "action": "Read lesson",
@@ -88,7 +93,8 @@
     "continueWithSupport": "Continue with support",
     "supportTitle": "You can continue",
     "supportAnswer": "The answer is {{id}}: {{text}}",
-    "supportBody": "You can select Next when you are ready, or ask a supporter for help."
+    "supportBody": "You can select Next when you are ready, or ask a supporter for help.",
+    "pick": "Choose one answer"
   },
   "practice": {
     "chooseOne": "Choose one",
@@ -103,7 +109,8 @@
       "later": "Later",
       "with-help": "With help"
     },
-    "chooseTwo": "Choose two. Select a card again to change it."
+    "chooseTwo": "Choose two. Select a card again to change it.",
+    "title": "Try it in real life"
   },
   "playbook": {
     "pauseLegend": "My pause card",
@@ -162,7 +169,8 @@
     "title": "{{course}}: units",
     "complete": "Complete",
     "inProgress": "In progress",
-    "notStarted": "Not started"
+    "notStarted": "Not started",
+    "progress": "{{done}} of {{total}} units complete"
   },
   "leave": {
     "title": "Leave this unit?",

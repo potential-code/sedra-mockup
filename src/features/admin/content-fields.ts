@@ -32,6 +32,34 @@ export const FIELD_KEYS = [
 ] as const
 
 export type FieldKey = (typeof FIELD_KEYS)[number]
+
+/** Order the fields appear in the editor (error summary follows it). */
+export const SCREEN_ORDER: FieldKey[] = [
+  'language',
+  'programme_id',
+  'course_id',
+  'unit_id',
+  'order',
+  'title',
+  'objective',
+  'source_pages',
+  'summary',
+  'video_url',
+  'duration_seconds',
+  'captions_url',
+  'media_status',
+  'transcript',
+  'image_alt',
+  'question',
+  'options_A',
+  'options_B',
+  'options_C',
+  'correct_option',
+  'feedback_correct',
+  'feedback_retry',
+  'practice_prompt',
+  'review_status',
+]
 export type Fields = Record<FieldKey, string>
 
 export const REVIEW_STATUSES = ['draft', 'in-review', 'approved'] as const
@@ -79,6 +107,14 @@ function fileName(url: string): string {
 
 /** Validation before "Publish (demo)" (brief §9). Returns i18n keys, empty when valid. */
 export function validateForPublish(f: Fields): FieldErrors {
+  const raw = collectErrors(f)
+  // Report errors in on-screen field order so the summary reads top to bottom.
+  const ordered: FieldErrors = {}
+  for (const k of SCREEN_ORDER) if (raw[k]) ordered[k] = raw[k]
+  return ordered
+}
+
+function collectErrors(f: Fields): FieldErrors {
   const e: FieldErrors = {}
   const blank = (k: FieldKey) => f[k].trim() === ''
   if (blank('title')) e.title = 'editor.errors.title'
@@ -89,6 +125,9 @@ export function validateForPublish(f: Fields): FieldErrors {
     if (blank(k)) e[k] = 'editor.errors.option'
   }
   if (!['A', 'B', 'C'].includes(f.correct_option)) e.correct_option = 'editor.errors.correct'
+  // Owner decision: both feedback messages are part of a complete check, so publishing needs them.
+  if (blank('feedback_correct')) e.feedback_correct = 'editor.errors.feedbackCorrect'
+  if (blank('feedback_retry')) e.feedback_retry = 'editor.errors.feedbackRetry'
   if (blank('image_alt')) e.image_alt = 'editor.errors.imageAlt'
   if (blank('transcript')) e.transcript = 'editor.errors.transcript'
   if (f.duration_seconds.trim() !== '30') e.duration_seconds = 'editor.errors.duration'

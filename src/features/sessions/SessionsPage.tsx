@@ -1,79 +1,249 @@
-import type { LiveSession, ProgrammeId } from '@shared/types'
-import { CalendarClock, Captions, Check, FileText, Hourglass, Info, Video } from 'lucide-react'
-import { useState } from 'react'
+import type { Lang, LiveSession, ProgrammeId } from '@shared/types'
+import {
+  BookOpen,
+  CalendarDays,
+  Captions,
+  Clock,
+  ConciergeBell,
+  FileText,
+  HeartHandshake,
+  Hourglass,
+  Info,
+  Play,
+  PlayCircle,
+  Video,
+} from 'lucide-react'
+import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ChoiceGroup } from '@/components/learner/ChoiceGroup'
 import { DemoTag } from '@/components/learner/DemoTag'
 import { formatUaeDateTime, PROGRAMME_LABEL_KEY, sortByStart } from '@/components/learner/learning'
-import { PageHeading } from '@/components/learner/PageHeading'
+import { Reveal, stagger } from '@/components/motion/Reveal'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { usePageTitle } from '@/hooks/use-page-title'
 import { useLocalized } from '@/i18n'
+import { asset } from '@/lib/asset'
+import { cn } from '@/lib/utils'
 import { useDb } from '@/store/db'
 
 type Filter = 'all' | ProgrammeId
 
-function SessionCard({ s, kind }: { s: LiveSession; kind: 'upcoming' | 'recording' }) {
+const PROGRAMME_ICON = { 'life-skills': BookOpen, hospitality: ConciergeBell } as const
+/** Recording thumbnails reuse the programme's opening unit still (decorative). */
+const RECORDING_THUMB: Record<ProgrammeId, string> = {
+  'life-skills': 'images/units/LS01.webp',
+  hospitality: 'images/units/HF01.webp',
+}
+
+/** Day / month / weekday / time parts in UAE time for the calendar tile and time chip. */
+function uaeParts(iso: string, lang: Lang) {
+  const loc = lang === 'ar' ? 'ar-AE' : 'en-AE'
+  const d = new Date(iso)
+  const f = (o: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat(loc, { ...o, timeZone: 'Asia/Dubai' }).format(d)
+  return {
+    day: f({ day: 'numeric' }),
+    month: f({ month: 'short' }),
+    weekday: f({ weekday: 'short' }),
+    time: f({ hour: 'numeric', minute: '2-digit' }),
+  }
+}
+
+function ProgrammeChip({ programmeId }: { programmeId: ProgrammeId }) {
+  const { t } = useTranslation('learner')
+  const Icon = PROGRAMME_ICON[programmeId]
+  return (
+    <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-sedra-pale-100 px-3 py-1 text-sm font-semibold text-ink">
+      <Icon aria-hidden="true" className="size-4 text-sedra-green" />
+      {t(`common:${PROGRAMME_LABEL_KEY[programmeId]}`)}
+    </span>
+  )
+}
+
+/** Time chip: visible time + "UAE time"; full date and time for screen readers. */
+function TimeChip({ s }: { s: LiveSession }) {
+  const { t } = useTranslation('learner')
+  const { lang } = useLocalized()
+  const p = uaeParts(s.startsAt, lang)
+  return (
+    <p className="m-0 inline-flex w-fit flex-wrap items-center gap-x-2 gap-y-0.5 rounded-xl border-2 border-sedra-pale bg-white px-3 py-1.5 font-semibold text-ink">
+      <Clock aria-hidden="true" className="size-5 shrink-0 text-sedra-green" />
+      <span aria-hidden="true">
+        {p.weekday} · {p.time}
+      </span>
+      <span className="text-base font-normal text-ink-soft" aria-hidden="true">
+        {t('shared.uaeTime')}
+      </span>
+      <span className="sr-only">
+        {t('sessions.time')}: {formatUaeDateTime(s.startsAt, lang)} ({t('shared.uaeTime')})
+      </span>
+    </p>
+  )
+}
+
+function UpcomingCard({ s }: { s: LiveSession }) {
   const { t } = useTranslation('learner')
   const { l, lang } = useLocalized()
+  const p = uaeParts(s.startsAt, lang)
   return (
-    <article className="grid grid-cols-1 gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-base font-semibold text-ink-soft">
-          {t(`common:${PROGRAMME_LABEL_KEY[s.programmeId]}`)}
+    <article className="card-pop grid h-full grid-cols-[auto_1fr] overflow-hidden">
+      {/* Calendar tile: decorative copy of the date that TimeChip reads out in full. */}
+      <div
+        aria-hidden="true"
+        className="flex w-20 flex-col items-center justify-center gap-0.5 bg-sedra-green px-2 py-5 text-white sm:w-28"
+      >
+        <span className="text-sm font-semibold uppercase tracking-wide opacity-90">
+          {p.weekday}
         </span>
-        <DemoTag />
+        <span className="text-4xl leading-none font-bold sm:text-5xl">{p.day}</span>
+        <span className="text-base font-semibold">{p.month}</span>
+        <span className="mt-2 h-1.5 w-8 rounded-full bg-sedra-lime" />
       </div>
-      <h3 className="m-0 text-xl">{l(s.title)}</h3>
-      <p className="m-0 flex items-start gap-2">
-        <CalendarClock aria-hidden="true" className="mt-1 size-5 shrink-0 text-sedra-green" />
-        <span>
-          <span className="sr-only">{t('sessions.time')}: </span>
-          {formatUaeDateTime(s.startsAt, lang)} ({t('shared.uaeTime')})
-        </span>
-      </p>
-
-      {kind === 'upcoming' ? (
-        <>
-          <div className="grid grid-cols-1 gap-1 rounded-xl bg-sedra-pale-50 p-3">
+      <div className="grid min-w-0 content-start gap-3 p-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <ProgrammeChip programmeId={s.programmeId} />
+          <DemoTag />
+        </div>
+        <h3 className="m-0 text-xl">{l(s.title)}</h3>
+        <TimeChip s={s} />
+        <div className="grid grid-cols-[auto_1fr] gap-2 rounded-xl bg-sedra-pale-50 p-3 text-base">
+          <Info aria-hidden="true" className="mt-0.5 size-5 text-sedra-green" />
+          <div className="grid gap-0.5">
             <h4 className="m-0 text-base font-bold text-ink">{t('sessions.booking')}</h4>
-            <p className="m-0 text-base">{t('sessions.bookingBody')}</p>
+            <p className="m-0">{t('sessions.bookingBody')}</p>
           </div>
-          <Button
-            className="justify-self-start"
-            onClick={() => toast.info(t('sessions.joinToast'))}
-          >
-            <Video aria-hidden="true" />
-            {t('sessions.join')}
-          </Button>
-        </>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 gap-2 rounded-xl border-2 border-dashed border-border bg-sedra-pale-50 p-4">
-            <p className="m-0 flex items-center gap-2 font-semibold text-ink">
-              <Hourglass aria-hidden="true" className="size-5" />
-              {t('sessions.pendingRecording')}
-            </p>
-            <p className="m-0 text-base">{t('sessions.pendingBody')}</p>
-            <ul className="m-0 grid list-none gap-1 p-0 text-base">
-              <li className="flex items-center gap-2">
-                <Captions aria-hidden="true" className="size-5" />
-                {t('sessions.captions')}
-              </li>
-              <li className="flex items-center gap-2">
-                <FileText aria-hidden="true" className="size-5" />
-                {t('sessions.transcript')}
-              </li>
-            </ul>
-          </div>
-          <p className="m-0 flex items-start gap-2 text-base text-ink-soft">
-            <Info aria-hidden="true" className="mt-1 size-5 shrink-0" />
-            {t('sessions.viewDisabled')}
-          </p>
-        </>
-      )}
+        </div>
+        <Button
+          size="lg"
+          className="justify-self-start shadow-md motion-safe:transition-transform motion-safe:active:scale-[0.97]"
+          onClick={() => toast.info(t('sessions.joinToast'))}
+        >
+          <Video aria-hidden="true" />
+          {t('sessions.join')}
+          <span className="sr-only">: {l(s.title)}</span>
+        </Button>
+      </div>
     </article>
+  )
+}
+
+function RecordingCard({ s }: { s: LiveSession }) {
+  const { t } = useTranslation('learner')
+  const { l } = useLocalized()
+  const reasonId = useId()
+  return (
+    <article className="card-pop group grid h-full content-start overflow-hidden">
+      <div className="relative aspect-video overflow-hidden bg-sedra-green-800">
+        <img
+          src={asset(RECORDING_THUMB[s.programmeId])}
+          alt=""
+          width={1200}
+          height={896}
+          loading="lazy"
+          className="size-full object-cover opacity-80 motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.04]"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-sedra-green-800/45" />
+        {/* Decorative play glyph: the recording is pending, so it is not a control. */}
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 m-auto flex size-16 items-center justify-center rounded-full bg-white/90 text-sedra-green shadow-lg"
+        >
+          <Play className="ms-1 size-7 fill-current" />
+        </span>
+        <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-sm font-semibold text-notice shadow-md">
+          <Hourglass aria-hidden="true" className="size-4" />
+          {t('sessions.pendingRecording')}
+        </span>
+      </div>
+      <div className="grid content-start gap-3 p-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <ProgrammeChip programmeId={s.programmeId} />
+          <DemoTag />
+        </div>
+        <h3 className="m-0 text-xl">{l(s.title)}</h3>
+        <TimeChip s={s} />
+        <p className="m-0 text-base">{t('sessions.pendingBody')}</p>
+        <ul className="m-0 flex list-none flex-wrap gap-2 p-0 text-base">
+          <li className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1">
+            <Captions aria-hidden="true" className="size-5 text-sedra-green" />
+            {t('sessions.captions')}
+          </li>
+          <li className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1">
+            <FileText aria-hidden="true" className="size-5 text-sedra-green" />
+            {t('sessions.transcript')}
+          </li>
+        </ul>
+        {/* Focusable but unavailable: the reason is visible and announced (brief §3). */}
+        <Button
+          variant="secondary"
+          aria-disabled="true"
+          aria-describedby={reasonId}
+          className="justify-self-start cursor-not-allowed opacity-80 hover:bg-sedra-pale-100"
+          onClick={(e) => e.preventDefault()}
+        >
+          <PlayCircle aria-hidden="true" />
+          {t('sessions.viewRecording')}
+        </Button>
+        <p id={reasonId} className="m-0 flex items-start gap-2 text-base text-ink-soft">
+          <Info aria-hidden="true" className="mt-1 size-5 shrink-0" />
+          {t('sessions.viewDisabled')}
+        </p>
+      </div>
+    </article>
+  )
+}
+
+function Hero({ next }: { next: LiveSession | undefined }) {
+  const { t } = useTranslation('learner')
+  const { l, lang } = useLocalized()
+  usePageTitle(t('sessions.pageTitle'))
+  const p = next ? uaeParts(next.startsAt, lang) : undefined
+  return (
+    <Reveal className="motif-tree grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-md lg:grid-cols-[1.15fr_1fr]">
+      <div className="grid content-center gap-4 p-6 md:p-10">
+        <h1 className="m-0 text-4xl break-words md:text-5xl">{t('sessions.heading')}</h1>
+        <p className="m-0 text-lg text-ink">{t('sessions.lead')}</p>
+        <p className="m-0 flex w-fit items-start gap-2 rounded-2xl bg-success-soft px-4 py-2 text-base font-semibold text-success">
+          <HeartHandshake aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
+          {t('sessions.noPenalty')}
+        </p>
+        {next && p ? (
+          <div className="mt-2 flex items-center gap-4 rounded-2xl border-2 border-sedra-pale bg-sedra-pale-50 p-3">
+            <div
+              aria-hidden="true"
+              className="flex size-16 shrink-0 flex-col items-center justify-center rounded-xl bg-sedra-green text-white shadow-md"
+            >
+              <span className="text-2xl leading-none font-bold">{p.day}</span>
+              <span className="text-sm font-semibold">{p.month}</span>
+            </div>
+            <div className="grid min-w-0 gap-0.5">
+              <p className="m-0 text-sm font-bold tracking-wide text-sedra-green uppercase">
+                {t('sessions.next')}
+              </p>
+              <p className="m-0 font-semibold text-ink">{l(next.title)}</p>
+              <p className="m-0 text-base text-ink-soft">
+                {formatUaeDateTime(next.startsAt, lang)} ({t('shared.uaeTime')})
+              </p>
+            </div>
+          </div>
+        ) : null}
+      </div>
+      <div className="relative min-h-56 lg:min-h-full">
+        <img
+          src={asset('images/home-hero.webp')}
+          alt={t('sessions.heroAlt')}
+          width={1600}
+          height={893}
+          className="absolute inset-0 size-full object-cover"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 start-0 hidden w-24 bg-linear-to-r from-white to-transparent lg:block rtl:bg-linear-to-l"
+        />
+      </div>
+    </Reveal>
   )
 }
 
@@ -88,61 +258,72 @@ export function SessionsPage() {
   const shown = sortByStart(sessions.filter((s) => filter === 'all' || s.programmeId === filter))
   const upcoming = shown.filter((s) => s.attendanceStatus === 'upcoming')
   const recordings = shown.filter((s) => s.attendanceStatus !== 'upcoming').reverse()
+  const next = sortByStart(sessions).find((s) => s.attendanceStatus === 'upcoming')
 
-  const tabClass =
-    'min-h-12 flex-none gap-2 rounded-lg px-5 text-base font-semibold text-ink data-[state=active]:bg-sedra-green data-[state=active]:text-white'
+  const tabClass = cn(
+    'h-auto min-h-12 flex-none gap-2 rounded-full px-3 text-base font-semibold whitespace-normal text-ink [overflow-wrap:normal] sm:px-5',
+    'hover:bg-sedra-pale-50 data-[state=active]:bg-sedra-green data-[state=active]:text-white data-[state=active]:shadow-md',
+    'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ink',
+  )
+  const countClass =
+    'rounded-full bg-sedra-pale-100 px-2 text-sm text-ink group-data-[state=active]/trigger:bg-white group-data-[state=active]/trigger:text-sedra-green'
 
   return (
     <div className="container-page grid grid-cols-1 [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink [&_:is(h2,h3,h4)]:break-words gap-8 py-8">
-      <PageHeading
-        title={t('sessions.heading')}
-        pageTitle={t('sessions.pageTitle')}
-        lead={t('sessions.lead')}
-      >
-        <p className="m-0 text-base text-ink-soft">{t('sessions.noPenalty')}</p>
-      </PageHeading>
+      <Hero next={next} />
 
-      <ChoiceGroup
-        legend={t('sessions.filter')}
-        name="programme-filter"
-        value={filter}
-        onChange={setFilter}
-        choices={[
-          { value: 'all', label: t('sessions.all') },
-          { value: 'life-skills', label: t('common:lifeSkills') },
-          { value: 'hospitality', label: t('common:hospitalityForAll') },
-        ]}
-      />
+      <Reveal delay={0.08} className="rounded-2xl bg-white p-5 shadow-sm md:p-6">
+        <ChoiceGroup
+          legend={t('sessions.filter')}
+          name="programme-filter"
+          value={filter}
+          onChange={setFilter}
+          choices={[
+            { value: 'all', label: t('sessions.all') },
+            { value: 'life-skills', label: t('common:lifeSkills') },
+            { value: 'hospitality', label: t('common:hospitalityForAll') },
+          ]}
+        />
+      </Reveal>
 
-      <Tabs value={tab} onValueChange={setTab} dir={dir} className="gap-4">
-        <TabsList className="h-auto w-full flex-wrap justify-start gap-2 bg-sedra-pale-50 p-1 sm:w-fit">
-          <TabsTrigger value="upcoming" className={tabClass}>
-            {tab === 'upcoming' ? <Check aria-hidden="true" className="size-5" /> : null}
-            {t('sessions.upcoming')} ({upcoming.length})
+      <Tabs value={tab} onValueChange={setTab} dir={dir} className="gap-6">
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-full bg-white p-1.5 shadow-md group-data-[orientation=horizontal]/tabs:h-auto sm:inline-flex sm:w-fit">
+          <TabsTrigger value="upcoming" className={cn(tabClass, 'group/trigger')}>
+            <CalendarDays aria-hidden="true" className="hidden size-5 min-[400px]:block" />
+            {t('sessions.upcoming')}
+            <span className={countClass}>{upcoming.length}</span>
           </TabsTrigger>
-          <TabsTrigger value="recordings" className={tabClass}>
-            {tab === 'recordings' ? <Check aria-hidden="true" className="size-5" /> : null}
-            {t('sessions.recordings')} ({recordings.length})
+          <TabsTrigger value="recordings" className={cn(tabClass, 'group/trigger')}>
+            <PlayCircle aria-hidden="true" className="hidden size-5 min-[400px]:block" />
+            {t('sessions.recordings')}
+            <span className={countClass}>{recordings.length}</span>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="upcoming" className="grid grid-cols-1 gap-4">
           {upcoming.length === 0 ? <p className="m-0">{t('sessions.noUpcoming')}</p> : null}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {upcoming.map((s) => (
-              <SessionCard key={s.id} s={s} kind="upcoming" />
+          <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 lg:grid-cols-2">
+            {upcoming.map((s, i) => (
+              <Reveal as="li" key={s.id} delay={stagger(i)}>
+                <UpcomingCard s={s} />
+              </Reveal>
             ))}
-          </div>
+          </ul>
         </TabsContent>
         <TabsContent value="recordings" className="grid grid-cols-1 gap-4">
           {recordings.length === 0 ? <p className="m-0">{t('sessions.noRecordings')}</p> : null}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {recordings.map((s) => (
-              <SessionCard key={s.id} s={s} kind="recording" />
+          <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 md:grid-cols-2 xl:grid-cols-3">
+            {recordings.map((s, i) => (
+              <Reveal as="li" key={s.id} delay={stagger(i)}>
+                <RecordingCard s={s} />
+              </Reveal>
             ))}
-          </div>
+          </ul>
         </TabsContent>
       </Tabs>
-      <p className="m-0 text-base text-ink-soft">{t('sessions.seedNote')}</p>
+      <p className="m-0 flex items-center gap-2 text-base text-ink-soft">
+        <DemoTag />
+        {t('sessions.seedNote')}
+      </p>
     </div>
   )
 }

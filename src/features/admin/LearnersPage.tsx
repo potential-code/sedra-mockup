@@ -1,11 +1,15 @@
 import type { AdminLearner } from '@shared/types'
 import { Link } from '@tanstack/react-router'
+import { BarChart3, Filter, Layers, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   AdminPageHeader,
+  Avatar,
+  Chip,
   captionCls,
   DemoTag,
+  ProgressMini,
   SelectField,
   StatusLabel,
   TableRegion,
@@ -18,6 +22,7 @@ import {
   isActive,
   type ProgrammeFilter,
   type ProgressFilter,
+  UNITS_PER_COURSE,
   useAdminLearners,
 } from '@/store/admin-actions'
 
@@ -34,21 +39,28 @@ export function LearnersPage() {
 
   return (
     <div>
-      <AdminPageHeader title={t('learners.title')} intro={t('learners.intro')}>
+      <AdminPageHeader title={t('learners.title')} intro={t('learners.intro')} icon={Users}>
         <DemoTag label={t('common.illustrative')} />
       </AdminPageHeader>
 
       <form
         aria-labelledby="lf-legend"
         onSubmit={(e) => e.preventDefault()}
-        className="mb-4 rounded-2xl border bg-sedra-pale-50 p-4"
+        className="mb-5 rounded-2xl bg-white p-4 shadow-md sm:p-5"
       >
-        <fieldset className="m-0 grid gap-4 border-0 p-0 sm:grid-cols-2">
-          <legend id="lf-legend" className="mb-2 text-lg font-bold text-sedra-green">
+        <fieldset className="m-0 flex flex-col gap-4 border-0 p-0 md:flex-row md:items-end">
+          <legend
+            id="lf-legend"
+            className="mb-3 flex items-center gap-2 text-lg font-bold text-sedra-green"
+          >
+            <Filter aria-hidden="true" className="size-5" />
             {t('learners.filters.legend')}
           </legend>
           <SelectField
             id="filter-programme"
+            pill
+            icon={Layers}
+            className="md:min-w-64 md:flex-1"
             label={t('learners.filters.programme')}
             value={programme}
             onChange={(v) => setProgramme(v as ProgrammeFilter)}
@@ -59,6 +71,9 @@ export function LearnersPage() {
           />
           <SelectField
             id="filter-progress"
+            pill
+            icon={BarChart3}
+            className="md:min-w-64 md:flex-1"
             label={t('learners.filters.progress')}
             value={progress}
             onChange={(v) => setProgress(v as ProgressFilter)}
@@ -67,44 +82,44 @@ export function LearnersPage() {
               label: t(`learners.filters.progressOptions.${p}`),
             }))}
           />
+          <p
+            className="m-0 flex min-h-12 items-center gap-2 rounded-full bg-sedra-pale-100 px-4 font-semibold text-ink md:shrink-0"
+            aria-live="polite"
+          >
+            <Users aria-hidden="true" className="size-5 shrink-0 text-sedra-green" />
+            {t('learners.showing', { shown: rows.length, total: learners.length })}
+          </p>
         </fieldset>
       </form>
 
-      <p className="mb-3 font-semibold text-ink" aria-live="polite">
-        {t('learners.showing', { shown: rows.length, total: learners.length })}
-      </p>
-
       <ul className="m-0 flex list-none flex-col gap-3 p-0 md:hidden">
         {rows.map((l) => (
-          <LearnerCard key={l.id} l={l} />
+          <li key={l.id} className="max-w-none">
+            <LearnerCard l={l} />
+          </li>
         ))}
       </ul>
-      {rows.length === 0 ? <p className="md:hidden">{t('learners.empty')}</p> : null}
+      {rows.length === 0 ? (
+        <p className="rounded-2xl bg-white p-5 shadow-sm md:hidden">{t('learners.empty')}</p>
+      ) : null}
 
       <div className="hidden md:block">
-        <TableRegion label={t('learners.tableLabel')}>
-          <table className="w-full min-w-[56rem] border-collapse">
+        <TableRegion label={t('learners.tableLabel')} className="max-h-[42rem] overflow-y-auto">
+          <table className="w-full min-w-[58rem] border-separate border-spacing-0">
             <caption className={captionCls}>{t('learners.caption')}</caption>
-            <thead className="border-b bg-sedra-pale-50">
+            <thead>
               <tr>
-                <th scope="col" className={thCls}>
-                  {t('learners.cols.learner')}
-                </th>
-                <th scope="col" className={thCls}>
-                  {t('learners.cols.programmes')}
-                </th>
-                <th scope="col" className={thCls}>
-                  {t('learners.cols.progress')}
-                </th>
-                <th scope="col" className={thCls}>
-                  {t('learners.cols.latest')}
-                </th>
-                <th scope="col" className={thCls}>
-                  {t('learners.cols.checks')}
-                </th>
-                <th scope="col" className={thCls}>
-                  {t('learners.cols.support')}
-                </th>
+                {(
+                  ['learner', 'programmes', 'progress', 'latest', 'checks', 'support'] as const
+                ).map((c) => (
+                  <th
+                    key={c}
+                    scope="col"
+                    className={`${thCls} sticky top-0 z-10 border-b bg-sedra-pale-50 first:ps-5`}
+                  >
+                    {t(`learners.cols.${c}`)}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -125,66 +140,103 @@ export function LearnersPage() {
   )
 }
 
+function CourseProgress({ l }: { l: AdminLearner }) {
+  const { t } = useTranslation('admin')
+  return (
+    <div className="flex flex-col gap-2">
+      {l.programmes.includes('life-skills') ? (
+        <ProgressMini
+          value={l.unitsCompleted['healthy-communication'] ?? 0}
+          max={UNITS_PER_COURSE}
+          label={t('learners.unitsOf', {
+            course: t('course.healthy-communication'),
+            done: l.unitsCompleted['healthy-communication'] ?? 0,
+          })}
+        />
+      ) : null}
+      {l.programmes.includes('hospitality') ? (
+        <ProgressMini
+          value={l.unitsCompleted['intro-hospitality'] ?? 0}
+          max={UNITS_PER_COURSE}
+          label={t('learners.unitsOf', {
+            course: t('course.intro-hospitality'),
+            done: l.unitsCompleted['intro-hospitality'] ?? 0,
+          })}
+        />
+      ) : null}
+    </div>
+  )
+}
+
+function ActiveText({ l }: { l: AdminLearner }) {
+  const { t } = useTranslation('admin')
+  const on = isActive(l)
+  return (
+    <span className="flex items-center gap-1.5 text-sm text-ink-soft">
+      <span
+        aria-hidden="true"
+        className={`size-2.5 shrink-0 rounded-full ${on ? 'bg-sedra-green' : 'border-2 border-ink-soft'}`}
+      />
+      {on ? t('learners.activeYes') : t('learners.activeNo')}
+    </span>
+  )
+}
+
+function SupportChip({ l }: { l: AdminLearner }) {
+  const { t } = useTranslation('admin')
+  return l.supportFlag ? (
+    <StatusLabel tone="warning">{t('learners.supportOpen')}</StatusLabel>
+  ) : (
+    <StatusLabel tone="neutral">{t('learners.supportNone')}</StatusLabel>
+  )
+}
+
 function LearnerRow({ l }: { l: AdminLearner }) {
   const { t } = useTranslation('admin')
   const f = useUaeFormat()
+  const cell = `${tdCls} border-b border-border/60 group-last:border-0`
   return (
-    <tr className="border-b last:border-0">
-      <th scope="row" className={`${thCls} align-top`}>
-        <Link
-          to="/admin/learners/$learnerId"
-          params={{ learnerId: l.id }}
-          className="inline-flex min-h-12 min-w-12 flex-col justify-center font-semibold text-sedra-green underline underline-offset-4"
-        >
-          <span className="ltr-isolate">{l.id}</span>
-          <span dir="auto">{l.name}</span>
-        </Link>
+    <tr className="group transition-colors even:bg-sedra-pale-50/50 hover:bg-sedra-pale-100/60">
+      <th
+        scope="row"
+        className={`${thCls} border-b border-border/60 ps-5 align-top group-last:border-0`}
+      >
+        <div className="flex items-center gap-3">
+          <Avatar name={l.name} />
+          <Link
+            to="/admin/learners/$learnerId"
+            params={{ learnerId: l.id }}
+            className="inline-flex min-h-12 min-w-12 flex-col justify-center text-base font-semibold text-sedra-green underline-offset-4 hover:underline"
+          >
+            <span dir="auto">{l.name}</span>
+            <span className="ltr-isolate text-sm font-normal text-ink-soft">{l.id}</span>
+          </Link>
+        </div>
       </th>
-      <td className={tdCls}>
-        <ul className="m-0 list-none p-0">
+      <td className={cell}>
+        <ul className="m-0 flex list-none flex-col items-start gap-1 p-0">
           {l.programmes.map((p) => (
-            <li key={p}>{t(`programme.${p}`)}</li>
+            <li key={p}>
+              <Chip>{t(`programme.${p}`)}</Chip>
+            </li>
           ))}
         </ul>
       </td>
-      <td className={tdCls}>
-        <ul className="m-0 list-none p-0">
-          {l.programmes.includes('life-skills') ? (
-            <li>
-              {t('learners.unitsOf', {
-                course: t('course.healthy-communication'),
-                done: l.unitsCompleted['healthy-communication'] ?? 0,
-              })}
-            </li>
-          ) : null}
-          {l.programmes.includes('hospitality') ? (
-            <li>
-              {t('learners.unitsOf', {
-                course: t('course.intro-hospitality'),
-                done: l.unitsCompleted['intro-hospitality'] ?? 0,
-              })}
-            </li>
-          ) : null}
-        </ul>
+      <td className={`${cell} min-w-56`}>
+        <CourseProgress l={l} />
       </td>
-      <td className={tdCls}>
-        <span className="block">{f.dateTime(l.latestActivity)}</span>
-        <span className="text-sm text-ink-soft">
-          {isActive(l) ? t('learners.activeYes') : t('learners.activeNo')}
-        </span>
+      <td className={cell}>
+        <span className="block text-sm font-semibold text-ink">{f.dateTime(l.latestActivity)}</span>
+        <ActiveText l={l} />
       </td>
-      <td className={tdCls}>
+      <td className={`${cell} text-sm`}>
         {t('learners.checksSummary', {
           reviewed: l.checksReviewed,
           firstTry: l.checksCorrectFirstTry,
         })}
       </td>
-      <td className={tdCls}>
-        {l.supportFlag ? (
-          <StatusLabel tone="warning">{t('learners.supportOpen')}</StatusLabel>
-        ) : (
-          <StatusLabel tone="neutral">{t('learners.supportNone')}</StatusLabel>
-        )}
+      <td className={cell}>
+        <SupportChip l={l} />
       </td>
     </tr>
   )
@@ -195,70 +247,60 @@ function LearnerCard({ l }: { l: AdminLearner }) {
   const { t } = useTranslation('admin')
   const f = useUaeFormat()
   return (
-    <li className="max-w-none rounded-2xl border bg-white p-4">
-      <h2 className="m-0 text-lg">
-        <Link
-          to="/admin/learners/$learnerId"
-          params={{ learnerId: l.id }}
-          className="inline-flex min-h-12 min-w-12 items-center gap-2 text-sedra-green underline underline-offset-4"
-        >
-          <span className="ltr-isolate">{l.id}</span>
-          <span dir="auto">{l.name}</span>
-        </Link>
-      </h2>
-      <dl className="m-0 flex flex-col gap-2">
+    <article aria-labelledby={`lc-${l.id}`} className="card-pop flex flex-col gap-4 p-4">
+      <div className="flex items-center gap-3">
+        <Avatar name={l.name} />
+        <h2 id={`lc-${l.id}`} className="m-0 min-w-0 flex-1 text-lg">
+          <Link
+            to="/admin/learners/$learnerId"
+            params={{ learnerId: l.id }}
+            className="inline-flex min-h-12 min-w-12 flex-col justify-center text-sedra-green underline underline-offset-4"
+          >
+            <span dir="auto">{l.name}</span>
+            <span className="ltr-isolate text-sm font-normal text-ink-soft">{l.id}</span>
+          </Link>
+        </h2>
+      </div>
+      <dl className="m-0 flex flex-col gap-3">
         <div>
-          <dt className="text-sm font-semibold text-ink-soft">{t('learners.cols.programmes')}</dt>
-          <dd className="m-0">{l.programmes.map((p) => t(`programme.${p}`)).join(' · ')}</dd>
+          <dt className="sr-only">{t('learners.cols.programmes')}</dt>
+          <dd className="m-0 flex flex-wrap gap-1.5">
+            {l.programmes.map((p) => (
+              <Chip key={p}>{t(`programme.${p}`)}</Chip>
+            ))}
+          </dd>
+        </div>
+        <div>
+          <dt className="sr-only">{t('learners.cols.support')}</dt>
+          <dd className="m-0">
+            <SupportChip l={l} />
+          </dd>
         </div>
         <div>
           <dt className="text-sm font-semibold text-ink-soft">{t('learners.cols.progress')}</dt>
-          {l.programmes.includes('life-skills') ? (
+          <dd className="m-0 mt-1">
+            <CourseProgress l={l} />
+          </dd>
+        </div>
+        <div className="grid grid-cols-1 gap-3 rounded-xl bg-sedra-pale-50 p-3 min-[400px]:grid-cols-2">
+          <div>
+            <dt className="text-sm font-semibold text-ink-soft">{t('learners.cols.latest')}</dt>
             <dd className="m-0">
-              {t('learners.unitsOf', {
-                course: t('course.healthy-communication'),
-                done: l.unitsCompleted['healthy-communication'] ?? 0,
+              <span className="block text-sm font-semibold">{f.dateTime(l.latestActivity)}</span>
+              <ActiveText l={l} />
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm font-semibold text-ink-soft">{t('learners.cols.checks')}</dt>
+            <dd className="m-0 text-sm">
+              {t('learners.checksSummary', {
+                reviewed: l.checksReviewed,
+                firstTry: l.checksCorrectFirstTry,
               })}
             </dd>
-          ) : null}
-          {l.programmes.includes('hospitality') ? (
-            <dd className="m-0">
-              {t('learners.unitsOf', {
-                course: t('course.intro-hospitality'),
-                done: l.unitsCompleted['intro-hospitality'] ?? 0,
-              })}
-            </dd>
-          ) : null}
-        </div>
-        <div>
-          <dt className="text-sm font-semibold text-ink-soft">{t('learners.cols.latest')}</dt>
-          <dd className="m-0">
-            {f.dateTime(l.latestActivity)}
-            <span className="block text-sm text-ink-soft">
-              {isActive(l) ? t('learners.activeYes') : t('learners.activeNo')}
-            </span>
-          </dd>
-        </div>
-        <div>
-          <dt className="text-sm font-semibold text-ink-soft">{t('learners.cols.checks')}</dt>
-          <dd className="m-0">
-            {t('learners.checksSummary', {
-              reviewed: l.checksReviewed,
-              firstTry: l.checksCorrectFirstTry,
-            })}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-sm font-semibold text-ink-soft">{t('learners.cols.support')}</dt>
-          <dd className="m-0">
-            {l.supportFlag ? (
-              <StatusLabel tone="warning">{t('learners.supportOpen')}</StatusLabel>
-            ) : (
-              <StatusLabel tone="neutral">{t('learners.supportNone')}</StatusLabel>
-            )}
-          </dd>
+          </div>
         </div>
       </dl>
-    </li>
+    </article>
   )
 }

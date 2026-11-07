@@ -1,10 +1,30 @@
-import { ExternalLink, Eye, EyeOff } from 'lucide-react'
+import {
+  CheckCircle2,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  FileText,
+  FolderOpen,
+  Link2,
+  MapPin,
+  PlayCircle,
+  Tag,
+} from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AdminPageHeader, DemoTag, Notice, StatusLabel } from '@/components/admin/AdminUi'
+import {
+  AdminPageHeader,
+  Chip,
+  DemoTag,
+  IconCircle,
+  Notice,
+  StatusLabel,
+} from '@/components/admin/AdminUi'
+import { Reveal, stagger } from '@/components/motion/Reveal'
 import { Button } from '@/components/ui/button'
 import { EXT01, getCourse } from '@/content'
 import { useLocalized } from '@/i18n'
+import { asset } from '@/lib/asset'
 
 /** In-platform resources: HTML summaries; downloads stay secondary (brief §2 Resources). */
 const INTERNAL_RESOURCES = [
@@ -22,46 +42,61 @@ export function ResourcesAdminPage() {
 
   return (
     <div>
-      <AdminPageHeader title={t('resources.title')} intro={t('resources.intro')}>
+      <AdminPageHeader title={t('resources.title')} intro={t('resources.intro')} icon={FolderOpen}>
         <DemoTag />
       </AdminPageHeader>
 
       <section
         aria-labelledby="ext01-title"
-        className="mb-8 flex flex-col gap-4 rounded-2xl border bg-white p-5"
+        className="mb-10 flex flex-col gap-5 rounded-3xl bg-white p-5 shadow-md sm:p-7"
       >
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="ltr-isolate rounded-lg bg-sedra-pale-100 px-2 py-0.5 font-bold">
-            {EXT01.id}
-          </span>
-          <StatusLabel tone="warning">{t('resources.ext.reviewStatus')}</StatusLabel>
+        <div className="flex flex-wrap items-start gap-4">
+          <IconCircle icon={PlayCircle} tint="notice" size="lg" />
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Chip className="ltr-isolate">{EXT01.id}</Chip>
+              <StatusLabel tone="warning">{t('resources.ext.reviewStatus')}</StatusLabel>
+            </div>
+            <h2 id="ext01-title" className="m-0 text-2xl">
+              {l(EXT01.title)}
+            </h2>
+          </div>
         </div>
-        <h2 id="ext01-title" className="m-0 text-2xl">
-          {l(EXT01.title)}
-        </h2>
-        <dl className="m-0 flex flex-col gap-3">
-          <div>
-            <dt className="font-semibold">{t('resources.ext.placement')}</dt>
+        <dl className="m-0 grid gap-3 md:grid-cols-2">
+          <div className="min-w-0 rounded-xl bg-sedra-pale-50 p-3">
+            <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+              <MapPin aria-hidden="true" className="size-4 text-sedra-green" />
+              {t('resources.ext.placement')}
+            </dt>
             <dd className="m-0">
               {t('resources.ext.placementValue', {
                 course: course ? l(course.title) : EXT01.courseId,
               })}
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold">{t('resources.ext.originalUrl')}</dt>
+          <div className="min-w-0 rounded-xl bg-sedra-pale-50 p-3">
+            <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+              <Link2 aria-hidden="true" className="size-4 text-sedra-green" />
+              {t('resources.ext.originalUrl')}
+            </dt>
             <dd className="m-0 break-all">
               <code className="ltr-isolate">{EXT01.originalUrl}</code>
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold">{t('resources.ext.embedUrl')}</dt>
+          <div className="min-w-0 rounded-xl bg-sedra-pale-50 p-3">
+            <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+              <Link2 aria-hidden="true" className="size-4 text-sedra-green" />
+              {t('resources.ext.embedUrl')}
+            </dt>
             <dd className="m-0 break-all">
               <code className="ltr-isolate">{EXT01.embedUrl}</code>
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold">{t('resources.ext.fallbackLabel')}</dt>
+          <div className="min-w-0 rounded-xl bg-sedra-pale-50 p-3">
+            <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+              <Tag aria-hidden="true" className="size-4 text-sedra-green" />
+              {t('resources.ext.fallbackLabel')}
+            </dt>
             <dd className="m-0">
               {EXT01.fallbackLabel.en} /{' '}
               <span lang="ar" dir="rtl">
@@ -69,8 +104,11 @@ export function ResourcesAdminPage() {
               </span>
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold">{t('resources.ext.completion')}</dt>
+          <div className="min-w-0 rounded-xl bg-sedra-pale-50 p-3">
+            <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+              <CheckCircle2 aria-hidden="true" className="size-4 text-sedra-green" />
+              {t('resources.ext.completion')}
+            </dt>
             <dd className="m-0">
               <StatusLabel tone="neutral">{t('resources.ext.notRequired')}</StatusLabel>
             </dd>
@@ -100,7 +138,7 @@ export function ResourcesAdminPage() {
         </div>
         <div id="ext01-preview">
           {preview ? (
-            <div className="aspect-video w-full max-w-3xl overflow-hidden rounded-xl border bg-black">
+            <div className="aspect-video w-full max-w-3xl overflow-hidden rounded-2xl bg-black shadow-lg">
               <iframe
                 src={EXT01.embedUrl}
                 title={t('resources.ext.iframeTitle', { title: l(EXT01.title) })}
@@ -115,27 +153,48 @@ export function ResourcesAdminPage() {
       </section>
 
       <section aria-labelledby="internal-res" className="flex flex-col gap-3">
-        <h2 id="internal-res" className="m-0 text-2xl">
-          {t('resources.internal.heading')}
-        </h2>
+        <div className="flex items-center gap-3">
+          <IconCircle icon={FileText} />
+          <h2 id="internal-res" className="m-0 text-2xl">
+            {t('resources.internal.heading')}
+          </h2>
+        </div>
         <p className="m-0 text-ink-soft">{t('resources.internal.intro')}</p>
-        <ul className="m-0 grid list-none gap-3 p-0 md:grid-cols-3">
-          {INTERNAL_RESOURCES.map((r) => {
+        <ul className="m-0 mt-2 grid list-none gap-5 p-0 sm:grid-cols-2 xl:grid-cols-3">
+          {INTERNAL_RESOURCES.map((r, i) => {
             const c = getCourse(r.course)
             return (
-              <li
-                key={r.key}
-                className="flex max-w-none flex-col gap-2 rounded-2xl border bg-white p-4"
-              >
-                <h3 className="m-0 text-lg">{t(`resources.internal.items.${r.key}.title`)}</h3>
-                <p className="m-0 text-sm text-ink-soft">
-                  <span className="ltr-isolate">{r.unit}</span>
-                  {c ? ` · ${l(c.title)}` : ''}
-                </p>
-                <p className="m-0">{t(`resources.internal.items.${r.key}.body`)}</p>
-                <StatusLabel tone="done">{t('resources.internal.status')}</StatusLabel>
-                <p className="m-0 text-sm text-ink-soft">{t('resources.internal.download')}</p>
-              </li>
+              <Reveal as="li" key={r.key} delay={stagger(i)} className="max-w-none">
+                <article
+                  aria-labelledby={`res-${r.key}`}
+                  className="card-pop flex h-full flex-col overflow-hidden"
+                >
+                  <img
+                    src={asset(`images/units/${r.unit}.webp`)}
+                    alt=""
+                    width={480}
+                    height={270}
+                    loading="lazy"
+                    className="aspect-[16/9] w-full object-cover"
+                  />
+                  <div className="flex flex-1 flex-col gap-2 p-5">
+                    <p className="m-0 text-sm font-semibold text-ink-soft">
+                      <span className="ltr-isolate">{r.unit}</span>
+                      {c ? ` · ${l(c.title)}` : ''}
+                    </p>
+                    <h3 id={`res-${r.key}`} className="m-0 text-lg">
+                      {t(`resources.internal.items.${r.key}.title`)}
+                    </h3>
+                    <p className="m-0">{t(`resources.internal.items.${r.key}.body`)}</p>
+                    <div className="mt-auto flex flex-col gap-2 pt-2">
+                      <StatusLabel tone="done">{t('resources.internal.status')}</StatusLabel>
+                      <p className="m-0 text-sm text-ink-soft">
+                        {t('resources.internal.download')}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              </Reveal>
             )
           })}
         </ul>

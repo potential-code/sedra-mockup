@@ -18,8 +18,8 @@ export const COURSES: Course[] = [
     unitIds: ['LS01', 'LS02', 'LS03', 'LS04', 'LS05', 'LS06', 'LS07', 'LS08'],
     image: 'images/programme-life-skills.webp',
     imageAlt: {
-      en: 'Two young people share labelled speech cards in a calm space.',
-      ar: 'شابّان يتبادلان بطاقات كلام في مكان هادئ.',
+      en: 'Two young women talk calmly, one holding a speech-bubble card.',
+      ar: 'شابّتان تتحدّثان بهدوء، وإحداهما تحمل بطاقة فقاعة كلام.',
     },
   },
   {
@@ -34,8 +34,8 @@ export const COURSES: Course[] = [
     unitIds: ['HF01', 'HF02', 'HF03', 'HF04', 'HF05', 'HF06', 'HF07', 'HF08'],
     image: 'images/programme-hospitality.webp',
     imageAlt: {
-      en: 'A host offers a welcome card to a guest at a clear reception area.',
-      ar: 'مضيف يقدّم بطاقة ترحيب لضيف في منطقة استقبال واضحة.',
+      en: 'A host at a reception desk welcomes a guest who has just arrived.',
+      ar: 'مضيف عند مكتب الاستقبال يرحّب بضيفة وصلت للتوّ.',
     },
   },
 ]

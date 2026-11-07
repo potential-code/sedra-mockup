@@ -1,5 +1,14 @@
 import type { PracticeStatus, Unit } from '@shared/types'
-import { Check, Clock, HandHelping, Lightbulb, type LucideIcon, Printer, Save } from 'lucide-react'
+import {
+  Check,
+  Clock,
+  Footprints,
+  HandHelping,
+  Lightbulb,
+  type LucideIcon,
+  Printer,
+  Save,
+} from 'lucide-react'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { announce } from '@/components/shared/LiveRegion'
@@ -50,33 +59,40 @@ function ToggleChoice({
   pressed,
   onClick,
   children,
+  compact = false,
 }: {
   pressed: boolean
   onClick: () => void
   children: React.ReactNode
+  compact?: boolean
 }) {
   return (
-    <Button
+    <button
       type="button"
-      variant="outline"
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        'h-auto min-h-12 justify-start whitespace-normal text-start',
-        pressed && 'bg-sedra-pale-100',
+        'group flex w-full items-center gap-3 rounded-2xl border-2 px-4 text-start text-base font-semibold shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200',
+        compact ? 'min-h-12 py-2' : 'min-h-16 py-3 text-lg',
+        'hover:border-sedra-green hover:shadow-md',
+        pressed
+          ? 'border-sedra-green bg-sedra-pale-100 text-ink shadow-md'
+          : 'border-border bg-white text-ink',
       )}
     >
       <span
         aria-hidden="true"
         className={cn(
-          'flex size-6 shrink-0 items-center justify-center rounded-md border-2 border-sedra-green',
-          pressed && 'bg-sedra-green text-white',
+          'flex size-7 shrink-0 items-center justify-center rounded-lg border-2 transition-colors',
+          pressed
+            ? 'border-sedra-green bg-sedra-green text-white'
+            : 'border-input bg-white group-hover:border-sedra-green',
         )}
       >
-        {pressed && <Check className="size-4" />}
+        {pressed && <Check className="size-5" strokeWidth={3} />}
       </span>
-      {children}
-    </Button>
+      <span className="min-w-0 flex-1">{children}</span>
+    </button>
   )
 }
 
@@ -141,7 +157,18 @@ export function PracticePanel({ unit }: { unit: Unit }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="m-0">{l(unit.practice.prompt)}</p>
+      <div className="flex items-start gap-3 rounded-2xl bg-sedra-pale-50 p-4 ring-1 ring-border">
+        <span
+          aria-hidden="true"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-sedra-green shadow-sm"
+        >
+          <Footprints className="size-6" />
+        </span>
+        <div className="min-w-0">
+          <p className="m-0 text-base font-semibold text-sedra-green">{t('practice.title')}</p>
+          <p className="m-0 mt-0.5 text-lg">{l(unit.practice.prompt)}</p>
+        </div>
+      </div>
 
       {!isPlaybook && !sortCards && choices.length > 0 && (
         <fieldset className="m-0 border-0 p-0">
@@ -199,7 +226,7 @@ export function PracticePanel({ unit }: { unit: Unit }) {
           {playbook?.saved && playbook.pause !== undefined && playbook.message !== undefined && (
             <section
               aria-labelledby={`${ids}-reminder`}
-              className="rounded-2xl border-2 border-sedra-green bg-white p-4"
+              className="rounded-3xl border-2 border-sedra-green bg-white p-5 shadow-md"
             >
               <h4 id={`${ids}-reminder`} className="m-0 text-lg font-bold text-sedra-green">
                 {t('playbook.cardTitle')}
@@ -234,11 +261,16 @@ export function PracticePanel({ unit }: { unit: Unit }) {
           {sortCards.map((card, ci) => {
             const value = picked[ci] ?? 0
             return (
-              <fieldset key={card.key} className="m-0 rounded-2xl border bg-white p-4">
+              <fieldset key={card.key} className="m-0 rounded-2xl border bg-white p-4 shadow-sm">
                 <legend className="px-1 font-semibold">{t(`sort.cards.${card.key}`)}</legend>
-                <div className="mt-1 flex flex-wrap gap-2">
+                <div className="mt-1 grid gap-2 min-[26rem]:grid-cols-2">
                   {([1, 2] as const).map((v) => (
-                    <ToggleChoice key={v} pressed={value === v} onClick={() => setSlot(ci, v)}>
+                    <ToggleChoice
+                      key={v}
+                      compact
+                      pressed={value === v}
+                      onClick={() => setSlot(ci, v)}
+                    >
                       {v === 1 ? t('sort.helpful') : t('sort.notHelpful')}
                     </ToggleChoice>
                   ))}
@@ -278,27 +310,35 @@ export function PracticePanel({ unit }: { unit: Unit }) {
       ) : (
         <fieldset className="m-0 border-0 p-0">
           <legend className="mb-2 p-0 font-semibold">{t('practice.statusLegend')}</legend>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 rounded-3xl bg-sedra-pale-50 p-1.5 ring-1 ring-border">
             {statuses.map((s) => {
               const Icon = STATUS_ICONS[s]
               const pressed = currentStatus === s
               return (
-                <Button
+                <button
                   key={s}
                   type="button"
-                  variant={pressed ? 'default' : 'outline'}
                   aria-pressed={pressed}
                   onClick={() => setStatus(s)}
+                  className={cn(
+                    'inline-flex min-h-12 flex-1 basis-28 items-center justify-center gap-2 rounded-full px-4 text-base font-semibold transition-[background-color,box-shadow,color] duration-200',
+                    pressed
+                      ? 'bg-sedra-green text-white shadow-md'
+                      : 'text-sedra-green hover:bg-white',
+                  )}
                 >
-                  <Icon aria-hidden="true" />
+                  <Icon aria-hidden="true" className="size-5 shrink-0" />
                   {t(`practice.status.${s}`)}
-                </Button>
+                </button>
               )
             })}
           </div>
         </fieldset>
       )}
-      <p className="m-0 text-base text-ink-soft">{t('practice.optionalNote')}</p>
+      <p className="m-0 flex items-center gap-2 text-base text-ink-soft">
+        <Clock aria-hidden="true" className="size-5 shrink-0" />
+        {t('practice.optionalNote')}
+      </p>
     </div>
   )
 }

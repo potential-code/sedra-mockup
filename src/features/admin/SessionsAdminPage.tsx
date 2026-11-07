@@ -1,20 +1,34 @@
 import type { LiveSession, ProgrammeId } from '@shared/types'
-import { Captions, FileText, Pencil, Save, X } from 'lucide-react'
+import {
+  CalendarDays,
+  Captions,
+  ClipboardCheck,
+  FileText,
+  Link2,
+  Pencil,
+  Save,
+  Video,
+  X,
+} from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
   AdminPageHeader,
+  Chip,
   DemoTag,
+  IconCircle,
   Notice,
   SelectField,
   StatusLabel,
   TextField,
 } from '@/components/admin/AdminUi'
 import { fromUaeParts, toUaeParts, useUaeFormat } from '@/components/admin/format'
+import { Reveal, stagger } from '@/components/motion/Reveal'
 import { announce } from '@/components/shared/LiveRegion'
 import { Button } from '@/components/ui/button'
 import { useLocalized } from '@/i18n'
+import { asset } from '@/lib/asset'
 import { saveSession, useAdminSessions } from '@/store/admin-actions'
 
 /** /admin/sessions: demo session records and editor (brief §9 Sessions editor). */
@@ -33,7 +47,7 @@ export function SessionsAdminPage() {
 
   return (
     <div>
-      <AdminPageHeader title={t('sessions.title')} intro={t('sessions.intro')}>
+      <AdminPageHeader title={t('sessions.title')} intro={t('sessions.intro')} icon={CalendarDays}>
         <DemoTag />
       </AdminPageHeader>
 
@@ -41,9 +55,9 @@ export function SessionsAdminPage() {
         <p>{t('sessions.integrationNote')}</p>
       </Notice>
 
-      <ul className="m-0 grid list-none gap-4 p-0 lg:grid-cols-2">
-        {sessions.map((s) => (
-          <li key={s.id} className="max-w-none">
+      <ul className="m-0 grid list-none gap-5 p-0 lg:grid-cols-2">
+        {sessions.map((s, i) => (
+          <Reveal as="li" key={s.id} delay={stagger(i)} className="max-w-none">
             <SessionCard
               session={s}
               editing={editing === s.id}
@@ -52,7 +66,7 @@ export function SessionsAdminPage() {
               }}
               onEdit={() => setEditing(s.id)}
             />
-          </li>
+          </Reveal>
         ))}
       </ul>
 
@@ -73,85 +87,141 @@ function SessionCard({
   onEdit: () => void
 }) {
   const { t } = useTranslation('admin')
-  const { l } = useLocalized()
+  const { l, lang } = useLocalized()
   const f = useUaeFormat()
   const headingId = `ses-${s.id}`
+  const locale = lang === 'ar' ? 'ar-AE' : 'en-AE'
+  const d = new Date(s.startsAt)
+  const month = new Intl.DateTimeFormat(locale, { timeZone: 'Asia/Dubai', month: 'short' }).format(
+    d,
+  )
+  const day = new Intl.DateTimeFormat(locale, { timeZone: 'Asia/Dubai', day: 'numeric' }).format(d)
+  const image =
+    s.programmeId === 'life-skills'
+      ? 'images/programme-life-skills.webp'
+      : 'images/programme-hospitality.webp'
   return (
     <article
       aria-labelledby={headingId}
-      className="flex h-full flex-col gap-3 rounded-2xl border bg-white p-5"
+      className={`card-pop flex h-full flex-col overflow-hidden ${editing ? 'ring-3 ring-sedra-green' : ''}`}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <DemoTag />
-        <span className="text-sm font-semibold text-ink-soft">
-          {t(`programme.${s.programmeId}`)}
-        </span>
+      <div className="relative h-28 shrink-0">
+        <img
+          src={asset(image)}
+          alt=""
+          width={640}
+          height={160}
+          className="size-full object-cover"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-sedra-green-800/35" />
+        <div className="absolute top-3 end-3">
+          <DemoTag />
+        </div>
       </div>
-      <h2 id={headingId} className="m-0 text-xl">
-        {l(s.title)}
-      </h2>
-      <dl className="m-0 grid gap-x-4 gap-y-1 sm:grid-cols-[auto_1fr]">
-        <dt className="font-semibold">{t('sessions.when')}</dt>
-        <dd className="m-0">
-          {f.dateTime(s.startsAt)} {t('common.uaeTime')}
-        </dd>
-        <dt className="font-semibold">{t('sessions.fields.accessLink')}</dt>
-        <dd className="m-0 break-all">
-          <span className="ltr-isolate">{s.accessLink}</span>{' '}
-          <span className="text-sm text-ink-soft">({t('sessions.demoLink')})</span>
-        </dd>
-        <dt className="font-semibold">{t('sessions.fields.attendance')}</dt>
-        <dd className="m-0">
-          <StatusLabel
-            tone={
-              s.attendanceStatus === 'attended'
-                ? 'done'
-                : s.attendanceStatus === 'upcoming'
-                  ? 'info'
-                  : 'neutral'
-            }
+      <div className="flex flex-1 flex-col gap-4 p-5 pt-0">
+        <div className="-mt-10 flex items-end gap-4">
+          <div
+            aria-hidden="true"
+            className="relative flex w-20 shrink-0 flex-col overflow-hidden rounded-2xl bg-white text-center shadow-lg"
           >
-            {t(`sessions.attendance.${s.attendanceStatus}`)}
-          </StatusLabel>
-        </dd>
-        <dt className="font-semibold">{t('sessions.fields.recording')}</dt>
-        <dd className="m-0">
-          <StatusLabel tone={s.recordingStatus === 'available' ? 'info' : 'pending'}>
-            {t(`sessions.recording.${s.recordingStatus}`)}
-          </StatusLabel>
-        </dd>
-      </dl>
+            <span className="bg-sedra-green py-1 text-sm font-bold text-white uppercase">
+              {month}
+            </span>
+            <span className="py-1.5 text-3xl font-bold text-ink tabular-nums">{day}</span>
+          </div>
+          <Chip className="mb-1">{t(`programme.${s.programmeId}`)}</Chip>
+        </div>
+        <h2 id={headingId} className="m-0 text-xl">
+          {l(s.title)}
+        </h2>
+        <dl className="m-0 flex flex-col gap-3">
+          <div>
+            <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+              <CalendarDays aria-hidden="true" className="size-4 text-sedra-green" />
+              {t('sessions.when')}
+            </dt>
+            <dd className="m-0 ms-6 font-semibold">
+              {f.dateTime(s.startsAt)} {t('common.uaeTime')}
+            </dd>
+          </div>
+          <div>
+            <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+              <Link2 aria-hidden="true" className="size-4 text-sedra-green" />
+              {t('sessions.fields.accessLink')}
+            </dt>
+            <dd className="m-0 ms-6 break-all">
+              <span className="ltr-isolate">{s.accessLink}</span>{' '}
+              <span className="text-sm text-ink-soft">({t('sessions.demoLink')})</span>
+            </dd>
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-3">
+            <div>
+              <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+                <ClipboardCheck aria-hidden="true" className="size-4 text-sedra-green" />
+                {t('sessions.fields.attendance')}
+              </dt>
+              <dd className="m-0 mt-1">
+                <StatusLabel
+                  tone={
+                    s.attendanceStatus === 'attended'
+                      ? 'done'
+                      : s.attendanceStatus === 'upcoming'
+                        ? 'info'
+                        : 'neutral'
+                  }
+                >
+                  {t(`sessions.attendance.${s.attendanceStatus}`)}
+                </StatusLabel>
+              </dd>
+            </div>
+            <div>
+              <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+                <Video aria-hidden="true" className="size-4 text-sedra-green" />
+                {t('sessions.fields.recording')}
+              </dt>
+              <dd className="m-0 mt-1">
+                <StatusLabel tone={s.recordingStatus === 'available' ? 'info' : 'pending'}>
+                  {t(`sessions.recording.${s.recordingStatus}`)}
+                </StatusLabel>
+              </dd>
+            </div>
+          </div>
+        </dl>
 
-      <section
-        aria-label={t('sessions.placeholdersLabel', { title: l(s.title) })}
-        className="flex flex-col gap-2 rounded-xl bg-sedra-pale-50 p-3"
-      >
-        <p className="m-0 flex items-start gap-2">
-          <Captions aria-hidden="true" className="mt-1 size-5 shrink-0" />
-          <span>
-            <strong>{t('sessions.captionedRecording')}:</strong> {t('sessions.pendingRecording')}
-          </span>
-        </p>
-        <p className="m-0 flex items-start gap-2">
-          <FileText aria-hidden="true" className="mt-1 size-5 shrink-0" />
-          <span>
-            <strong>{t('sessions.transcript')}:</strong> {t('sessions.pendingRecording')}
-          </span>
-        </p>
-      </section>
-
-      <div className="mt-auto">
-        <Button
-          ref={openerRef}
-          type="button"
-          variant="outline"
-          onClick={onEdit}
-          aria-expanded={editing}
-          aria-label={t('sessions.editTitle', { title: l(s.title) })}
+        <section
+          aria-label={t('sessions.placeholdersLabel', { title: l(s.title) })}
+          className="grid gap-2 sm:grid-cols-2"
         >
-          <Pencil aria-hidden="true" />
-          {t('sessions.edit')}
-        </Button>
+          {[
+            { icon: Captions, label: t('sessions.captionedRecording') },
+            { icon: FileText, label: t('sessions.transcript') },
+          ].map((p) => (
+            <p
+              key={p.label}
+              className="m-0 flex items-center gap-3 rounded-xl border-2 border-dashed border-border bg-sedra-pale-50 p-3"
+            >
+              <IconCircle icon={p.icon} tint="notice" size="sm" />
+              <span className="min-w-0 text-sm">
+                <strong className="block text-ink">{p.label}</strong>
+                {t('sessions.pendingRecording')}
+              </span>
+            </p>
+          ))}
+        </section>
+
+        <div className="mt-auto">
+          <Button
+            ref={openerRef}
+            type="button"
+            variant="outline"
+            onClick={onEdit}
+            aria-expanded={editing}
+            aria-label={t('sessions.editTitle', { title: l(s.title) })}
+          >
+            <Pencil aria-hidden="true" />
+            {t('sessions.edit')}
+          </Button>
+        </div>
       </div>
     </article>
   )
@@ -230,12 +300,17 @@ function SessionForm({ session, onClose }: { session: LiveSession; onClose: () =
     <section
       id="session-editor"
       aria-labelledby="session-editor-title"
-      className="mt-8 rounded-2xl border-2 border-sedra-green bg-white p-4 sm:p-6"
+      className="mt-8 rounded-3xl bg-white ring-2 ring-sedra-green/40 p-4 shadow-lg sm:p-7"
     >
-      <h2 id="session-editor-title" ref={headingRef} tabIndex={-1} className="m-0 mb-1 text-2xl">
-        {t('sessions.editTitle', { title: l(session.title) })}
-      </h2>
-      <p className="mt-0 mb-4 text-ink-soft">{t('sessions.editIntro')}</p>
+      <div className="mb-5 flex items-center gap-3">
+        <IconCircle icon={Pencil} size="lg" />
+        <div className="min-w-0">
+          <h2 id="session-editor-title" ref={headingRef} tabIndex={-1} className="m-0 text-2xl">
+            {t('sessions.editTitle', { title: l(session.title) })}
+          </h2>
+          <p className="m-0 text-ink-soft">{t('sessions.editIntro')}</p>
+        </div>
+      </div>
       <form
         noValidate
         onSubmit={(e) => {
@@ -274,7 +349,7 @@ function SessionForm({ session, onClose }: { session: LiveSession; onClose: () =
             required
           />
         </div>
-        <fieldset className="m-0 flex flex-col gap-4 rounded-xl border p-4">
+        <fieldset className="m-0 flex flex-col gap-4 rounded-2xl border-2 border-dashed border-border bg-sedra-pale-50/60 p-4">
           <legend className="px-1 font-semibold text-ink">
             {t('sessions.fields.dateTimeLegend')}
           </legend>

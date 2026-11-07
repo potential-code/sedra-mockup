@@ -166,17 +166,32 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
   }
 
   const playLabel = playing ? t('player.pause') : ended ? t('player.playAgain') : t('player.play')
+  const pct = duration > 0 ? Math.min(100, (time / duration) * 100) : 0
+  const roundBtn =
+    'rounded-full text-white hover:bg-white/15 hover:text-white aria-pressed:bg-white/20'
 
   return (
     <section
       aria-label={label}
-      className="overflow-hidden rounded-2xl border bg-ink text-white"
+      className={cn(
+        'mx-auto w-full max-w-[24rem] overflow-hidden rounded-3xl bg-sedra-green-800 text-white shadow-lg ring-1 ring-black/5',
+        fullscreen && 'flex max-w-none flex-col rounded-none',
+      )}
       ref={wrapRef}
     >
-      <div className={cn('flex justify-center bg-black', fullscreen && 'h-[calc(100%-8rem)]')}>
+      <div
+        className={cn(
+          'relative flex justify-center overflow-hidden bg-black',
+          fullscreen && 'min-h-0 flex-1',
+        )}
+      >
         <video
           ref={videoRef}
-          className={cn('block h-auto max-h-[60vh] w-auto max-w-full', fullscreen && 'max-h-full')}
+          className={cn(
+            'block aspect-[9/16] max-h-[68vh] w-full object-contain',
+            '[&::cue]:bg-[rgb(0_0_0/0.82)] [&::cue]:text-[1.05em] [&::cue]:leading-snug [&::cue]:text-white',
+            fullscreen && 'h-full max-h-none w-auto',
+          )}
           src={asset(src)}
           poster={asset(poster)}
           preload="metadata"
@@ -205,10 +220,29 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
             default={captionsDefault}
           />
         </video>
+        {/* Decorative play cue over the paused frame; clicks pass through to the video. */}
+        {!playing && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/15"
+          >
+            <span className="flex size-20 items-center justify-center rounded-full bg-white/90 text-sedra-green shadow-pop">
+              {ended ? (
+                <RotateCcw className="size-9" />
+              ) : (
+                <Play className="size-9 translate-x-0.5 fill-current" />
+              )}
+            </span>
+          </span>
+        )}
+        {/* Progress sliver along the bottom of the frame (illustration; the slider below is the control). */}
+        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1 bg-white/20">
+          <span className="block h-full bg-sedra-lime" style={{ width: `${pct}%` }} />
+        </span>
       </div>
 
       {/* Player controls keep their order in RTL (brief §4: do not mirror player controls). */}
-      <div dir="ltr" className="flex flex-col gap-2 bg-ink p-3">
+      <div dir="ltr" className="flex flex-col gap-1 px-3 pt-2 pb-3">
         <div className="flex items-center gap-3">
           <label htmlFor={`${ids}-pos`} className="sr-only">
             {t('player.position')}
@@ -225,9 +259,9 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
               current: formatTime(time),
               total: formatTime(duration),
             })}
-            className="h-12 min-w-0 flex-1 accent-white"
+            className="h-12 min-w-0 flex-1 cursor-pointer accent-white"
           />
-          <span id={`${ids}-time`} className="shrink-0 text-base tabular-nums">
+          <span id={`${ids}-time`} className="shrink-0 text-base font-semibold tabular-nums">
             <span className="sr-only">{t('player.time')} </span>
             {formatTime(time)} / {formatTime(duration)}
           </span>
@@ -237,17 +271,21 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
             ref={playRef}
             type="button"
             size="icon"
-            className="bg-white text-ink hover:bg-sedra-pale-100"
+            className="size-14 rounded-full bg-white text-sedra-green-800 shadow-md hover:bg-sedra-pale-100"
             onClick={togglePlay}
             aria-label={playLabel}
           >
-            {playing ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
+            {playing ? (
+              <Pause aria-hidden="true" className="size-6 fill-current" />
+            ) : (
+              <Play aria-hidden="true" className="size-6 translate-x-0.5 fill-current" />
+            )}
           </Button>
           <Button
             type="button"
             size="icon"
             variant="ghost"
-            className="text-white hover:bg-white/15 hover:text-white"
+            className={roundBtn}
             onClick={replay}
             aria-label={t('player.replay')}
           >
@@ -257,7 +295,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
             type="button"
             size="icon"
             variant="ghost"
-            className="text-white hover:bg-white/15 hover:text-white aria-pressed:bg-white/20"
+            className={roundBtn}
             onClick={() => setCaptionsOn((c) => !c)}
             aria-pressed={captionsOn}
             aria-label={t('player.captions')}
@@ -268,16 +306,29 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
             type="button"
             size="icon"
             variant="ghost"
-            className="text-white hover:bg-white/15 hover:text-white"
+            className={roundBtn}
             onClick={() => setMuted((m) => !m)}
             aria-pressed={muted}
             aria-label={t('player.mute')}
           >
             {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
           </Button>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className={cn(roundBtn, 'ms-auto')}
+            onClick={toggleFullscreen}
+            aria-label={fullscreen ? t('player.exitFullscreen') : t('player.fullscreen')}
+          >
+            {fullscreen ? <Minimize aria-hidden="true" /> : <Maximize aria-hidden="true" />}
+          </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-black/20 px-3">
           <label htmlFor={`${ids}-vol`} className="sr-only">
             {t('player.volume')}
           </label>
+          <Volume2 aria-hidden="true" className="size-5 shrink-0 opacity-80" />
           <input
             id={`${ids}-vol`}
             type="range"
@@ -290,7 +341,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
               setMuted(Number(e.target.value) === 0)
             }}
             aria-valuetext={`${Math.round((muted ? 0 : volume) * 100)}%`}
-            className="h-12 w-24 accent-white"
+            className="h-12 min-w-0 flex-1 basis-24 cursor-pointer accent-white"
           />
           <label htmlFor={`${ids}-speed`} className="sr-only">
             {t('player.speed')}
@@ -299,7 +350,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
             id={`${ids}-speed`}
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
-            className="min-h-12 rounded-xl border border-white/60 bg-ink px-3 text-base text-white"
+            className="my-1 min-h-12 cursor-pointer rounded-full border border-white/50 bg-sedra-green-800 px-4 text-base font-semibold text-white"
           >
             {SPEEDS.map((s) => (
               <option key={s} value={s}>
@@ -307,16 +358,6 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
               </option>
             ))}
           </select>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="ms-auto text-white hover:bg-white/15 hover:text-white"
-            onClick={toggleFullscreen}
-            aria-label={fullscreen ? t('player.exitFullscreen') : t('player.fullscreen')}
-          >
-            {fullscreen ? <Minimize aria-hidden="true" /> : <Maximize aria-hidden="true" />}
-          </Button>
         </div>
       </div>
     </section>

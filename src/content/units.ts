@@ -190,8 +190,8 @@ const LS01 = ls({
     ),
   },
   imageAlt: l(
-    'Two peers share labelled speech cards in a calm, uncluttered scene.',
-    'صديقان يتبادلان بطاقات كلام في مشهد هادئ وبسيط.',
+    'Lena holds a speech-bubble card while Maya points to a picture board.',
+    'تحمل لينا بطاقة فقاعة كلام بينما تشير مايا إلى لوحة صور.',
   ),
 })
 
@@ -259,8 +259,8 @@ const LS02 = ls({
     ),
   },
   imageAlt: l(
-    'Lena pauses beside three labelled cards: Stop, Think, Do.',
-    'تتوقّف لينا بجانب ثلاث بطاقات: توقّف، فكّر، افعل.',
+    'Lena pauses in a quiet corridor, beside picture cards for stop, think and do.',
+    'تتوقّف لينا في ممرّ هادئ بجانب بطاقات صور للتوقّف والتفكير والفعل.',
   ),
   badge: l('Paused and noticed', 'توقّفتُ ولاحظتُ'),
 })
@@ -336,8 +336,8 @@ const LS03 = ls({
     ],
   },
   imageAlt: l(
-    'A person sits comfortably in a quiet space and chooses a calming card.',
-    'شخص يجلس براحة في مكان هادئ ويختار بطاقة تساعده على الهدوء.',
+    'A young man chooses a picture card while a supporter waits nearby.',
+    'شاب يختار بطاقة صور بينما ينتظر شخص داعم بالقرب منه.',
   ),
 })
 
@@ -406,8 +406,8 @@ const LS04 = ls({
     ],
   },
   imageAlt: l(
-    'Lena pauses with labelled feeling cards: hurt and confused.',
-    'تتوقّف لينا ومعها بطاقات مشاعر: متألّمة ومحتارة.',
+    'Lena stands apart, holding feeling cards, while others chat in the hallway.',
+    'تقف لينا وحدها وتحمل بطاقات مشاعر، بينما يتحدّث آخرون في الممرّ.',
   ),
   badge: l('Recognised a feeling', 'تعرّفتُ على شعور'),
 })
@@ -482,8 +482,8 @@ const LS05 = ls({
     multiple: true,
   },
   imageAlt: l(
-    'Lena looks at a question card and chooses a card that says Can we talk?',
-    'تنظر لينا إلى بطاقة سؤال وتختار بطاقة مكتوب عليها: هل يمكننا أن نتحدّث؟',
+    'Lena sits at a table with a question-mark card and a picture tablet.',
+    'تجلس لينا إلى طاولة أمامها بطاقة علامة استفهام وجهاز لوحي بالصور.',
   ),
 })
 
@@ -548,8 +548,8 @@ const LS06 = ls({
     ),
   },
   imageAlt: l(
-    'Lena and Maya talk calmly with a short communication card.',
-    'لينا ومايا تتحدّثان بهدوء مع بطاقة تواصل قصيرة.',
+    'Lena shows Maya a speech-bubble card as they start to talk.',
+    'تُري لينا مايا بطاقة فقاعة كلام وهما تبدآن الحديث.',
   ),
   badge: l('Tried a kind response', 'جرّبتُ ردّاً لطيفاً'),
 })
@@ -618,8 +618,8 @@ const LS07 = ls({
     ),
   },
   imageAlt: l(
-    'Two peers talk respectfully beside three labelled steps: Stop, Think, Do.',
-    'صديقان يتحدّثان باحترام بجانب ثلاث خطوات: توقّف، فكّر، افعل.',
+    'Lena and Maya talk calmly at a table with talk and break cards.',
+    'لينا ومايا تتحدّثان بهدوء إلى طاولة عليها بطاقتا الحديث والاستراحة.',
   ),
 })
 
@@ -694,8 +694,8 @@ const LS08 = ls({
     ],
   },
   imageAlt: l(
-    'A three-card playbook with a pause card and a help message card.',
-    'دليل من ثلاث بطاقات فيه بطاقة توقّف وبطاقة رسالة لطلب المساعدة.',
+    'Lena makes her own reminder with a folded card booklet.',
+    'تصنع لينا تذكيرها الخاص بكتيّب بطاقات مطويّ.',
   ),
   badge: l('Built a reminder', 'صنعتُ تذكيراً'),
 })
@@ -778,8 +778,8 @@ const HF01 = hf({
     ),
   },
   imageAlt: l(
-    'A host offers a welcome card to a guest at a clear reception area.',
-    'مضيف يقدّم بطاقة ترحيب لضيف في منطقة استقبال واضحة.',
+    'A host at reception holds up a welcome card as a guest arrives.',
+    'مضيف في الاستقبال يرفع بطاقة ترحيب عند وصول ضيفة.',
   ),
 })
 
@@ -858,8 +858,8 @@ const HF02 = hf({
     ],
   },
   imageAlt: l(
-    'A host welcomes a visitor at the door, with labelled cards for everyday places.',
-    'مضيف يرحّب بزائر عند الباب، مع بطاقات لأماكن من الحياة اليومية.',
+    'A host welcomes a visitor who uses a wheelchair at a home entrance.',
+    'مضيفة ترحّب بزائر يستخدم كرسيّاً متحرّكاً عند مدخل منزل.',
   ),
 })
 
@@ -935,8 +935,8 @@ const HF03 = hf({
     ],
   },
   imageAlt: l(
-    'A host listens to a visitor and offers a map at reception.',
-    'مضيف يستمع إلى زائر ويقدّم له خريطة في الاستقبال.',
+    'A host and a guest look at a map together at reception.',
+    'مضيف وضيفة ينظران معاً إلى خريطة في الاستقبال.',
   ),
 })
 
@@ -998,8 +998,8 @@ const HF04 = hf({
     ),
   },
   imageAlt: l(
-    'A host offers a question card while a guest looks at a simple map.',
-    'مضيف يقدّم بطاقة سؤال بينما ينظر الضيف إلى خريطة بسيطة.',
+    'A guest points at a wall map while the host waits with a question card.',
+    'ضيفة تشير إلى خريطة على الحائط بينما ينتظر المضيف ومعه بطاقة سؤال.',
   ),
 })
 
@@ -1074,8 +1074,8 @@ const HF05 = hf({
     choices: [l('Good', 'جيدة'), l('Uncomfortable', 'غير مريحة'), l('Enjoyable', 'ممتعة')],
   },
   imageAlt: l(
-    'A host gives clear information beside labelled comfortable and uncomfortable cards.',
-    'مضيف يعطي معلومات واضحة بجانب بطاقتين: مريح وغير مريح.',
+    'A host points to a lightbulb card to give a guest clear information.',
+    'مضيف يشير إلى بطاقة مصباح ليعطي الضيفة معلومات واضحة.',
   ),
 })
 
@@ -1146,8 +1146,8 @@ const HF06 = hf({
     ),
   },
   imageAlt: l(
-    'A guest points to a map at reception and the host responds.',
-    'ضيف يشير إلى خريطة في الاستقبال، والمضيف يستجيب.',
+    'A host traces a route on a map for a guest at reception.',
+    'مضيف يرسم الطريق على خريطة لضيفة في الاستقبال.',
   ),
 })
 
@@ -1218,8 +1218,8 @@ const HF07 = hf({
     ),
   },
   imageAlt: l(
-    'Host and guest role cards with helpful and not helpful sorting cards.',
-    'بطاقتا دور المضيف والضيف مع بطاقات تصنيف: مفيد وغير مفيد.',
+    'Two young adults practise a welcome role-play while another practises alone.',
+    'شابّان يتدرّبان على لعب دور الترحيب بينما يتدرّب شخص آخر وحده.',
   ),
 })
 
@@ -1298,8 +1298,8 @@ const HF08 = hf({
     ],
   },
   imageAlt: l(
-    'Three labelled reminder cards with a greeting card and a map card.',
-    'ثلاث بطاقات تذكير مع بطاقة تحية وبطاقة خريطة.',
+    'A young woman holds a greeting card beside picture cards for everyday actions.',
+    'شابة تحمل بطاقة تحية بجانب بطاقات صور لأفعال يومية.',
   ),
 })
 

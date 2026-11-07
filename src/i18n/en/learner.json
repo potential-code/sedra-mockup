@@ -40,7 +40,24 @@
     "accessCaptions": "Captions and text for every video",
     "accessButtons": "Buttons instead of gestures. No time limits.",
     "accessNote": "You can change these choices at any time after you sign in.",
-    "signInCta": "Sign in to start"
+    "signInCta": "Sign in to start",
+    "eyebrow": "Learn at your own pace",
+    "headline": "Learn everyday skills. Practise hospitality.",
+    "heroStat": "16 short units",
+    "heroStatSub": "in 2 programmes",
+    "heroChip": "Captions on every video",
+    "heroChipSub": "Text version too",
+    "howHeading": "How each lesson works",
+    "howLead": "One clear task at a time. No timers.",
+    "step": "Step {{n}}",
+    "step1Title": "Watch or read",
+    "step1Body": "A 30-second video, or read the same lesson as text.",
+    "step2Title": "Try one question",
+    "step2Body": "No time limit. Try again as often as you like.",
+    "step3Title": "Practise",
+    "step3Body": "An optional activity. Do it now, later or with help.",
+    "programmesLead": "Pick one to start. You can switch at any time.",
+    "accessKicker": "Our promise"
   },
   "welcome": {
     "pageTitle": "Sign in",
@@ -57,11 +74,16 @@
     "submit": "Sign in (demo)",
     "demoNote": "Demo: this opens the fictional learner Noor. Real emails are not sent.",
     "needHelp": "Need help signing in?",
-    "helpBody": "Ask your supporter or the SEDRA team. You can take your time. In this demo, you can also choose a profile below.",
+    "helpBody": "Ask your supporter or the SEDRA team. You can take your time. In this demo, you can also choose a profile above.",
     "personasHeading": "Or choose a demo profile",
     "personasLead": "All profiles are fictional.",
     "choose": "Continue as {{name}}",
-    "avatarAlt": "Picture for {{name}}"
+    "avatarAlt": "Picture for {{name}}",
+    "pickHeading": "Choose a demo profile",
+    "pickLead": "Pick who you want to be. All profiles are fictional.",
+    "staffTag": "Staff",
+    "emailToggle": "Sign in with email (demo)",
+    "emailToggleHint": "Opens the fictional learner Noor."
   },
   "prefs": {
     "pageTitle": "Preferences",
@@ -85,10 +107,17 @@
     "motion": "Movement on screen",
     "motionSystem": "Follow my device",
     "motionOn": "Reduce movement",
-    "motionOff": "Allow movement",
+    "motionOff": "Allow gentle movement (your device setting still wins)",
     "readAloud": "Read-aloud button",
     "readAloudHint": "Shows a button to hear some text read aloud. You start and stop it. It does not replace your screen reader.",
-    "save": "Save and continue"
+    "save": "Save and continue",
+    "sectionReading": "Language and view",
+    "sectionSeeing": "Text and contrast",
+    "sectionMedia": "Video and sound",
+    "sectionMovement": "Movement",
+    "previewLabel": "Preview",
+    "previewText": "Short lessons. Clear steps. Your own pace.",
+    "saveNote": "You can change these at any time."
   },
   "dashboard": {
     "pageTitle": "My learning",
@@ -112,7 +141,19 @@
     "helpHeading": "Need help?",
     "helpBody": "Read tips or ask for support.",
     "openHelp": "Open Help",
-    "prefsLink": "Change how you learn"
+    "prefsLink": "Change how you learn",
+    "heroEyebrow": "Pick up where you stopped",
+    "heroEyebrowStart": "Your first step",
+    "heroDoneTitle": "Well done",
+    "courseProgress": "Course progress",
+    "statsLabel": "My learning at a glance",
+    "statUnits": "Units complete",
+    "statUnitsValue": "{{done}} of {{total}}",
+    "statBadges": "Badges earned",
+    "statBadgesValue": "{{count}} of 4",
+    "statSession": "Next live session",
+    "badgeEarned": "{{badge}}: earned",
+    "badgeNotYet": "{{badge}}: not yet"
   },
   "programme": {
     "notFound": "We could not find this programme.",
@@ -129,7 +170,14 @@
     "badge": "Badge: {{badge}}",
     "start": "Start",
     "continue": "Continue",
-    "review": "Review"
+    "review": "Review",
+    "unitNumber": "Unit {{n}}",
+    "videoPendingChip": "Video being prepared",
+    "videoSampleChip": "Sample video",
+    "durationChip": "30 seconds",
+    "upNext": "Up next",
+    "progressHeading": "Your progress",
+    "pathLead": "Go in order or choose any unit. You can replay every unit."
   },
   "sessions": {
     "pageTitle": "Sessions",
@@ -153,7 +201,9 @@
     "viewRecording": "View recording",
     "viewDisabled": "View recording is not available yet because the recording is pending.",
     "noPenalty": "Missing a session is okay. Recordings are separate from your course progress.",
-    "seedNote": "Dates are demo examples."
+    "seedNote": "Dates are demo examples.",
+    "next": "Next live session",
+    "heroAlt": "A group of young people sit together and share picture cards."
   },
   "resources": {
     "pageTitle": "Resources",
@@ -206,7 +256,8 @@
     "hideOptional": "Hide optional resources",
     "downloadsHeading": "Print",
     "downloadsBody": "You can print this page if you like paper.",
-    "print": "Print this page"
+    "print": "Print this page",
+    "jumpLabel": "Go to a course"
   },
   "achievements": {
     "pageTitle": "My achievements",
@@ -226,7 +277,15 @@
     "hospitalityHeading": "Hospitality for All",
     "hospitalityDone": "You practised a new skill. Continue when you are ready.",
     "hospitalityNotYet": "Finish all 8 units to see your acknowledgement.",
-    "disclaimer": "These milestones are personal. They are not a qualification, certificate or proof of readiness for work."
+    "disclaimer": "These milestones are personal. They are not a qualification, certificate or proof of readiness for work.",
+    "summaryLabel": "My achievements at a glance",
+    "badgesCount": "{{count}} of 4 badges",
+    "journeyHeading": "My learning journey",
+    "journeyLead": "Units you finished, in course order.",
+    "journeyDone": "Finished",
+    "journeyNext": "Up next",
+    "journeyEmpty": "Your journey starts with your first unit.",
+    "badgeAfter": "After unit {{n}}"
   },
   "help": {
     "pageTitle": "Help",

@@ -4,11 +4,19 @@ import {
   ArrowLeft,
   ArrowRight,
   Award,
+  ChevronDown,
+  Clapperboard,
   ExternalLink,
   Flag,
   HelpCircle,
+  Layers,
   ListOrdered,
+  type LucideIcon,
+  MessageCircleQuestion,
+  PartyPopper,
+  Sparkles,
 } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KnowledgeCheck } from '@/components/check/KnowledgeCheck'
@@ -27,7 +35,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { getCourse, getUnit, nextUnit, previousUnit, unitsForCourse } from '@/content'
 import { usePageTitle } from '@/hooks/use-page-title'
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { useLocalized } from '@/i18n'
+import { asset } from '@/lib/asset'
+import { cn } from '@/lib/utils'
 import {
   getUnitProgress,
   isUnitComplete,
@@ -40,6 +51,16 @@ import { LessonMedia, type MediaMode, videoFor } from './LessonMedia'
 import { PracticePanel } from './PracticePanel'
 import { StepNav } from './StepNav'
 import { UnitOutline } from './UnitOutline'
+
+const STEP_ORDER: UnitStep[] = ['media', 'check', 'practice']
+const STEP_ICONS: Record<UnitStep, LucideIcon> = {
+  media: Clapperboard,
+  check: MessageCircleQuestion,
+  practice: Sparkles,
+}
+/** White buttons on the green banner (green text on white: 6.48:1). */
+const BANNER_BTN = 'bg-white text-sedra-green shadow-sm hover:bg-sedra-pale-100'
+const PRIMARY_BTN = 'flex-1 shadow-md sm:flex-none'
 
 /** Set before in-page navigation to another unit so its h1 receives focus on arrival. */
 let focusHeadingOnMount = false
@@ -77,6 +98,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
   const navigate = useNavigate()
   const prefs = usePrefs()
   const learner = useLearner()
+  const reduce = useReducedMotion()
   const progress = getUnitProgress(learner, unit.id)
   const units = unitsForCourse(unit.courseId)
   const prev = previousUnit(unit.id)
@@ -175,62 +197,124 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
         ? t('steps.checkTitle')
         : t('steps.practiceTitle')
 
+  const stepIndex = STEP_ORDER.indexOf(step)
+  const prevStepIndex = useRef(stepIndex)
+  const stepDir = stepIndex >= prevStepIndex.current ? 1 : -1
+  useEffect(() => {
+    prevStepIndex.current = stepIndex
+  }, [stepIndex])
+  const StepIcon = STEP_ICONS[step]
+  const doneInCourse = units.filter((u) => isUnitComplete(getUnitProgress(learner, u.id))).length
+
   return (
     <div className="container-page py-4 md:py-6">
-      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start lg:gap-8">
-        <article aria-labelledby="unit-title" className="flex min-w-0 flex-col gap-5">
-          <header className="flex flex-col gap-3">
-            <Link
-              to="/programmes/$programmeId"
-              params={{ programmeId: unit.programmeId }}
-              className="flex min-h-12 items-center gap-2 self-start rounded-lg font-semibold text-sedra-green underline-offset-4 hover:underline"
-            >
-              <ArrowLeft aria-hidden="true" className="size-5 rtl-mirror" />
-              {t('nav.backToCourse', { course: l(course.title) })}
-            </Link>
-            <p className="m-0 font-semibold text-ink-soft">
-              {t('unitOf', { n: unit.order, total: units.length })}
-            </p>
-            <h1 id="unit-title" ref={h1Ref} tabIndex={-1} className="m-0 text-3xl md:text-4xl">
-              {l(unit.title)}
-            </h1>
-            <p className="m-0">{l(unit.objective)}</p>
-            <nav aria-label={t('nav.unitNav')} className="flex flex-wrap gap-2">
-              {prev ? (
-                <Button variant="outline" size="sm" onClick={() => goToUnit(prev)}>
-                  <ArrowLeft aria-hidden="true" className="rtl-mirror" />
-                  {t('nav.previousUnit')}
-                </Button>
-              ) : (
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/programmes/$programmeId" params={{ programmeId: unit.programmeId }}>
-                    <ListOrdered aria-hidden="true" />
-                    {t('nav.courseOverview')}
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start xl:gap-8">
+        <article aria-labelledby="unit-title" className="@container flex min-w-0 flex-col gap-5">
+          <header className="overflow-hidden rounded-3xl bg-white shadow-md">
+            {/* Unit banner: photo under a SEDRA-green scrim so white text always has contrast. */}
+            <div className="relative isolate overflow-hidden bg-sedra-green-800">
+              <img
+                src={asset(unit.image)}
+                alt=""
+                width={1200}
+                height={896}
+                className="absolute inset-0 -z-20 size-full scale-110 object-cover blur-[2px]"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 -z-10 bg-gradient-to-t from-sedra-green-800 via-sedra-green-800/90 to-sedra-green-800/80"
+              />
+              <div className="motif-tree-light flex flex-col gap-4 p-3 @md:p-6 @2xl:flex-row @2xl:items-end @2xl:gap-6">
+                <div className="flex min-w-0 flex-1 flex-col gap-3">
+                  <Link
+                    to="/programmes/$programmeId"
+                    params={{ programmeId: unit.programmeId }}
+                    className="flex min-h-12 items-center gap-2 self-start rounded-lg font-semibold text-white underline-offset-4 hover:underline"
+                  >
+                    <ArrowLeft aria-hidden="true" className="size-5 rtl-mirror" />
+                    {t('nav.backToCourse', { course: l(course.title) })}
                   </Link>
-                </Button>
-              )}
-              {next ? (
-                <Button variant="outline" size="sm" onClick={() => goToUnit(next)}>
-                  {t('nav.nextUnit')}
-                  <ArrowRight aria-hidden="true" className="rtl-mirror" />
-                </Button>
-              ) : (
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/programmes/$programmeId" params={{ programmeId: unit.programmeId }}>
-                    {t('nav.courseSummary')}
-                    <ArrowRight aria-hidden="true" className="rtl-mirror" />
-                  </Link>
-                </Button>
-              )}
-            </nav>
+                  <p className="m-0 inline-flex items-center gap-2 self-start rounded-full bg-white px-3 py-1 text-sm font-bold text-sedra-green shadow-sm">
+                    <Layers aria-hidden="true" className="size-4" />
+                    {t('unitOf', { n: unit.order, total: units.length })}
+                  </p>
+                  <h1
+                    id="unit-title"
+                    ref={h1Ref}
+                    tabIndex={-1}
+                    className="m-0 text-3xl text-white md:text-4xl"
+                  >
+                    {l(unit.title)}
+                  </h1>
+                  <p className="m-0 text-lg text-white">{l(unit.objective)}</p>
+                  <nav aria-label={t('nav.unitNav')} className="flex flex-wrap gap-2 pt-1">
+                    {prev ? (
+                      <Button size="sm" className={BANNER_BTN} onClick={() => goToUnit(prev)}>
+                        <ArrowLeft aria-hidden="true" className="rtl-mirror" />
+                        {t('nav.previousUnit')}
+                      </Button>
+                    ) : (
+                      <Button asChild size="sm" className={BANNER_BTN}>
+                        <Link
+                          to="/programmes/$programmeId"
+                          params={{ programmeId: unit.programmeId }}
+                        >
+                          <ListOrdered aria-hidden="true" />
+                          {t('nav.courseOverview')}
+                        </Link>
+                      </Button>
+                    )}
+                    {next ? (
+                      <Button size="sm" className={BANNER_BTN} onClick={() => goToUnit(next)}>
+                        {t('nav.nextUnit')}
+                        <ArrowRight aria-hidden="true" className="rtl-mirror" />
+                      </Button>
+                    ) : (
+                      <Button asChild size="sm" className={BANNER_BTN}>
+                        <Link
+                          to="/programmes/$programmeId"
+                          params={{ programmeId: unit.programmeId }}
+                        >
+                          {t('nav.courseSummary')}
+                          <ArrowRight aria-hidden="true" className="rtl-mirror" />
+                        </Link>
+                      </Button>
+                    )}
+                  </nav>
+                </div>
+                <img
+                  src={asset(unit.image)}
+                  alt=""
+                  width={1200}
+                  height={896}
+                  className="hidden aspect-[4/3] w-60 shrink-0 rotate-2 rounded-2xl object-cover shadow-pop ring-4 ring-white/90 @2xl:block"
+                />
+              </div>
+            </div>
+            <div className="px-1 pt-4 pb-2 @md:px-4">
+              <StepNav step={step} progress={progress} onStep={(s) => goStep(s)} />
+            </div>
           </header>
 
-          <StepNav step={step} progress={progress} onStep={(s) => goStep(s)} />
-
-          <section aria-labelledby="step-title" className="flex flex-col gap-4">
-            <h2 id="step-title" ref={stepHeadingRef} tabIndex={-1} className="m-0 text-2xl">
-              {stepTitle}
-            </h2>
+          <motion.section
+            key={step}
+            aria-labelledby="step-title"
+            className="flex flex-col gap-5 rounded-3xl bg-white p-3 shadow-md @md:p-6"
+            initial={reduce ? false : { opacity: 0, x: 32 * stepDir * (lang === 'ar' ? -1 : 1) }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                aria-hidden="true"
+                className="hidden size-11 shrink-0 items-center justify-center rounded-2xl bg-sedra-pale-100 text-sedra-green @xs:flex"
+              >
+                <StepIcon className="size-6" />
+              </span>
+              <h2 id="step-title" ref={stepHeadingRef} tabIndex={-1} className="m-0 text-2xl">
+                {stepTitle}
+              </h2>
+            </div>
 
             {step === 'media' && (
               <LessonMedia
@@ -288,7 +372,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
             )}
 
             {step === 'practice' && <PracticePanel unit={unit} />}
-          </section>
+          </motion.section>
 
           {step !== 'media' && progress.checkReviewed && (
             <AfterReview
@@ -304,9 +388,9 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
           )}
 
           {/* Sticky action area: the one prominent next step (brief §3 mobile layout). */}
-          <div className="sticky bottom-[calc(4rem+1px+env(safe-area-inset-bottom))] z-30 -mx-4 flex flex-wrap items-center gap-2 border-t bg-white px-4 py-3 shadow-[0_-4px_12px_rgb(0_0_0/0.06)] md:static md:mx-0 md:rounded-2xl md:border">
+          <div className="sticky bottom-[calc(4rem+1px+env(safe-area-inset-bottom)+0.5rem)] z-30 flex flex-wrap items-center gap-2 rounded-2xl border bg-white/95 p-3 shadow-pop backdrop-blur-md lg:bottom-4">
             {step === 'media' && (
-              <Button size="lg" onClick={() => goStep('check')}>
+              <Button size="lg" className={PRIMARY_BTN} onClick={() => goStep('check')}>
                 {t('actions.toQuestion')}
                 <ArrowRight aria-hidden="true" className="rtl-mirror" />
               </Button>
@@ -324,7 +408,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
             )}
             {step === 'check' && progress.checkReviewed && (
               <>
-                <Button size="lg" onClick={goNext}>
+                <Button size="lg" className={PRIMARY_BTN} onClick={goNext}>
                   {isLast ? <Flag aria-hidden="true" /> : null}
                   {nextLabel}
                   {!isLast && <ArrowRight aria-hidden="true" className="rtl-mirror" />}
@@ -336,7 +420,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
             )}
             {step === 'practice' && (
               <>
-                <Button size="lg" onClick={goNext}>
+                <Button size="lg" className={PRIMARY_BTN} onClick={goNext}>
                   {isLast ? <Flag aria-hidden="true" /> : null}
                   {nextLabel}
                   {!isLast && <ArrowRight aria-hidden="true" className="rtl-mirror" />}
@@ -347,12 +431,27 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
                 </Button>
               </>
             )}
+            {!(step === 'check' && !progress.checkReviewed) && (
+              <p className="m-0 ms-auto hidden items-center gap-2 text-base font-semibold text-ink-soft sm:flex">
+                <StepIcon aria-hidden="true" className="size-5" />
+                {t('actions.stepOf', { n: stepIndex + 1 })}
+              </p>
+            )}
           </div>
 
-          <details className="rounded-2xl border bg-white lg:hidden">
-            <summary className="flex min-h-12 cursor-pointer items-center gap-2 px-4 font-semibold text-ink">
-              <ListOrdered aria-hidden="true" className="size-5" />
-              {t('outline.title', { course: l(course.title) })}
+          <details className="group rounded-3xl bg-white shadow-md xl:hidden">
+            <summary className="flex min-h-14 cursor-pointer items-center gap-3 px-4 font-semibold text-ink">
+              <span
+                aria-hidden="true"
+                className="flex size-9 items-center justify-center rounded-full bg-sedra-pale-100 text-sedra-green"
+              >
+                <ListOrdered className="size-5" />
+              </span>
+              <span className="flex-1">{t('outline.title', { course: l(course.title) })}</span>
+              <ChevronDown
+                aria-hidden="true"
+                className="size-5 transition-transform group-open:rotate-180"
+              />
             </summary>
             <div className="border-t p-2">
               <UnitOutline
@@ -368,18 +467,42 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
 
         <aside
           aria-labelledby="outline-title"
-          className="sticky top-4 hidden rounded-2xl border bg-white p-3 lg:block"
+          className="sticky top-4 hidden overflow-hidden rounded-3xl bg-white shadow-md xl:block"
         >
-          <h2 id="outline-title" className="m-0 px-3 pb-2 text-lg">
-            {t('outline.title', { course: l(course.title) })}
-          </h2>
-          <UnitOutline
-            units={units}
-            currentId={unit.id}
-            onNavigate={() => {
-              focusHeadingOnMount = true
-            }}
-          />
+          <div className="bg-sedra-pale-50 px-4 pt-4 pb-3">
+            <h2 id="outline-title" className="m-0 text-lg">
+              {t('outline.title', { course: l(course.title) })}
+            </h2>
+            {!simplified && (
+              <div className="mt-2">
+                <p className="m-0 text-sm font-semibold text-ink-soft">
+                  {t('outline.progress', { done: doneInCourse, total: units.length })}
+                </p>
+                <div
+                  aria-hidden="true"
+                  className="mt-1.5 h-2 overflow-hidden rounded-full bg-white"
+                >
+                  <motion.div
+                    className="h-full rounded-full bg-sedra-mid ltr:origin-left rtl:origin-right"
+                    initial={false}
+                    animate={{ scaleX: doneInCourse / Math.max(1, units.length) }}
+                    transition={
+                      reduce ? { duration: 0 } : { type: 'spring', stiffness: 120, damping: 22 }
+                    }
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto p-2">
+            <UnitOutline
+              units={units}
+              currentId={unit.id}
+              onNavigate={() => {
+                focusHeadingOnMount = true
+              }}
+            />
+          </div>
         </aside>
       </div>
 
@@ -435,16 +558,23 @@ function AfterReview({
   const { t } = useTranslation('unit')
   const { l } = useLocalized()
   if (!unit.badge && !isLast && !(unit.id === 'LS01' && !simplified)) return null
+  const finished = unfinishedInCourse === 0
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
+      {/* Brief §2: milestone badges are static (no animation, no sound). */}
       {unit.badge && unitComplete && (
         <section
           aria-labelledby="badge-title"
-          className="flex items-start gap-3 rounded-2xl border-2 border-sedra-green bg-white p-4"
+          className="motif-tree flex items-center gap-4 rounded-3xl border-2 border-sedra-green bg-white p-5 shadow-md"
         >
-          <Award aria-hidden="true" className="mt-1 size-8 shrink-0 text-sedra-green" />
-          <div>
+          <span
+            aria-hidden="true"
+            className="flex size-16 shrink-0 items-center justify-center rounded-full bg-sedra-green text-white ring-4 ring-sedra-pale"
+          >
+            <Award className="size-9" />
+          </span>
+          <div className="min-w-0">
             <h2 id="badge-title" className="m-0 text-xl">
               {t('badge.title', { badge: l(unit.badge) })}
             </h2>
@@ -455,33 +585,51 @@ function AfterReview({
       {isLast && (
         <section
           aria-labelledby="complete-title"
-          className="flex flex-col gap-2 rounded-2xl bg-sedra-pale-50 p-4"
+          className="grid overflow-hidden rounded-3xl bg-white shadow-md @xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
         >
-          <h2 id="complete-title" className="m-0 text-xl">
-            {unfinishedInCourse === 0
-              ? t('complete.title', { course: l(course.title) })
-              : t('complete.notYetTitle')}
-          </h2>
-          <p className="m-0">
-            {unfinishedInCourse > 0
-              ? t('complete.notYetBody', { count: unfinishedInCourse })
-              : unit.programmeId === 'hospitality'
-                ? t('complete.bodyHospitality')
-                : t('complete.body')}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <Link to="/programmes/$programmeId" params={{ programmeId: unit.programmeId }}>
-                <ListOrdered aria-hidden="true" />
-                {t('nav.courseSummary')}
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/achievements">
-                <Award aria-hidden="true" />
-                {t('complete.achievements')}
-              </Link>
-            </Button>
+          <img
+            src={asset(course.image)}
+            alt=""
+            width={1200}
+            height={800}
+            className="aspect-[16/9] h-full w-full object-cover @xl:aspect-auto"
+          />
+          <div className="flex flex-col gap-3 p-5">
+            <span
+              aria-hidden="true"
+              className={cn(
+                'flex size-12 items-center justify-center rounded-full',
+                finished ? 'bg-success text-white' : 'bg-sedra-pale-100 text-sedra-green',
+              )}
+            >
+              {finished ? <PartyPopper className="size-6" /> : <Flag className="size-6" />}
+            </span>
+            <h2 id="complete-title" className="m-0 text-2xl">
+              {finished
+                ? t('complete.title', { course: l(course.title) })
+                : t('complete.notYetTitle')}
+            </h2>
+            <p className="m-0">
+              {unfinishedInCourse > 0
+                ? t('complete.notYetBody', { count: unfinishedInCourse })
+                : unit.programmeId === 'hospitality'
+                  ? t('complete.bodyHospitality')
+                  : t('complete.body')}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline">
+                <Link to="/programmes/$programmeId" params={{ programmeId: unit.programmeId }}>
+                  <ListOrdered aria-hidden="true" />
+                  {t('nav.courseSummary')}
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/achievements">
+                  <Award aria-hidden="true" />
+                  {t('complete.achievements')}
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
       )}
@@ -489,7 +637,7 @@ function AfterReview({
         <Link
           to="/resources"
           hash="ext01"
-          className="inline-flex min-h-12 items-center gap-2 self-start font-semibold text-sedra-green underline underline-offset-4"
+          className="inline-flex min-h-12 items-center gap-2 self-start rounded-2xl bg-white px-4 font-semibold text-sedra-green underline underline-offset-4 shadow-sm"
         >
           <ExternalLink aria-hidden="true" className="size-5" />
           {t('extraVideo')}

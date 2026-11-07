@@ -1,12 +1,14 @@
 import type { Unit } from '@shared/types'
-import { BookOpen, CheckCircle2, Clapperboard, Hourglass } from 'lucide-react'
+import { BookOpen, Clapperboard, Hourglass } from 'lucide-react'
 import type { RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TranscriptPanel } from '@/components/player/TranscriptPanel'
 import { VideoPlayer, type VideoPlayerHandle } from '@/components/player/VideoPlayer'
 import { Button } from '@/components/ui/button'
 import { useLocalized } from '@/i18n'
+import { cn } from '@/lib/utils'
 import { usePrefs } from '@/store/actions'
+import { DoneControl } from './DoneControl'
 import { Storyboard } from './Storyboard'
 import { SummaryCard } from './SummaryCard'
 import { UnitImage } from './UnitImage'
@@ -50,20 +52,54 @@ export function LessonMedia({
       <div className="flex flex-col gap-6">
         <section
           aria-labelledby={`${unit.id}-pending`}
-          className="overflow-hidden rounded-2xl border bg-white"
+          className="grid overflow-hidden rounded-3xl border bg-sedra-pale-50 shadow-sm @xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]"
         >
-          <UnitImage src={unit.image} alt={l(unit.imageAlt)} />
-          <div className="flex flex-col gap-3 p-4">
-            <h3 id={`${unit.id}-pending`} className="m-0 flex items-center gap-2 text-xl">
-              <Hourglass aria-hidden="true" className="size-6 shrink-0" />
+          <div className="relative">
+            <UnitImage
+              src={unit.image}
+              alt={l(unit.imageAlt)}
+              className="aspect-[4/3] h-full @xl:aspect-auto"
+            />
+            <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-sm font-semibold text-sedra-green shadow-md">
+              <Clapperboard aria-hidden="true" className="size-4" />
+              {t('pending.chip')}
+            </span>
+          </div>
+          <div className="flex flex-col gap-4 p-5">
+            <h3
+              id={`${unit.id}-pending`}
+              className="m-0 inline-flex items-center gap-2 self-start rounded-full bg-notice-soft px-3 py-1 text-base text-notice ring-1 ring-notice/30"
+            >
+              <Hourglass aria-hidden="true" className="size-5 shrink-0" />
               {t('pending.title')}
             </h3>
-            <p className="m-0">
+            <p className="m-0 text-lg">
               {unit.mediaStatus === 'sample' ? t('pending.bodyArabic') : t('pending.body')}
             </p>
+            <div className="flex flex-col gap-2">
+              <p className="m-0 text-base text-ink-soft">
+                {t('pending.storyboard', { count: unit.scenes.length })}
+              </p>
+              {/* Mini timeline of the four scenes (the full storyboard follows below). */}
+              <ol aria-hidden="true" className="m-0 grid list-none grid-cols-4 gap-1.5 p-0">
+                {unit.scenes.map((s, i) => (
+                  <li
+                    key={s.time}
+                    className="flex max-w-none flex-col gap-1 rounded-xl bg-white px-2 py-1.5 shadow-sm"
+                  >
+                    <span className="h-1.5 rounded-full bg-sedra-mid" />
+                    <span className="text-sm font-bold text-ink">{i + 1}</span>
+                    <span className="ltr-isolate text-xs text-ink-soft">
+                      {lang === 'ar' ? s.time.replace(/ s$/, ' ث') : s.time}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
             <Button
               type="button"
-              className="self-start"
+              size="lg"
+              className="self-start shadow-md"
               onClick={() => readHeadingRef.current?.focus()}
             >
               <BookOpen aria-hidden="true" />
@@ -84,35 +120,41 @@ export function LessonMedia({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       {/* Two equal routes. Plain toggle buttons so each choice is one Tab stop with a clear state. */}
-      <fieldset className="m-0 grid grid-cols-2 gap-2 border-0 p-0">
+      <fieldset className="m-0 border-0 p-0">
         <legend className="mb-2 p-0 font-semibold">{t('media.routeLabel')}</legend>
-        {(
-          [
-            ['watch', Clapperboard, t('media.watch')],
-            ['read', BookOpen, t('read.action')],
-          ] as const
-        ).map(([m, Icon, label]) => (
-          <Button
-            key={m}
-            type="button"
-            variant={mode === m ? 'default' : 'outline'}
-            aria-pressed={mode === m}
-            onClick={() => {
-              playerRef.current?.pause()
-              onModeChange(m)
-            }}
-            className="w-full"
-          >
-            <Icon aria-hidden="true" />
-            {label}
-          </Button>
-        ))}
+        <div className="grid grid-cols-2 gap-1.5 rounded-2xl bg-sedra-pale-50 p-1.5 ring-1 ring-border">
+          {(
+            [
+              ['watch', Clapperboard, t('media.watch')],
+              ['read', BookOpen, t('read.action')],
+            ] as const
+          ).map(([m, Icon, label]) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={mode === m}
+              onClick={() => {
+                playerRef.current?.pause()
+                onModeChange(m)
+              }}
+              className={cn(
+                'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-3 text-base font-semibold transition-[background-color,box-shadow,color] duration-200',
+                mode === m
+                  ? 'bg-sedra-green text-white shadow-md'
+                  : 'text-sedra-green hover:bg-white',
+              )}
+            >
+              <Icon aria-hidden="true" className="size-5 shrink-0" />
+              {label}
+            </button>
+          ))}
+        </div>
       </fieldset>
 
       {mode === 'watch' ? (
-        <>
+        <div className="grid gap-5 @2xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] @2xl:items-start">
           <VideoPlayer
             ref={playerRef}
             src={video.video}
@@ -124,33 +166,33 @@ export function LessonMedia({
             captionsDefault={prefs.captions}
             onEnded={onDone}
           />
-          <div className="flex flex-col gap-2">
+          <div className="flex min-w-0 flex-col gap-4">
             <TranscriptPanel
-              label={t('common:readTranscript')}
-              path={video.transcript}
-              fallback={narration}
               lang="en"
+              sources={[
+                {
+                  label: t('common:readTranscript'),
+                  path: video.transcript,
+                  fallback: narration,
+                },
+                {
+                  label: t('transcript.descriptive'),
+                  path: video.descriptiveTranscript,
+                  fallback: unit.scenes
+                    .map((s) => `${s.visual.en}\n${s.narration.en}`)
+                    .join('\n\n'),
+                },
+              ]}
             />
-            <TranscriptPanel
-              label={t('transcript.descriptive')}
-              path={video.descriptiveTranscript}
-              fallback={unit.scenes.map((s) => `${s.visual.en}\n${s.narration.en}`).join('\n\n')}
-              lang="en"
+            <DoneControl
+              done={done}
+              onDone={onDone}
+              doneText={t('media.watchedStatus')}
+              actionText={t('media.markWatched')}
             />
+            <SummaryCard unit={unit} />
           </div>
-          {done ? (
-            <p className="m-0 flex items-center gap-2 font-semibold text-success">
-              <CheckCircle2 aria-hidden="true" className="size-5" />
-              {t('media.watchedStatus')}
-            </p>
-          ) : (
-            <Button type="button" variant="outline" className="self-start" onClick={onDone}>
-              <CheckCircle2 aria-hidden="true" />
-              {t('media.markWatched')}
-            </Button>
-          )}
-          <SummaryCard unit={unit} />
-        </>
+        </div>
       ) : (
         <>
           <SummaryCard unit={unit} />

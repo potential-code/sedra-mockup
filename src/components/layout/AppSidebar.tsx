@@ -94,10 +94,13 @@ export function AppSidebar({
 
       {/* Mobile / tablet top bar with menu */}
       <div className="sticky top-0 z-40 flex items-center gap-2 border-b bg-white px-3 py-2 shadow-sm lg:hidden">
-        <Link to={homeTo} className="me-auto rounded-lg" aria-label={t('nav.home')}>
+        <Link to={homeTo} className="me-auto min-w-12 shrink-0 rounded-lg" aria-label={t('nav.home')}>
           <Logo className="h-12" />
         </Link>
-        <LanguageSwitch />
+        {/* Language is also inside the menu; hidden here on very narrow screens to avoid overflow. */}
+        <div className="hidden min-[400px]:block">
+          <LanguageSwitch />
+        </div>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" aria-label={t('menu')}>

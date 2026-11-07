@@ -64,7 +64,22 @@
     "breakdownFormula": "{{ls}} + {{hf}} − {{both}} = {{total}}",
     "breakdownText": "{{ls}} Life Skills enrolments plus {{hf}} Hospitality enrolments, minus {{both}} learners enrolled in both, equals {{total}} unique learners. Programme totals are not added together as people.",
     "viewLearners": "View the learner table",
-    "timeNote": "Demo reference time: {{date}} (UAE time)."
+    "timeNote": "Demo reference time: {{date}} (UAE time).",
+    "eyebrow": "Admin dashboard",
+    "activeHeading": "Active learners",
+    "activeShare": "{{active}} of {{total}} learners were active in the last seven days.",
+    "breakdown": {
+      "lsOnly": "Life Skills only",
+      "both": "Enrolled in both programmes",
+      "hfOnly": "Hospitality for All only"
+    },
+    "programmes": {
+      "heading": "Programmes",
+      "enrolled": "Enrolled",
+      "completions": "Completed the course",
+      "units": "Units",
+      "openContent": "Open {{course}} content"
+    }
   },
   "support": {
     "heading": "Support requests",
@@ -88,7 +103,8 @@
       "closed": "Closed"
     },
     "fromDemoLearner": "Demo learner (Help page)",
-    "empty": "No support requests in this demo."
+    "empty": "No support requests in this demo.",
+    "listLabel": "Support requests"
   },
   "learners": {
     "title": "Learners",
@@ -165,7 +181,9 @@
     "langEn": "English: text and check",
     "langEnVideo": "English: text, check and video",
     "langAr": "Arabic: draft text, needs review",
-    "edit": "Edit {{id}}"
+    "edit": "Edit {{id}}",
+    "samplesMeta": "{{n}} sample video produced",
+    "statusLabel": "Status"
   },
   "editor": {
     "back": "Back to programmes & content",
@@ -239,7 +257,9 @@
       "transcript": "Enter a transcript.",
       "duration": "Unit videos must be 30 seconds.",
       "assetId": "Asset ID does not match this unit.",
-      "sampleNeedsVideo": "A sample video needs a video file. Or set media status to Video pending production."
+      "sampleNeedsVideo": "A sample video needs a video file. Or set media status to Video pending production.",
+      "feedbackCorrect": "Enter the message learners see when they choose the correct answer.",
+      "feedbackRetry": "Enter the hint learners see when they need to try again."
     },
     "errorSummary": "There are {{n}} things to fix before publishing",
     "errorSummaryHelp": "Your text is kept. Select an item to go to it.",
@@ -247,7 +267,16 @@
     "publish": "Publish (demo)",
     "savedToast": "Saved in this demo only. Nothing is published.",
     "publishToast": "Simulated: all publishing checks passed.",
-    "simulated": "Simulated. Drafts stay in this browser. Real publishing needs content review, hosting and permissions."
+    "simulated": "Simulated. Drafts stay in this browser. Real publishing needs content review, hosting and permissions.",
+    "barEditing": "Editing the {{lang}} draft. Nothing is published.",
+    "preview": {
+      "heading": "Unit preview",
+      "noTitle": "No title yet",
+      "noSummary": "No summary yet",
+      "noQuestion": "No question yet",
+      "correct": "Correct answer",
+      "note": "Preview of the draft you are editing. Learners do not see it."
+    }
   },
   "sessions": {
     "title": "Sessions",
@@ -358,7 +387,8 @@
     "exportNote": "The file is created in your browser from demo data. No server, real learner record or live system is used.",
     "export": "Export CSV (demo)",
     "exportToast": "Simulated export: demo CSV downloaded.",
-    "exportDescription": "Created in this browser from fictional demo data only."
+    "exportDescription": "Created in this browser from fictional demo data only.",
+    "summaryHeading": "Summary"
   },
   "future": {
     "title": "Future options",
@@ -386,6 +416,7 @@
         "title": "Regional expansion",
         "body": "Possible use by partners in other regions, after local review."
       }
-    }
+    },
+    "adminOnly": "Admins only"
   }
 }
