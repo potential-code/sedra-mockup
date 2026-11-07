@@ -17,8 +17,9 @@ await page.evaluate(
   },
   [DB_KEY, persona, lang],
 )
+// Leave the app first so the in-memory store reloads from the patched storage.
+await page.goto('about:blank')
 await page.goto(url(path))
-await page.reload()
 await page.waitForTimeout(1200)
 await page.screenshot({ path: out, fullPage: process.env.FULL === '1' })
 await browser.close()
