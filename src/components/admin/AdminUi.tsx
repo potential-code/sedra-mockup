@@ -35,7 +35,8 @@ export const TINTS: Record<Tint, string> = {
  * Brand stat cards: a subtle same-hue gradient plus a soft coloured shadow so they pop out.
  * Text colour is checked against the lighter end of each gradient (>= 4.5:1).
  */
-const POP = 'pop-lift shadow-[0_14px_30px_-12px_rgb(45_64_25/0.45),0_4px_10px_-4px_rgb(45_64_25/0.25)]'
+const POP =
+  'pop-lift shadow-[0_14px_30px_-12px_rgb(45_64_25/0.45),0_4px_10px_-4px_rgb(45_64_25/0.25)]'
 export const BRAND_CARDS = {
   forest: `bg-gradient-to-br from-sedra-green-800 via-sedra-green-800 to-[#3a5128] text-white ${POP}`,
   green: `bg-gradient-to-br from-[#4d6b2f] to-sedra-green-800 text-white ${POP}`,

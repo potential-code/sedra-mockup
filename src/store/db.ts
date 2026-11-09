@@ -23,7 +23,7 @@ import { DEFAULT_PREFS, seedLearners, seedSessions, seedSupportRequests } from '
  * never loses the last step (walkthrough A: refresh and resume).
  */
 const KEY = 'sedra-demo-db'
-const VERSION = 9
+const VERSION = 10
 
 export type LearnerPersonaId = Exclude<PersonaId, 'admin'>
 
@@ -40,33 +40,18 @@ export interface DemoDb {
   unitEdits: Partial<Record<UnitId, UnitEdit>>
   customResources: CustomResource[]
   /** SEDRA admin edits to course title and purpose (demo only). */
-  courseEdits: Partial<Record<CourseId, Pick<Course, 'title' | 'purpose'>>>
+  courseEdits: Partial<Record<CourseId, Pick<Course, 'title' | 'purpose'> & { image?: string }>>
   /** Publishing is per course, not per unit. Missing = published. */
   courseUnpublished: Partial<Record<CourseId, boolean>>
   /** SEDRA edits to the built-in resources (title and short description, per language). */
   resourceEdits: Partial<Record<BuiltInResourceKey, ResourceTextEdit>>
-  /** Demo only: units SEDRA adds in the course builder (admin side; learners do not see them). */
-  addedUnits: AddedUnit[]
-  /** Demo only: extra learning blocks SEDRA adds to existing units. */
-  addedBlocks: Partial<Record<string, AddedBlock[]>>
   /** EXT01 is hidden from learners until SEDRA approves it after review (brief §9). */
   ext01Approved: boolean
-}
-
-export type BlockType = 'video' | 'text' | 'question' | 'practice'
-export interface AddedBlock {
-  id: string
-  type: BlockType
-  title: string
-  description: string
-}
-export interface AddedUnit {
-  id: string
-  courseId: CourseId
-  title: string
-  description: string
-  lang: 'en' | 'ar'
-  blocks: AddedBlock[]
+  /**
+   * Resources SEDRA hid from learners (key: built-in key, 'EXT01', 'summaries:<courseId>' or a
+   * custom resource id). Optional so older saved demo data still loads; missing = visible.
+   */
+  resourceHidden?: Partial<Record<string, boolean>>
 }
 
 export type BuiltInResourceKey = 'stopThinkDo' | 'playbook' | 'hospitalityPlan'
@@ -93,9 +78,8 @@ function seed(keep?: Pick<DemoDb, 'session' | 'prefs'>): DemoDb {
     courseEdits: {},
     courseUnpublished: {},
     resourceEdits: {},
-    addedUnits: [],
-    addedBlocks: {},
     ext01Approved: false,
+    resourceHidden: {},
   }
 }
 

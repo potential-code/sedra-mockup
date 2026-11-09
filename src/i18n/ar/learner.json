@@ -263,7 +263,10 @@
     "openLink": "افتح الرابط",
     "opensNewTab": "يفتح في علامة تبويب جديدة",
     "filterLabel": "عرض موارد",
-    "filterAll": "كل الدورات"
+    "filterAll": "كل الدورات",
+    "planHeading": "خطة التدرّب على الضيافة",
+    "planIntro": "تصرّف ترحيبي واحد تجرّبه اليوم. خطّط له في الوحدة 8.",
+    "openPlanUnit": "فتح الوحدة 8"
   },
   "achievements": {
     "pageTitle": "إنجازاتي",

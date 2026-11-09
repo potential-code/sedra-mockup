@@ -13,7 +13,6 @@ import {
   type LucideIcon,
   Pencil,
   Save,
-  Send,
   Sprout,
   Video,
 } from 'lucide-react'
@@ -30,14 +29,13 @@ import {
   TextField,
 } from '@/components/admin/AdminUi'
 import { ContentLangSwitch, useContentLang } from '@/components/admin/ContentLangSwitch'
-import { useUaeFormat } from '@/components/admin/format'
 import { announce } from '@/components/shared/LiveRegion'
 import { Button } from '@/components/ui/button'
 import { getUnit } from '@/content'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
-import { getContentDraft, saveContentDraft, useContentDrafts } from '@/store/admin-actions'
+import { getContentDraft, saveContentDraft } from '@/store/admin-actions'
 import { publishUnit, unitFromFields } from '@/store/admin-content'
 import {
   type FieldErrors,
@@ -47,6 +45,7 @@ import {
   type ReviewStatus,
   validateForPublish,
 } from './content-fields'
+import { PracticeChoicesEditor } from './PracticeChoicesEditor'
 
 function BackLink({ courseId }: { courseId?: string }) {
   const { t } = useTranslation('admin')
@@ -102,8 +101,6 @@ export function ContentEditPage() {
 function Editor({ unit }: { unit: Unit }) {
   const { t } = useTranslation('admin')
   const { l } = useLocalized()
-  const f = useUaeFormat()
-  const drafts = useContentDrafts()
   // Both language drafts live in state, so switching language never loses entered text.
   const [byLang, setByLang] = useState<Record<Lang, Fields>>(() => ({
     en: initialFields(unit, 'en'),
@@ -115,7 +112,6 @@ function Editor({ unit }: { unit: Unit }) {
 
   const fields = byLang[lang]
   const textDir = lang === 'ar' ? 'rtl' : 'ltr'
-  const saved = drafts.find((d) => d.unitId === unit.id && d.language === lang)
 
   const set = (k: FieldKey) => (v: string) => {
     setByLang((s) => ({ ...s, [lang]: { ...s[lang], [k]: v } }))
@@ -131,13 +127,6 @@ function Editor({ unit }: { unit: Unit }) {
       fields: rest,
       reviewStatus: review_status as ReviewStatus,
     })
-  }
-
-  function onSaveDraft() {
-    setErrors({})
-    persist()
-    toast.success(t('editor.savedToast'), { description: t('editor.simulated') })
-    announce(t('editor.savedToast'))
   }
 
   function onPublish() {
@@ -231,11 +220,6 @@ function Editor({ unit }: { unit: Unit }) {
             {errors.language ? (
               <FieldError id="f-language-error">{t(errors.language)}</FieldError>
             ) : null}
-            <p className="m-0 text-sm text-ink-soft">
-              {saved
-                ? t('editor.lastSaved', { date: f.dateTime(saved.updatedAt) })
-                : t('editor.notSaved')}
-            </p>
           </Section>
 
           <Section id="sec-lesson" title={t('editor.sections.lesson')} icon={FileText}>
@@ -338,41 +322,24 @@ function Editor({ unit }: { unit: Unit }) {
 
           <Section id="sec-practice" title={t('editor.sections.practice')} icon={Sprout}>
             {field('practice_prompt', { multiline: true, rows: 3 })}
-            {field('practice_choices', {
-              multiline: true,
-              rows: 4,
-              hint: t('editor.practiceChoicesHint'),
-            })}
-            <SelectField
-              id="f-practice_multiple"
-              label={t('editor.fields.practice_multiple')}
-              value={fields.practice_multiple}
-              onChange={set('practice_multiple')}
-              options={[
-                { value: 'no', label: t('editor.practiceOne') },
-                { value: 'yes', label: t('editor.practiceMany') },
-              ]}
+            <PracticeChoicesEditor
+              value={fields.practice_choices}
+              onChange={set('practice_choices')}
+              multiple={fields.practice_multiple === 'yes' ? 'yes' : 'no'}
+              onMultipleChange={set('practice_multiple')}
+              dir={textDir}
             />
             <p className="m-0 text-sm text-ink-soft">{t('editor.practiceNote')}</p>
           </Section>
 
-          {/* Sticky action bar: Save and Publish stay in reach while scrolling a long form. */}
+          {/* Sticky action bar: the one Save changes stays in reach while scrolling a long form. */}
           <div className="sticky bottom-3 z-20 flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-white/95 p-3 shadow-pop backdrop-blur sm:p-4">
             <p className="m-0 hidden min-w-0 flex-1 items-center gap-2 text-sm text-ink-soft sm:flex">
               <Languages aria-hidden="true" className="size-4 shrink-0 text-sedra-green" />
               {t('editor.barEditing', { lang: t(`editor.lang.${lang}`) })}
             </p>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onSaveDraft}
-              className="flex-1 sm:flex-none"
-            >
-              <Save aria-hidden="true" />
-              {t('editor.saveDraft')}
-            </Button>
             <Button type="button" onClick={onPublish} className="flex-1 sm:flex-none">
-              <Send aria-hidden="true" className="rtl-mirror" />
+              <Save aria-hidden="true" />
               {t('editor.saveLive')}
             </Button>
           </div>

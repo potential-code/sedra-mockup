@@ -1,9 +1,9 @@
 import { Link, Outlet } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import treeWhite from '@/assets/motifs/motif-tree-white.png'
 import { Reveal } from '@/components/motion/Reveal'
 import { PreferencesButton } from '@/components/preferences/PreferencesButton'
 import { Logo } from '@/components/shared/Logo'
-import treeWhite from '@/assets/motifs/motif-tree-white.png'
 import { asset } from '@/lib/asset'
 import { LanguageSwitch } from './LanguageSwitch'
 
@@ -36,11 +36,7 @@ export function AuthShell() {
             height={464}
             className="pointer-events-none absolute -end-16 top-[30%] -z-10 hidden w-[min(30vw,28rem)] opacity-10 lg:block"
           />
-          <Link
-            to="/"
-            className="self-start rounded-2xl"
-            aria-label={t('home.title')}
-          >
+          <Link to="/" className="self-start rounded-2xl" aria-label={t('home.title')}>
             <Logo variant="white" className="h-20 lg:h-28" />
           </Link>
           <Reveal className="grid max-w-md gap-3">

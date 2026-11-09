@@ -109,10 +109,7 @@ try {
     await page.getByRole('button', { name: 'Publish course' }).click()
     await page.waitForTimeout(300)
     db = await readDb(page)
-    R.ok(
-      !db.courseUnpublished?.['healthy-communication'],
-      'Publish course makes it visible again',
-    )
+    R.ok(!db.courseUnpublished?.['healthy-communication'], 'Publish course makes it visible again')
   } catch (e) {
     R.ok(false, '(b) course unpublish flow ran', e.message.split('\n')[0])
   }
@@ -244,6 +241,72 @@ try {
     R.ok((await bodyText()).includes(RES_TITLE), 'Learner /resources shows the custom resource')
   } catch (e) {
     R.ok(false, '(e) resource flow ran', e.message.split('\n')[0])
+  }
+
+  // (f) hide the added resource: the learner no longer sees it; show it again.
+  try {
+    await asPersona('admin')
+    await go('/admin/resources')
+    R.ok(
+      /What learners see in Resources/.test(await bodyText()),
+      "Admin resources page titled 'What learners see in Resources'",
+    )
+    const row = page.locator('article', { has: page.getByRole('heading', { name: RES_TITLE }) })
+    R.ok(
+      /Visible to learners/.test(await row.innerText()),
+      'Added resource row: Visible to learners',
+    )
+    await page.getByRole('button', { name: `Hide ${RES_TITLE} from learners` }).click()
+    await page.waitForTimeout(300)
+    R.ok(/Hidden/.test(await row.innerText()), 'Row status changes to Hidden')
+    const db = await readDb(page)
+    const id = db.customResources.find((r) => r.title.en === RES_TITLE)?.id
+    R.ok(db.resourceHidden?.[id] === true, 'db.resourceHidden marks the resource hidden')
+    await asPersona('noor')
+    await go('/resources')
+    R.ok(
+      !(await bodyText()).includes(RES_TITLE),
+      'Learner /resources no longer shows the hidden resource',
+    )
+  } catch (e) {
+    R.ok(false, '(f) hide resource flow ran', e.message.split('\n')[0])
+  }
+
+  // (g) EXT01: hidden until approved; approve, the learner sees the video card.
+  try {
+    await asPersona('noor')
+    await go('/resources')
+    R.ok((await page.locator('#ext01').count()) === 0, 'Before approval: no EXT01 video card')
+    await asPersona('admin')
+    await go('/admin/resources')
+    const ext = page.locator('article', {
+      has: page.getByRole('heading', { name: 'Video shared by SEDRA project team' }),
+    })
+    R.ok(/Hidden: needs review/.test(await ext.innerText()), "EXT01 row: 'Hidden: needs review'")
+    R.ok(
+      !(await ext.innerText()).includes('youtube.com/embed'),
+      'EXT01 technical fields are collapsed under Details',
+    )
+    await ext.getByRole('button', { name: 'Details' }).click()
+    R.ok(
+      (await ext.innerText()).includes('https://www.youtube.com/embed/gu8gSuF_lvw'),
+      'Details shows the exact embed URL',
+    )
+    await ext.getByRole('button', { name: 'Approve for learners' }).click()
+    await page.waitForTimeout(300)
+    R.ok(/Visible to learners/.test(await ext.innerText()), 'EXT01 row: Visible to learners')
+    await asPersona('noor')
+    await go('/resources')
+    R.ok(
+      await page
+        .locator('#ext01 iframe')
+        .isVisible()
+        .catch(() => false),
+      'Learner /resources shows the EXT01 video card after approval',
+    )
+    await patchDb(page, (db) => ({ ...db, ext01Approved: false }), { reload: true })
+  } catch (e) {
+    R.ok(false, '(g) EXT01 approval flow ran', e.message.split('\n')[0])
   }
 
   // Layout: no horizontal scroll at 390 px on admin pages.

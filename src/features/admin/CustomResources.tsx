@@ -1,9 +1,9 @@
 import type { CourseId, CustomResource } from '@shared/types'
-import { AlertTriangle, ExternalLink, FilePlus2, Pencil, Plus, Save, Trash2 } from 'lucide-react'
+import { AlertTriangle, Save, Trash2 } from 'lucide-react'
 import { type ReactNode, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Chip, IconCircle, SelectField, StatusLabel, TextField } from '@/components/admin/AdminUi'
+import { SelectField, TextField } from '@/components/admin/AdminUi'
 import { announce } from '@/components/shared/LiveRegion'
 import {
   AlertDialog,
@@ -23,99 +23,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { COURSES, getCourse } from '@/content'
+import { COURSES } from '@/content'
 import { useLocalized } from '@/i18n'
-import {
-  isHttpsUrl,
-  removeCustomResource,
-  saveCustomResource,
-  useCustomResources,
-} from '@/store/admin-content'
+import { isHttpsUrl, removeCustomResource, saveCustomResource } from '@/store/admin-content'
 
-/** Admin-added resources (db.customResources). EXT01 and built-in guides are not editable here. */
-export function CustomResourcesSection() {
-  const { t } = useTranslation('admin')
-  const resources = useCustomResources()
-  return (
-    <section aria-labelledby="custom-res" className="mt-10 flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <IconCircle icon={FilePlus2} />
-        <h2 id="custom-res" className="m-0 min-w-0 flex-1 basis-48 text-2xl">
-          {t('resources.custom.heading')}
-        </h2>
-        <ResourceDialog
-          trigger={
-            <Button type="button">
-              <Plus aria-hidden="true" />
-              {t('resources.custom.add')}
-            </Button>
-          }
-        />
-      </div>
-      <p className="m-0 text-ink-soft">{t('resources.custom.intro')}</p>
-      <p className="m-0 text-sm text-ink-soft">{t('resources.custom.builtInNote')}</p>
-      {resources.length === 0 ? (
-        <p className="m-0 rounded-2xl bg-white p-5 shadow-sm">{t('resources.custom.empty')}</p>
-      ) : (
-        <ul className="m-0 mt-2 grid list-none gap-5 p-0 sm:grid-cols-2 xl:grid-cols-3">
-          {resources.map((r) => (
-            <li key={r.id} className="max-w-none">
-              <ResourceCard r={r} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  )
-}
-
-function ResourceCard({ r }: { r: CustomResource }) {
+/** Remove an admin-added resource, after a confirm step. Built-in guides and EXT01 have none. */
+export function RemoveResourceButton({ r }: { r: CustomResource }) {
   const { t } = useTranslation('admin')
   const { l } = useLocalized()
   const [confirm, setConfirm] = useState(false)
-  const course = getCourse(r.courseId)
-  const id = `cres-${r.id}`
   return (
-    <article aria-labelledby={id} className="card-pop flex h-full flex-col gap-3 p-5">
-      <div className="flex flex-wrap gap-1.5">
-        <Chip>{course ? l(course.title) : r.courseId}</Chip>
-      </div>
-      <h3 id={id} className="m-0 text-lg">
-        {l(r.title)}
-      </h3>
-      <p className="m-0">{l(r.body)}</p>
-      {r.url ? (
-        <p className="m-0 flex items-start gap-1.5 text-sm break-all">
-          <ExternalLink aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-sedra-green" />
-          <span className="ltr-isolate">{r.url}</span>
-        </p>
-      ) : (
-        <StatusLabel tone="neutral">{t('resources.custom.noLink')}</StatusLabel>
-      )}
-      <div className="mt-auto flex flex-wrap gap-2 pt-2">
-        <ResourceDialog
-          resource={r}
-          trigger={
-            <Button
-              type="button"
-              variant="outline"
-              aria-label={t('resources.custom.editLabel', { title: l(r.title) })}
-            >
-              <Pencil aria-hidden="true" />
-              {t('resources.custom.edit')}
-            </Button>
-          }
-        />
-        <Button
-          type="button"
-          variant="outline"
-          aria-label={t('resources.custom.removeLabel', { title: l(r.title) })}
-          onClick={() => setConfirm(true)}
-        >
-          <Trash2 aria-hidden="true" />
-          {t('resources.custom.remove')}
-        </Button>
-      </div>
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        aria-label={t('resources.custom.removeLabel', { title: l(r.title) })}
+        onClick={() => setConfirm(true)}
+      >
+        <Trash2 aria-hidden="true" />
+        {t('resources.custom.remove')}
+      </Button>
       <AlertDialog open={confirm} onOpenChange={setConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -141,11 +68,18 @@ function ResourceCard({ r }: { r: CustomResource }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </article>
+    </>
   )
 }
 
-function ResourceDialog({ resource, trigger }: { resource?: CustomResource; trigger: ReactNode }) {
+/** One Add / Edit dialog for admin-added resources (course, type, EN + AR text, link). */
+export function ResourceDialog({
+  resource,
+  trigger,
+}: {
+  resource?: CustomResource
+  trigger: ReactNode
+}) {
   const [open, setOpen] = useState(false)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -163,6 +97,7 @@ function ResourceForm({ resource, onDone }: { resource?: CustomResource; onDone:
   const { t } = useTranslation('admin')
   const { l } = useLocalized()
   const summaryRef = useRef<HTMLDivElement>(null)
+  const [kind, setKind] = useState<'link' | 'text'>(resource && !resource.url ? 'text' : 'link')
   const [courseId, setCourseId] = useState<CourseId>(resource?.courseId ?? 'healthy-communication')
   const [v, setV] = useState<Record<Key, string>>({
     titleEn: resource?.title.en ?? '',
@@ -180,7 +115,7 @@ function ResourceForm({ resource, onDone }: { resource?: CustomResource; onDone:
     for (const k of ['titleEn', 'titleAr', 'bodyEn', 'bodyAr'] as const) {
       if (!v[k].trim()) e[k] = `resources.custom.errors.${k}`
     }
-    if (v.url.trim() && !isHttpsUrl(v.url)) e.url = 'resources.custom.errors.url'
+    if (kind === 'link' && !isHttpsUrl(v.url)) e.url = 'resources.custom.errors.url'
     setErrors(e)
     if (Object.keys(e).length > 0) {
       requestAnimationFrame(() => summaryRef.current?.focus())
@@ -191,7 +126,7 @@ function ResourceForm({ resource, onDone }: { resource?: CustomResource; onDone:
       courseId,
       title: { en: v.titleEn.trim(), ar: v.titleAr.trim() },
       body: { en: v.bodyEn.trim(), ar: v.bodyAr.trim() },
-      url: v.url.trim() || undefined,
+      url: kind === 'link' ? v.url.trim() : undefined,
     })
     toast.success(t('resources.custom.savedToast'), {
       description: t('resources.custom.savedDescription'),
@@ -256,6 +191,35 @@ function ResourceForm({ resource, onDone }: { resource?: CustomResource; onDone:
         onChange={(x) => setCourseId(x as CourseId)}
         options={COURSES.map((c) => ({ value: c.id, label: l(c.title) }))}
       />
+      <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+        <legend className="mb-1 p-0 font-semibold text-ink">
+          {t('resources.custom.fields.type')}
+        </legend>
+        <div className="flex flex-wrap gap-3">
+          {(['link', 'text'] as const).map((k) => (
+            <label
+              key={k}
+              className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-input bg-white px-4 has-[:checked]:border-sedra-green has-[:checked]:bg-sedra-pale-50 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring"
+            >
+              <input
+                type="radio"
+                name="cr-type"
+                value={k}
+                checked={kind === k}
+                onChange={() => {
+                  setKind(k)
+                  setErrors(({ url: _u, ...rest }) => rest)
+                }}
+                className="size-5 accent-sedra-green"
+              />
+              <span className="flex flex-col">
+                <span className="font-semibold">{t(`resources.custom.kind.${k}`)}</span>
+                <span className="text-sm text-ink-soft">{t(`resources.custom.kind.${k}Hint`)}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <div className="grid gap-4 md:grid-cols-2">
         <TextField
           id="cr-titleEn"
@@ -298,17 +262,20 @@ function ResourceForm({ resource, onDone }: { resource?: CustomResource; onDone:
           required
         />
       </div>
-      <TextField
-        id="cr-url"
-        type="url"
-        inputMode="url"
-        label={t('resources.custom.fields.url')}
-        value={v.url}
-        onChange={set('url')}
-        error={err('url')}
-        hint={t('resources.custom.urlHint')}
-        dir="ltr"
-      />
+      {kind === 'link' ? (
+        <TextField
+          id="cr-url"
+          type="url"
+          inputMode="url"
+          label={t('resources.custom.fields.url')}
+          value={v.url}
+          onChange={set('url')}
+          error={err('url')}
+          hint={t('resources.custom.urlHint')}
+          dir="ltr"
+          required
+        />
+      ) : null}
       <div className="flex flex-wrap gap-3">
         <Button type="submit">
           <Save aria-hidden="true" />

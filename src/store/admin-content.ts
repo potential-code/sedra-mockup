@@ -9,16 +9,8 @@ import type {
   UnitEdit,
   UnitId,
 } from '@shared/types'
-import { useMemo } from 'react'
 import { isUnitPublished } from '@/content'
-import {
-  type AddedBlock,
-  type AddedUnit,
-  type BuiltInResourceKey,
-  getDb,
-  update,
-  useDb,
-} from './db'
+import { type BuiltInResourceKey, getDb, update, useDb } from './db'
 
 /**
  * Admin authoring writes (demo only). Everything stays in this browser's demo db.
@@ -192,7 +184,14 @@ export function saveCustomResource(input: {
 }
 
 export function removeCustomResource(id: string) {
-  update((db) => ({ ...db, customResources: db.customResources.filter((r) => r.id !== id) }))
+  update((db) => {
+    const { [id]: _gone, ...hidden } = db.resourceHidden ?? {}
+    return {
+      ...db,
+      customResources: db.customResources.filter((r) => r.id !== id),
+      resourceHidden: hidden,
+    }
+  })
 }
 
 /** https link check for optional resource links. */
@@ -206,9 +205,14 @@ export function isHttpsUrl(v: string): boolean {
 }
 
 /** Demo: SEDRA edits a course's title and purpose. Learner pages show the new text. */
-export function saveCourseEdit(courseId: CourseId, edit: { title: Localized; purpose: Localized }) {
+export function saveCourseEdit(
+  courseId: CourseId,
+  edit: { title: Localized; purpose: Localized; image?: string },
+) {
   update((db) => ({ ...db, courseEdits: { ...(db.courseEdits ?? {}), [courseId]: edit } }))
 }
+
+const EMPTY_OBJ = {}
 
 export function useCourseEdits() {
   return useDb((db) => db.courseEdits ?? EMPTY_OBJ)
@@ -248,118 +252,33 @@ export function useResourceText(key: BuiltInResourceKey, lang: Lang) {
   }
 }
 
-/* ---------- demo: add units and learning blocks ---------- */
-
-const newId = (p: string) =>
-  `${p}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`
-
-const EMPTY_UNITS: AddedUnit[] = []
-const EMPTY_OBJ = {}
-
-export function useAddedUnits(courseId: CourseId): AddedUnit[] {
-  // Select the stored array (stable reference), then filter: a fresh array per read loops React.
-  const all = useDb((db) => db.addedUnits ?? EMPTY_UNITS)
-  return useMemo(() => all.filter((u) => u.courseId === courseId), [all, courseId])
-}
-
-export function addUnit(
-  input: Omit<AddedUnit, 'id' | 'blocks'> & { blocks: Omit<AddedBlock, 'id'>[] },
-) {
-  const unit: AddedUnit = {
-    ...input,
-    id: newId('unit'),
-    blocks: input.blocks.map((b) => ({ ...b, id: newId('block') })),
-  }
-  update((db) => ({ ...db, addedUnits: [...(db.addedUnits ?? []), unit] }))
-  return unit
-}
-
-export function removeAddedUnit(id: string) {
-  update((db) => ({ ...db, addedUnits: (db.addedUnits ?? []).filter((u) => u.id !== id) }))
-}
-
-/** Extra blocks on any unit (built-in unit ID or an added unit's ID). */
-export function useAddedBlocks(unitId: string): AddedBlock[] {
-  return useDb(
-    (db) =>
-      db.addedBlocks?.[unitId] ??
-      (db.addedUnits ?? []).find((u) => u.id === unitId)?.blocks ??
-      EMPTY_BLOCKS,
-  )
-}
-const EMPTY_BLOCKS: AddedBlock[] = []
-
-export function addBlock(unitId: string, block: Omit<AddedBlock, 'id'>) {
-  const b: AddedBlock = { ...block, id: newId('block') }
-  update((db) => {
-    const added = (db.addedUnits ?? []).find((u) => u.id === unitId)
-    if (added) {
-      return {
-        ...db,
-        addedUnits: db.addedUnits.map((u) =>
-          u.id === unitId ? { ...u, blocks: [...u.blocks, b] } : u,
-        ),
-      }
-    }
-    return {
-      ...db,
-      addedBlocks: {
-        ...(db.addedBlocks ?? {}),
-        [unitId]: [...(db.addedBlocks?.[unitId] ?? []), b],
-      },
-    }
-  })
-}
-
-export function removeBlock(unitId: string, blockId: string) {
-  update((db) => {
-    const added = (db.addedUnits ?? []).find((u) => u.id === unitId)
-    if (added) {
-      return {
-        ...db,
-        addedUnits: db.addedUnits.map((u) =>
-          u.id === unitId ? { ...u, blocks: u.blocks.filter((x) => x.id !== blockId) } : u,
-        ),
-      }
-    }
-    return {
-      ...db,
-      addedBlocks: {
-        ...(db.addedBlocks ?? {}),
-        [unitId]: (db.addedBlocks?.[unitId] ?? []).filter((x) => x.id !== blockId),
-      },
-    }
-  })
-}
-
-export function updateBlock(unitId: string, block: AddedBlock) {
-  update((db) => {
-    const added = (db.addedUnits ?? []).find((u) => u.id === unitId)
-    if (added) {
-      return {
-        ...db,
-        addedUnits: db.addedUnits.map((u) =>
-          u.id === unitId
-            ? { ...u, blocks: u.blocks.map((x) => (x.id === block.id ? block : x)) }
-            : u,
-        ),
-      }
-    }
-    return {
-      ...db,
-      addedBlocks: {
-        ...(db.addedBlocks ?? {}),
-        [unitId]: (db.addedBlocks?.[unitId] ?? []).map((x) => (x.id === block.id ? block : x)),
-      },
-    }
-  })
-}
-
-/** EXT01 review: learners see the video only after SEDRA approves it. */
-export function useExt01Approved(): boolean {
+/** EXT01 review state only (admin): SEDRA approved it after content and accessibility review. */
+export function useExt01ReviewApproved(): boolean {
   return useDb((db) => db.ext01Approved === true)
+}
+
+/**
+ * EXT01 for learners: shown only when approved after review AND not hidden by SEDRA (brief §9).
+ * Learner pages (Resources, programme page, the "Watch additional video" link after LS01) use this.
+ */
+export function useExt01Approved(): boolean {
+  return useDb((db) => db.ext01Approved === true && !db.resourceHidden?.EXT01)
 }
 
 export function setExt01Approved(approved: boolean) {
   update((db) => ({ ...db, ext01Approved: approved }))
+}
+
+/* ---------- resource visibility (Show / Hide) ---------- */
+
+/** Key of the grouped unit summaries row for a course. */
+export const summariesKey = (courseId: CourseId) => `summaries:${courseId}`
+
+/** True unless SEDRA hid this resource from learners. */
+export function useResourceVisible(key: string): boolean {
+  return useDb((db) => !db.resourceHidden?.[key])
+}
+
+export function setResourceHidden(key: string, hidden: boolean) {
+  update((db) => ({ ...db, resourceHidden: { ...(db.resourceHidden ?? {}), [key]: hidden } }))
 }

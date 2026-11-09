@@ -18,7 +18,9 @@
     "required": "required",
     "cancel": "Cancel",
     "uaeTime": "(UAE time)",
-    "opensNewTab": "(opens in a new tab)"
+    "opensNewTab": "(opens in a new tab)",
+    "remove": "Remove",
+    "demoOnly": "Saved in this demo only."
   },
   "programme": {
     "life-skills": "Life Skills",
@@ -284,10 +286,16 @@
     "chooseFile": "Choose a video file (demo)",
     "fileNotUploaded": "Demo: the file is not uploaded. Only its name is saved in the video file field.",
     "saveLive": "Save changes",
-    "practiceChoicesHint": "One choice per line. Leave empty to show only Done, Later and With help.",
-    "practiceOne": "One choice",
-    "practiceMany": "More than one choice",
-    "practiceNote": "Practice is optional. Learners can always pick Done, Later or With help, so it never blocks progress."
+    "practiceChoicesHint": "Learners tap one of these. Leave empty to show only Done, Later and With help.",
+    "practiceOne": "One answer",
+    "practiceMany": "Several answers",
+    "practiceNote": "Practice is optional. Learners can always pick Done, Later or With help, so it never blocks progress.",
+    "choiceN": "Choice {{n}}",
+    "removeChoiceN": "Remove choice {{n}}",
+    "addChoice": "Add choice",
+    "noChoices": "No choices yet. Learners will see Done, Later and With help.",
+    "practiceOneHint": "Like a radio button: learners pick one.",
+    "practiceManyHint": "Like checkboxes: learners can pick more than one."
   },
   "sessions": {
     "title": "Sessions",
@@ -354,8 +362,8 @@
     "restoredToast": "Session restored in this demo."
   },
   "resources": {
-    "title": "Resources",
-    "intro": "External and in-platform resources, with their internal review status.",
+    "title": "What learners see in Resources",
+    "intro": "Everything on the learner Resources page, by course. Add, edit, show or hide each item.",
     "ext": {
       "reviewStatus": "External resource pending content and accessibility review",
       "placement": "Placement",
@@ -435,16 +443,17 @@
         "titleAr": "Title in Arabic",
         "bodyEn": "Short text in English",
         "bodyAr": "Short text in Arabic",
-        "url": "Link (optional)"
+        "url": "Link (optional)",
+        "type": "Type"
       },
-      "urlHint": "Optional. Must start with https://",
+      "urlHint": "Must start with https://",
       "errorSummary": "Fix {{n}} things to save the resource",
       "errors": {
         "titleEn": "Enter a title in English.",
         "titleAr": "Enter a title in Arabic.",
         "bodyEn": "Enter short text in English.",
         "bodyAr": "Enter short text in Arabic.",
-        "url": "Enter a link that starts with https://, or leave it empty."
+        "url": "Enter a link that starts with https://, or choose Text."
       },
       "save": "Save resource (demo)",
       "savedToast": "Resource saved in this demo only.",
@@ -456,7 +465,46 @@
       "removeTitle": "Remove {{title}}?",
       "removeBody": "Learners will no longer see this resource. Built-in guides and EXT01 are not affected.",
       "keep": "Keep resource",
-      "removedToast": "Resource removed in this demo."
+      "removedToast": "Resource removed in this demo.",
+      "kind": {
+        "link": "Link",
+        "linkHint": "Text with a link to a web page",
+        "text": "Text",
+        "textHint": "Short text only, no link"
+      }
+    },
+    "list": {
+      "heading": "Resources list",
+      "filter": "Show resources for",
+      "all": "All courses",
+      "show": "Show",
+      "hide": "Hide",
+      "showLabel": "Show {{title}} to learners",
+      "hideLabel": "Hide {{title}} from learners",
+      "shownToast": "{{title}} is now visible to learners.",
+      "hiddenToast": "{{title}} is now hidden from learners.",
+      "summaries": "Unit summaries ({{n}})",
+      "summariesBody": "Made from the unit summaries. Learners can search them. Change the text in the content editor.",
+      "editSummaries": "Edit in content editor",
+      "details": "Details",
+      "reviewStatus": "Review status",
+      "guideIntro": "Text in both languages is required. Learners see it on Resources in this demo.",
+      "fieldTitleIn": "Title in {{lang}}",
+      "fieldBodyIn": "Short text in {{lang}}",
+      "errorTitle": "Enter a title in {{lang}}.",
+      "errorBody": "Enter short text in {{lang}}."
+    },
+    "status": {
+      "visible": "Visible to learners",
+      "review": "Hidden: needs review",
+      "hidden": "Hidden"
+    },
+    "type": {
+      "guide": "Guide",
+      "summary": "Summary",
+      "video": "Video",
+      "link": "Link",
+      "text": "Text"
     }
   },
   "reports": {
@@ -514,14 +562,14 @@
     "eyebrow": "Course builder",
     "intro": "Edit the 8 units of this course. Publishing applies to the whole course. Changes are live for learners in this demo.",
     "structure": "Course structure",
-    "structureHint": "Units are in learning order. Units you add appear at the end.",
+    "structureHint": "Units are in learning order. Each unit has three learning blocks: Watch or read, Question and Practice.",
     "updated": "Last change: {{date}} (UAE time)",
     "unitN": "Unit {{n}}",
     "edit": "Edit",
     "editUnit": "Edit {{id}}: {{title}}",
     "liveToast": "Changes are live for learners in this demo.",
     "settings": "Course settings",
-    "settingsHint": "SEDRA can change the course title and purpose. Saved in this demo only.",
+    "settingsHint": "SEDRA can change the course title, purpose and image. Saved in this demo only.",
     "glance": "At a glance",
     "glanceUnits": "Units",
     "glanceSamples": "Sample videos",
@@ -550,7 +598,12 @@
       "check": "Question",
       "practice": "Practice"
     },
-    "editBlock": "Edit {{block}} in {{title}}"
+    "editBlock": "Edit {{block}} in {{title}}",
+    "courseImage": "Course image",
+    "courseImageHint": "Choose a photo for the course card. Learners see it on their dashboard and course pages.",
+    "imgLifeSkills": "Life Skills photo",
+    "imgHospitality": "Hospitality photo",
+    "imgGroup": "Group photo"
   },
   "invite": {
     "open": "Invite learner",
@@ -588,42 +641,5 @@
   },
   "contentLang": {
     "label": "Content language"
-  },
-  "add": {
-    "unit": "Add unit",
-    "unitTitle": "Add a unit",
-    "unitIntro": "Demo only. Enter the {{lang}} text. Learners do not see added units in this demo.",
-    "title": "Unit title",
-    "description": "Unit description",
-    "blocksHeading": "Learning blocks",
-    "blockN": "Learning block {{n}}",
-    "anotherBlock": "Add another learning block",
-    "blockType": "Block type",
-    "blockTitle": "Block title",
-    "blockDescription": "Block description",
-    "types": {
-      "video": "Video",
-      "text": "Text to read",
-      "question": "Question",
-      "practice": "Practice"
-    },
-    "saveUnit": "Save unit",
-    "unitSaved": "Unit added",
-    "demoOnly": "Saved in this demo only.",
-    "block": "Add learning block",
-    "blockFor": "Add learning block to {{title}}",
-    "blockIntro": "Demo only. Enter the {{lang}} text.",
-    "saveBlock": "Save learning block",
-    "blockSaved": "Learning block added",
-    "blockRemoved": "Learning block removed",
-    "remove": "Remove",
-    "removeBlockN": "Remove learning block {{n}}",
-    "removeNamed": "Remove {{title}}",
-    "removeUnit": "Remove unit",
-    "unitRemoved": "Unit removed",
-    "addedTag": "Added in demo",
-    "blockUpdated": "Learning block updated",
-    "editNamed": "Edit {{title}}",
-    "editBlock": "Edit learning block"
   }
 }

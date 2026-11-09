@@ -190,6 +190,11 @@ html[data-text="150"] {
        320px / 150% text (brief §3 Touch and layout). break-word (not anywhere) only breaks a word
        when it would overflow, so flex items and table cells never squeeze words letter by letter. */
     overflow-wrap: break-word;
+    /* Narrow screens (phones, and 400% browser zoom which is about 320px wide): allow breaks
+       anywhere so long words and flex/grid items never force sideways scrolling (WCAG 1.4.10). */
+    @media (width < 30rem) {
+      overflow-wrap: anywhere;
+    }
   }
   /* Buttons wrap their label instead of overflowing narrow screens. */
   [data-slot="button"] {

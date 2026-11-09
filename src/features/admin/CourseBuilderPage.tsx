@@ -3,6 +3,7 @@ import { Link, useParams } from '@tanstack/react-router'
 import {
   ArrowLeft,
   BarChart3,
+  Check,
   ChevronDown,
   Clapperboard,
   Eye,
@@ -38,14 +39,10 @@ import {
   latestEdit,
   saveCourseEdit,
   setCoursePublished,
-  useAddedBlocks,
-  useAddedUnits,
   useCourseEdits,
   useCoursePublished,
   useUnitEdits,
 } from '@/store/admin-content'
-import { useDb } from '@/store/db'
-import { AddBlockDialog, AddedBlockList, AddedUnitCard, AddUnitDialog } from './BuilderAdditions'
 
 /** Every unit has the same three learning blocks (brief: video/text, one check, optional practice). */
 const BLOCKS = [
@@ -102,12 +99,6 @@ function Builder({ course }: { course: Course }) {
     .map((u) => getUnit(u.id) ?? u)
     .sort((a, b) => a.order - b.order)
   const samples = units.filter((u) => u.mediaStatus === 'sample').length
-  const added = useAddedUnits(course.id)
-  const extraBlocks = useDb((db) =>
-    course.unitIds.reduce((n, id) => n + (db.addedBlocks?.[id]?.length ?? 0), 0),
-  )
-  const totalBlocks =
-    units.length * BLOCKS.length + extraBlocks + added.reduce((n, u) => n + u.blocks.length, 0)
   const enrolled = learners.filter((x) => x.programmes.includes(course.programmeId)).length
   const updated = latestEdit(edits, course.unitIds)
 
@@ -165,7 +156,6 @@ function Builder({ course }: { course: Course }) {
                   ? t('builder.updated', { date: f.dateTime(updated) })
                   : t('content.updatedNever')}
               </span>
-              <AddUnitDialog courseId={course.id} lang={lang} />
             </div>
           }
         >
@@ -175,11 +165,6 @@ function Builder({ course }: { course: Course }) {
               <Reveal as="li" key={u.id} delay={stagger(i, 0.04)} className="max-w-none">
                 <UnitItem unit={u} lang={lang} />
               </Reveal>
-            ))}
-            {added.map((u, i) => (
-              <li key={u.id} className="max-w-none">
-                <AddedUnitCard unit={u} order={units.length + i + 1} lang={lang} />
-              </li>
             ))}
           </ol>
         </Panel>
@@ -217,8 +202,8 @@ function Builder({ course }: { course: Course }) {
             <dl className="m-0 grid grid-cols-2 gap-3">
               {(
                 [
-                  ['glanceUnits', units.length + added.length],
-                  ['glanceBlocks', totalBlocks],
+                  ['glanceUnits', units.length],
+                  ['glanceBlocks', units.length * BLOCKS.length],
                   ['glanceSamples', samples],
                   ['glanceLearners', enrolled],
                 ] as const
@@ -246,7 +231,6 @@ function UnitItem({ unit, lang }: { unit: Unit; lang: Lang }) {
   const { t } = useTranslation('admin')
   const id = `bu-${unit.id}`
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
-  const extra = useAddedBlocks(unit.id)
   const blockText: Record<(typeof BLOCKS)[number]['key'], string> = {
     media: unit.mediaStatus === 'sample' ? t('media.sample') : t('media.pending'),
     check: unit.check.question[lang],
@@ -285,7 +269,7 @@ function UnitItem({ unit, lang }: { unit: Unit; lang: Lang }) {
               <StatusLabel tone="pending">{t('media.pending')}</StatusLabel>
             )}
             <StatusLabel tone="info" icon={Layers}>
-              {t('builder.blocksN', { n: BLOCKS.length + extra.length })}
+              {t('builder.blocksN', { n: BLOCKS.length })}
             </StatusLabel>
           </div>
         </div>
@@ -346,8 +330,6 @@ function UnitItem({ unit, lang }: { unit: Unit; lang: Lang }) {
               </li>
             ))}
           </ol>
-          <AddedBlockList unitId={unit.id} startAt={BLOCKS.length + 1} />
-          <AddBlockDialog unitId={unit.id} unitTitle={unit.title[lang]} lang={lang} />
         </div>
       </details>
     </article>
@@ -360,13 +342,25 @@ function CourseSettingsDialog({ course, lang }: { course: Course; lang: Lang }) 
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
   const [purpose, setPurpose] = useState('')
+  const [image, setImage] = useState(course.image)
   const [errors, setErrors] = useState<{ title?: boolean; purpose?: boolean }>({})
+  // Photos already in the demo: the two course photos, the group photo and this course's units.
+  const imageOptions = [
+    { path: 'images/programme-life-skills.webp', label: t('builder.imgLifeSkills') },
+    { path: 'images/programme-hospitality.webp', label: t('builder.imgHospitality') },
+    { path: 'images/home-hero.webp', label: t('builder.imgGroup') },
+    ...course.unitIds.map((id, i) => ({
+      path: `images/units/${id}.webp`,
+      label: t('builder.unitN', { n: i + 1 }),
+    })),
+  ]
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
 
   function onOpenChange(next: boolean) {
     if (next) {
       setTitle(course.title[lang])
       setPurpose(course.purpose[lang])
+      setImage(course.image)
       setErrors({})
     }
     setOpen(next)
@@ -384,6 +378,7 @@ function CourseSettingsDialog({ course, lang }: { course: Course; lang: Lang }) 
     saveCourseEdit(course.id, {
       title: { ...course.title, [lang]: title.trim() },
       purpose: { ...course.purpose, [lang]: purpose.trim() },
+      image,
     })
     toast.success(t('builder.settingsSaved'), { description: t('builder.settingsSavedDesc') })
     announce(t('builder.settingsSaved'))
@@ -434,6 +429,41 @@ function CourseSettingsDialog({ course, lang }: { course: Course; lang: Lang }) 
             dir={dir}
             required
           />
+          <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+            <legend className="mb-1 p-0 font-semibold text-ink">{t('builder.courseImage')}</legend>
+            <p className="m-0 text-sm text-ink-soft">{t('builder.courseImageHint')}</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {imageOptions.map((o) => (
+                <label
+                  key={o.path}
+                  className="group flex cursor-pointer flex-col gap-1 rounded-xl border-2 border-border bg-white p-1.5 transition-colors hover:border-sedra-mid has-[:checked]:border-sedra-green has-[:checked]:bg-sedra-pale-50 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-sedra-green"
+                >
+                  <input
+                    type="radio"
+                    name="course-image"
+                    value={o.path}
+                    checked={image === o.path}
+                    onChange={() => setImage(o.path)}
+                    className="sr-only"
+                  />
+                  <img
+                    src={asset(o.path)}
+                    alt=""
+                    width={160}
+                    height={120}
+                    loading="lazy"
+                    className="aspect-[4/3] w-full rounded-lg object-cover"
+                  />
+                  <span className="flex items-center gap-1 px-1 text-sm font-semibold text-ink">
+                    {image === o.path ? (
+                      <Check aria-hidden="true" className="size-4 shrink-0 text-sedra-green" />
+                    ) : null}
+                    {o.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <div className="flex flex-wrap gap-3">
             <Button type="submit">
               <Save aria-hidden="true" />

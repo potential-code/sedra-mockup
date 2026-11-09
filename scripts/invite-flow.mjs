@@ -132,22 +132,28 @@ const INVITE = {
       .getByRole('link', { name: 'Learn' })
       .first()
       .getAttribute('href')
-    R.ok(/programmes\/hospitality/.test(learnHref ?? ''), 'Learn nav opens Hospitality', learnHref)
+    // Learn and the course card open the unit view directly; it carries the course menu.
+    R.ok(
+      /courses\/intro-hospitality\/units\/HF01/.test(learnHref ?? ''),
+      'Learn nav opens Hospitality unit 1',
+      learnHref,
+    )
 
     await page.getByRole('link', { name: 'Start Hospitality for All' }).click()
-    await page.waitForURL(/programmes\/hospitality/, { timeout: 5000 }).catch(() => {})
-    R.ok(/programmes\/hospitality/.test(page.url()), 'Start opens the programme page', page.url())
+    await page.waitForURL(/units\/HF01/, { timeout: 5000 }).catch(() => {})
+    R.ok(/units\/HF01/.test(page.url()), 'Start opens Hospitality unit 1', page.url())
     R.ok(
       await page
-        .getByRole('heading', { name: 'Course outline' })
+        .getByRole('heading', { name: /: units$/ })
         .waitFor({ timeout: 5000 })
         .then(() => true)
         .catch(() => false),
-      'Programme page shows Course outline',
+      'Unit view shows the course outline (units menu)',
     )
-    await page.getByRole('link', { name: 'Start unit 1' }).click()
-    await page.waitForURL(/units\/HF01/, { timeout: 5000 }).catch(() => {})
-    R.ok(/units\/HF01/.test(page.url()), 'Start unit 1 opens HF01', page.url())
+    R.ok(
+      (await page.locator('a[href*="courses/healthy-communication/"]').count()) === 0,
+      'Unit view offers no Life Skills links to a Hospitality-only learner',
+    )
 
     // Non-enrolled programme for the invited learner.
     await page.goto(url('/programmes/life-skills'))

@@ -1,17 +1,23 @@
 import type { ProgrammeId } from '@shared/types'
-import { useLocation } from '@tanstack/react-router'
-import { ChevronDown, ExternalLink, FileText } from 'lucide-react'
+import { Link, useLocation } from '@tanstack/react-router'
+import { ArrowRight, ChevronDown, ClipboardList, ExternalLink, FileText } from 'lucide-react'
 import { type ReactNode, useDeferredValue, useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { enrolledProgrammes, findCourse, PROGRAMME_LABEL_KEY } from '@/components/learner/learning'
 import { Reveal } from '@/components/motion/Reveal'
 import { Button } from '@/components/ui/button'
+import { getUnit } from '@/content'
 import { usePageTitle } from '@/hooks/use-page-title'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 import { useLearner, usePrefs } from '@/store/actions'
-import { useExt01Approved } from '@/store/admin-content'
+import {
+  summariesKey,
+  useExt01Approved,
+  useResourceText,
+  useResourceVisible,
+} from '@/store/admin-content'
 import { useDb } from '@/store/db'
 import { ExternalVideoCard } from './ExternalVideoCard'
 import { PlaybookCard } from './PlaybookCard'
@@ -62,8 +68,11 @@ function CustomResources({ programmeId }: { programmeId: ProgrammeId }) {
   const { l } = useLocalized()
   const courseId = findCourse(programmeId)?.id
   const all = useDb((db) => db.customResources)
-  const items = all.filter((r) => r.courseId === courseId)
-  if (items.length === 0) return null
+  const hidden = useDb((db) => db.resourceHidden)
+  // Only resources SEDRA shows to learners (admin Show / Hide).
+  const items = all.filter((r) => r.courseId === courseId && !hidden?.[r.id])
+  const plan = programmeId === 'hospitality' ? <HospitalityPlanCard /> : null
+  if (items.length === 0 && !plan) return null
   const headingId = `${SECTION_ID[programmeId]}-more`
   return (
     <section aria-labelledby={headingId} className="grid grid-cols-1 gap-4">
@@ -71,6 +80,7 @@ function CustomResources({ programmeId }: { programmeId: ProgrammeId }) {
         {t('resources.customHeading')}
       </h3>
       <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2 xl:grid-cols-3">
+        {plan}
         {items.map((r) => (
           <li key={r.id} className="max-w-none">
             <article className="card-pop grid h-full content-start gap-3 p-5">
@@ -102,6 +112,42 @@ function CustomResources({ programmeId }: { programmeId: ProgrammeId }) {
         ))}
       </ul>
     </section>
+  )
+}
+
+/** Built-in "Hospitality practice plan" (HF08): text SEDRA can edit, link to the HF08 practice. */
+function HospitalityPlanCard() {
+  const { t } = useTranslation('learner')
+  const { lang } = useLocalized()
+  const visible = useResourceVisible('hospitalityPlan')
+  const edited = useResourceText('hospitalityPlan', lang)
+  const hf08 = getUnit('HF08')
+  if (!visible) return null
+  const title = edited.title ?? t('resources.planHeading')
+  return (
+    <li className="max-w-none">
+      <article className="card-pop grid h-full content-start gap-3 p-5">
+        <span
+          aria-hidden="true"
+          className="grid size-11 place-items-center rounded-full bg-sedra-pale-100 text-sedra-green"
+        >
+          <ClipboardList className="size-6" />
+        </span>
+        <h4 className="m-0 text-lg font-bold text-sedra-green">{title}</h4>
+        <p className="m-0 text-base">{edited.body ?? t('resources.planIntro')}</p>
+        {hf08 ? (
+          <Link
+            to="/courses/$courseId/units/$unitId"
+            params={{ courseId: hf08.courseId, unitId: hf08.id }}
+            className="inline-flex min-h-12 items-center gap-2 justify-self-start font-semibold text-sedra-green underline underline-offset-4 hover:no-underline"
+          >
+            {t('resources.openPlanUnit')}
+            <span className="sr-only">: {title}</span>
+            <ArrowRight aria-hidden="true" className="size-5 rtl-mirror" />
+          </Link>
+        ) : null}
+      </article>
+    </li>
   )
 }
 
@@ -189,6 +235,11 @@ export function ResourcesPage() {
   const [showOptional, setShowOptional] = useState(hash === 'ext01')
   const [query, setQuery] = useState('')
   const extApproved = useExt01Approved()
+  // Admin Show / Hide (brief §2 Resources: SEDRA manages what learners see).
+  const guideVisible = useResourceVisible('stopThinkDo')
+  const playbookVisible = useResourceVisible('playbook')
+  const lsSummaries = useResourceVisible(summariesKey('healthy-communication'))
+  const hfSummaries = useResourceVisible(summariesKey('intro-hospitality'))
   const [course, setCourse] = useState<CourseFilterValue>('all')
   const q = useDeferredValue(query).trim().toLocaleLowerCase()
   // Enrolled programmes only (SEDRA manages enrolment).
@@ -197,7 +248,7 @@ export function ResourcesPage() {
   const hasHf = programmes.includes('hospitality') && (course === 'all' || course === 'hospitality')
   const lsCount = useMatchingUnits('life-skills', q).length
   const hfCount = useMatchingUnits('hospitality', q).length
-  const count = (hasLs ? lsCount : 0) + (hasHf ? hfCount : 0)
+  const count = (hasLs && lsSummaries ? lsCount : 0) + (hasHf && hfSummaries ? hfCount : 0)
 
   useEffect(() => {
     if (hash === 'ext01') {
@@ -222,8 +273,8 @@ export function ResourcesPage() {
 
       {hasLs ? (
         <CourseSection programmeId="life-skills">
-          <StopThinkDoGuide />
-          {simplified ? (
+          {guideVisible ? <StopThinkDoGuide /> : null}
+          {simplified && (playbookVisible || extApproved) ? (
             <Button
               variant="secondary"
               className="justify-self-start"
@@ -240,23 +291,27 @@ export function ResourcesPage() {
             hidden={!optionalOpen}
             className={cn(
               'grid grid-cols-1 items-stretch gap-6',
-              extApproved && 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]',
+              extApproved && playbookVisible && 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]',
             )}
           >
             {optionalOpen ? (
               <>
-                <PlaybookCard />
+                {playbookVisible ? <PlaybookCard /> : null}
                 <ExternalVideoCard />
               </>
             ) : null}
           </div>
-          <SummaryGrid programmeId="life-skills" q={q} headingId={`${id}-ls`} />
+          {lsSummaries ? (
+            <SummaryGrid programmeId="life-skills" q={q} headingId={`${id}-ls`} />
+          ) : null}
         </CourseSection>
       ) : null}
 
       {hasHf ? (
         <CourseSection programmeId="hospitality">
-          <SummaryGrid programmeId="hospitality" q={q} headingId={`${id}-hf`} />
+          {hfSummaries ? (
+            <SummaryGrid programmeId="hospitality" q={q} headingId={`${id}-hf`} />
+          ) : null}
         </CourseSection>
       ) : null}
     </div>

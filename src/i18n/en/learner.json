@@ -259,7 +259,10 @@
     "openLink": "Open link",
     "opensNewTab": "Opens in a new tab",
     "filterLabel": "Show resources for",
-    "filterAll": "All courses"
+    "filterAll": "All courses",
+    "planHeading": "Hospitality practice plan",
+    "planIntro": "One welcoming action to try today. Plan it in unit 8.",
+    "openPlanUnit": "Open unit 8"
   },
   "achievements": {
     "pageTitle": "My achievements",

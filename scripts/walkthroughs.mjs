@@ -271,19 +271,23 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     )
 
     await page.evaluate(() => document.activeElement?.blur())
-    const prog = await tabTo(page, (i) => i.tag === 'A' && /programmes\/hospitality/.test(i.href))
-    R.ok(
-      !!prog,
-      'Hospitality programme link reachable by Tab from dashboard',
-      prog ? '' : 'not found',
+    // Course cards open the unit view directly (it carries the course menu), not the programme page.
+    const prog = await tabTo(
+      page,
+      (i) =>
+        i.tag === 'A' && /intro-hospitality\/units\//.test(i.href) && /الضيافة للجميع/.test(i.text),
     )
-    await page.keyboard.press('Enter')
-    await page.waitForURL(/programmes\/hospitality/, { timeout: 5000 }).catch(() => {})
-    const unitLink = await tabTo(page, (i) => i.tag === 'A' && /units\/HF01/.test(i.href))
-    R.ok(!!unitLink, 'HF01 link reachable by Tab on programme page')
+    R.ok(!!prog, 'Hospitality course card reachable by Tab from dashboard', prog ? '' : 'not found')
     await page.keyboard.press('Enter')
     await page.waitForURL(/units\/HF01/, { timeout: 5000 }).catch(() => {})
     R.ok(/units\/HF01/.test(page.url()), 'HF01 opened by keyboard', page.url())
+    await page
+      .locator('a[href*="intro-hospitality/units/HF08"]')
+      .first()
+      .waitFor({ timeout: 5000 })
+      .catch(() => {})
+    const menuHf = await page.locator('a[href*="intro-hospitality/units/HF0"]').count()
+    R.ok(menuHf >= 8, 'Unit view shows the Hospitality course menu', `links=${menuHf}`)
 
     // Read the text alternative.
     const readBtn = await tabTo(page, (i) => i.tag === 'BUTTON' && /اقرأ الدرس/.test(i.text))
@@ -341,10 +345,21 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
 
     // Switch programme: Life Skills then back to Hospitality.
     await page.evaluate(() => document.activeElement?.blur())
-    const ls = await tabTo(page, (i) => i.tag === 'A' && /programmes\/life-skills/.test(i.href))
-    R.ok(!!ls, 'Life Skills programme link reachable by Tab')
+    const ls = await tabTo(
+      page,
+      (i) =>
+        i.tag === 'A' &&
+        /healthy-communication\/units\//.test(i.href) &&
+        /المهارات الحياتية/.test(i.text),
+    )
+    R.ok(!!ls, 'Life Skills course card reachable by Tab')
     await page.keyboard.press('Enter')
-    await page.waitForURL(/programmes\/life-skills/, { timeout: 5000 }).catch(() => {})
+    await page.waitForURL(/healthy-communication\/units\/LS/, { timeout: 5000 }).catch(() => {})
+    R.ok(
+      /healthy-communication\/units\/LS/.test(page.url()),
+      'Life Skills unit view opened',
+      page.url(),
+    )
     await page.goto(url('/programmes/hospitality'))
     await page.waitForTimeout(300)
     db = await readDb(page)
@@ -419,7 +434,8 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
   try {
     await signIn(page, 'Noor')
     for (const [id, correct] of [
-      ['LS02', 'B'],
+      // Units Noor has not finished yet (seed: LS01-LS06 done).
+      ['LS07', 'B'],
       ['HF03', null],
     ]) {
       await page.goto(url(unitPath(id)))
@@ -464,7 +480,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     await page.goto(url('/admin'))
     await page.waitForTimeout(400)
     const values = await page
-      .locator('section[aria-labelledby="ov-totals"] p.text-4xl')
+      .locator('section[aria-labelledby="ov-totals"] li p.tabular-nums')
       .allInnerTexts()
     R.ok(values.join('/') === '40/28/12/8/3', 'Overview totals 40/28/12/8/3', values.join('/'))
     await page.goto(url('/admin/learners'))
@@ -598,7 +614,8 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     R.ok(fb === 1, 'Check feedback announced once in live region', JSON.stringify(live))
 
     // Leave prompt: unfinished (selected but unchecked) answer; dialog restores focus on Keep learning.
-    await page.goto(url(unitPath('LS04')))
+    // HF02: not started for Noor, so selecting an answer leaves an unchecked draft.
+    await page.goto(url(unitPath('HF02')))
     await page.getByRole('button', { name: 'Next: question' }).click()
     await page.locator('input[type=radio]').first().check()
     const home = page.locator('a[href$="#/learn"]').first()
@@ -616,7 +633,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
       await page.waitForTimeout(300)
       const back = await page.evaluate(() => document.activeElement?.getAttribute('href'))
       R.ok(
-        /#\/learn$/.test(back ?? '') && /units\/LS04/.test(page.url()),
+        /#\/learn$/.test(back ?? '') && /units\/HF02/.test(page.url()),
         'Keep learning closes dialog, stays, focus returns to opener',
         `focus href=${back} url=${page.url()}`,
       )
