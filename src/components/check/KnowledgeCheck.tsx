@@ -180,7 +180,7 @@ export function KnowledgeCheck({
               </span>
               <span className="min-w-0 flex-1 font-medium">{l(o.text)}</span>
               {checked && (
-                <span className="hidden shrink-0 rounded-full bg-white px-2.5 py-0.5 text-sm font-semibold text-sedra-green ring-1 ring-sedra-green min-[26rem]:inline">
+                <span className="hidden shrink-0 rounded-full bg-white px-2.5 py-0.5 text-base font-semibold text-sedra-green ring-1 ring-sedra-green min-[26rem]:inline">
                   {t('check.yourChoice')}
                 </span>
               )}

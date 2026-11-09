@@ -1,6 +1,7 @@
 import { Link, Outlet } from '@tanstack/react-router'
 import { LogIn } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { PreferencesButton } from '@/components/preferences/PreferencesButton'
 import { Logo } from '@/components/shared/Logo'
 import { Button } from '@/components/ui/button'
 import { DemoBanner } from './DemoControls'
@@ -21,7 +22,8 @@ export function PublicShell() {
             <Logo className="h-14 md:h-16" />
           </Link>
           <LanguageSwitch />
-          <Button asChild size="sm" className="active:scale-[0.98]">
+          <PreferencesButton iconOnlyNarrow />
+          <Button asChild variant="outline" size="sm" className="active:scale-[0.98]">
             <Link to="/welcome">
               <LogIn aria-hidden="true" className="rtl-mirror" />
               <span>{t('home.signIn', { defaultValue: 'Sign in' })}</span>

@@ -1,6 +1,7 @@
 import { Link, Outlet } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Reveal } from '@/components/motion/Reveal'
+import { PreferencesButton } from '@/components/preferences/PreferencesButton'
 import { Logo } from '@/components/shared/Logo'
 import { LeafBorder, ValuesBand } from '@/components/shared/Motifs'
 import { asset } from '@/lib/asset'
@@ -48,8 +49,9 @@ export function AuthShell() {
         </aside>
 
         <div className="flex flex-col bg-surface">
-          <div className="flex justify-end p-4">
+          <div className="flex flex-wrap justify-end gap-2 p-4">
             <LanguageSwitch />
+            <PreferencesButton />
           </div>
           <main id="main" tabIndex={-1} className="flex-1 px-4 pb-10 outline-none md:px-10">
             <Outlet />

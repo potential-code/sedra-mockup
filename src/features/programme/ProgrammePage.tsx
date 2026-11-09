@@ -29,15 +29,15 @@ import { PageHeading } from '@/components/learner/PageHeading'
 import { ProgressBar } from '@/components/learner/ProgressMeter'
 import { ProgressRing } from '@/components/learner/ProgressRing'
 import { StatusLabel } from '@/components/learner/StatusLabel'
-import { Reveal, stagger } from '@/components/motion/Reveal'
+import { Reveal } from '@/components/motion/Reveal'
 import { Button } from '@/components/ui/button'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
-import { getUnitProgress, setLastProgramme, useLearner } from '@/store/actions'
+import { getUnitProgress, setLastProgramme, useLearner, usePrefs } from '@/store/actions'
 
 const CHIP =
-  'inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-sm font-semibold'
+  'inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-base font-semibold'
 
 /** Numbered node on the unit path: number, or a tick once complete (status is also in text). */
 function PathNode({ n, status, current }: { n: number; status: UnitStatus; current: boolean }) {
@@ -83,7 +83,7 @@ function UnitCard({ u, status, current }: { u: Unit; status: UnitStatus; current
           className="aspect-[16/9] size-full object-cover sm:absolute sm:inset-0 sm:aspect-auto"
         />
         {current ? (
-          <span className="absolute start-3 top-3 inline-flex items-center gap-1 rounded-full bg-sedra-green px-2.5 py-0.5 text-sm font-semibold text-white shadow-md">
+          <span className="absolute start-3 top-3 inline-flex items-center gap-1 rounded-full bg-sedra-green px-2.5 py-0.5 text-base font-semibold text-white shadow-md">
             <Sparkles aria-hidden="true" className="size-4" />
             {t('programme.upNext')}
           </span>
@@ -122,7 +122,7 @@ function UnitCard({ u, status, current }: { u: Unit; status: UnitStatus; current
         </div>
         <Button
           asChild
-          variant={status === 'complete' ? 'outline' : 'default'}
+          variant={current ? 'default' : 'outline'}
           className="justify-self-start md:justify-self-end"
         >
           <Link
@@ -145,6 +145,7 @@ export function ProgrammePage() {
   const { l } = useLocalized()
   const { programmeId } = useParams({ from: '/_learner/programmes/$programmeId' })
   const learner = useLearner()
+  const simplified = usePrefs().view === 'simplified'
 
   useEffect(() => {
     if (isProgrammeId(programmeId)) setLastProgramme(programmeId)
@@ -191,9 +192,9 @@ export function ProgrammePage() {
           ) : null}
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 hidden lg:block lg:ltr:bg-linear-to-r lg:rtl:bg-linear-to-l lg:from-sedra-green-800 lg:from-40% lg:via-sedra-green-800/85 lg:via-55% lg:to-sedra-green-800/0 lg:to-80%"
+            className="absolute inset-0 -z-10 hidden lg:block lg:ltr:bg-linear-to-r lg:rtl:bg-linear-to-l lg:from-sedra-green-800 lg:from-55% lg:via-sedra-green-800/90 lg:via-65% lg:to-sedra-green-800/0 lg:to-90%"
           />
-          <div className="motif-tree-light grid max-w-2xl grid-cols-1 gap-5 p-6 md:p-10">
+          <div className="grid max-w-2xl grid-cols-1 gap-5 p-6 md:p-10">
             <PageHeading tone="inverse" title={name} lead={course ? l(course.title) : undefined} />
             {course ? (
               <section aria-labelledby="purpose-heading" className="grid grid-cols-1 gap-1">
@@ -235,13 +236,11 @@ export function ProgrammePage() {
         {units.length === 0 ? <p className="m-0">{t('shared.notAvailable')}</p> : null}
         {/* Path: numbered nodes joined by a line. Order and status are also in each card's text. */}
         <ol className="relative m-0 grid list-none gap-5 p-0 before:absolute before:start-[1.375rem] before:top-8 before:bottom-8 before:w-1 before:rounded-full before:bg-sedra-pale before:content-['']">
-          {units.map((u, i) => {
+          {units.map((u) => {
             const status = unitStatus(getUnitProgress(learner, u.id))
             return (
-              <Reveal
-                as="li"
+              <li
                 key={u.id}
-                delay={stagger(i, 0.04)}
                 className="grid max-w-none grid-cols-[3rem_minmax(0,1fr)] gap-3 md:gap-5"
               >
                 <div className="pt-5">
@@ -249,7 +248,7 @@ export function ProgrammePage() {
                 </div>
                 <div className="grid min-w-0 grid-cols-1 gap-3">
                   <UnitCard u={u} status={status} current={u.id === current} />
-                  {u.id === 'LS01' ? (
+                  {u.id === 'LS01' && !simplified ? (
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border-2 border-dashed border-sedra-pale bg-white/70 px-4 py-1">
                       <Link
                         to="/resources"
@@ -265,13 +264,13 @@ export function ProgrammePage() {
                     </div>
                   ) : null}
                 </div>
-              </Reveal>
+              </li>
             )
           })}
         </ol>
       </section>
 
-      <Reveal>
+      {simplified ? null : (
         <section
           aria-labelledby="switch-heading"
           className="card-pop grid grid-cols-1 overflow-hidden sm:grid-cols-[minmax(0,14rem)_1fr]"
@@ -299,7 +298,7 @@ export function ProgrammePage() {
             </Button>
           </div>
         </section>
-      </Reveal>
+      )}
     </div>
   )
 }

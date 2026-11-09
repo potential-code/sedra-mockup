@@ -4,7 +4,6 @@ import { ArrowRight, Search } from 'lucide-react'
 import { Fragment, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { courseUnits, unitLinkParams } from '@/components/learner/learning'
-import { Reveal, stagger } from '@/components/motion/Reveal'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 
@@ -101,20 +100,20 @@ export function SummaryGrid({
       </h3>
       {units.length === 0 ? <p className="m-0">{t('resources.noResults')}</p> : null}
       <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2 xl:grid-cols-3">
-        {units.map((u, i) => (
-          <Reveal as="li" key={u.id} delay={stagger(i, 0.05)}>
-            <article className="card-pop group grid h-full grid-rows-[auto_1fr] overflow-hidden">
+        {units.map((u) => (
+          <li key={u.id} className="max-w-none">
+            <article className="card-pop grid h-full grid-rows-[auto_1fr] overflow-hidden">
               <div className="relative aspect-[16/9] overflow-hidden bg-sedra-pale-100">
                 <img
                   src={asset(`images/units/${u.id}.webp`)}
                   alt=""
                   width={1200}
                   height={896}
-                  className="size-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.05]"
+                  className="size-full object-cover"
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute start-3 top-3 rounded-full bg-white px-3 py-1 text-sm font-bold text-sedra-green shadow-md"
+                  className="absolute start-3 top-3 rounded-full bg-white px-3 py-1 text-base font-bold text-sedra-green shadow-md"
                 >
                   {t('shared.unitOf', { n: u.order, total: 8 })}
                 </span>
@@ -134,14 +133,11 @@ export function SummaryGrid({
                 >
                   {t('shared.openUnit')}
                   <span className="sr-only">: {l(u.title)}</span>
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="size-5 rtl-mirror motion-safe:transition-transform motion-safe:group-hover:translate-x-1 rtl:motion-safe:group-hover:-translate-x-1"
-                  />
+                  <ArrowRight aria-hidden="true" className="size-5 rtl-mirror" />
                 </Link>
               </div>
             </article>
-          </Reveal>
+          </li>
         ))}
       </ul>
     </section>

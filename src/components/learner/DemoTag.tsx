@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 export function DemoTag() {
   const { t } = useTranslation('learner')
   return (
-    <span className="inline-flex w-fit items-center justify-self-start gap-1 rounded-full border border-notice bg-notice-soft px-2.5 py-0.5 text-sm font-semibold text-notice">
+    <span className="inline-flex w-fit items-center justify-self-start gap-1 rounded-full border border-notice bg-notice-soft px-2.5 py-0.5 text-base font-semibold text-notice">
       <FlaskConical aria-hidden="true" className="size-4" />
       {t('shared.demo')}
     </span>

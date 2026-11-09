@@ -44,7 +44,7 @@ export function PlaybookCard() {
   return (
     <section
       aria-labelledby="playbook-heading"
-      className="motif-tree-light grid h-full grid-cols-1 content-start gap-5 rounded-3xl bg-sedra-green-800 p-6 text-white shadow-lg md:p-7"
+      className="grid h-full grid-cols-1 content-start gap-5 rounded-3xl bg-sedra-green-800 p-6 text-white shadow-lg md:p-7"
     >
       <div className="flex items-start gap-3">
         <span
@@ -71,7 +71,7 @@ export function PlaybookCard() {
           >
             <span
               aria-hidden="true"
-              className="flex size-7 items-center justify-center rounded-full bg-white text-sm text-sedra-green-800"
+              className="flex size-7 items-center justify-center rounded-full bg-white text-base text-sedra-green-800"
             >
               {i + 1}
             </span>
@@ -86,7 +86,6 @@ export function PlaybookCard() {
             key={key}
             className={cn(
               'grid content-start gap-2 rounded-2xl bg-white p-4 text-ink shadow-lg',
-              'motion-safe:transition-transform motion-safe:duration-300 motion-safe:hover:rotate-0 motion-safe:hover:-translate-y-1',
               tilt,
             )}
           >
@@ -107,7 +106,7 @@ export function PlaybookCard() {
         <Link
           to="/courses/$courseId/units/$unitId"
           params={{ courseId: ls08.courseId, unitId: ls08.id }}
-          className="inline-flex min-h-12 items-center gap-2 justify-self-start rounded-xl bg-white px-5 font-semibold text-sedra-green-800 shadow-md hover:bg-sedra-pale-50 motion-safe:transition-transform motion-safe:active:scale-[0.97]"
+          className="inline-flex min-h-12 items-center gap-2 justify-self-start rounded-xl bg-white px-5 font-semibold text-sedra-green-800 shadow-md hover:bg-sedra-pale-50"
         >
           {t('resources.openPlaybookUnit')}
           <ArrowRight aria-hidden="true" className="size-5 rtl-mirror" />

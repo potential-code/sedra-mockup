@@ -60,7 +60,7 @@ export function LessonMedia({
               alt={l(unit.imageAlt)}
               className="aspect-[4/3] h-full @xl:aspect-auto"
             />
-            <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-sm font-semibold text-sedra-green shadow-md">
+            <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-base font-semibold text-sedra-green shadow-md">
               <Clapperboard aria-hidden="true" className="size-4" />
               {t('pending.chip')}
             </span>
@@ -88,8 +88,8 @@ export function LessonMedia({
                     className="flex max-w-none flex-col gap-1 rounded-xl bg-white px-2 py-1.5 shadow-sm"
                   >
                     <span className="h-1.5 rounded-full bg-sedra-mid" />
-                    <span className="text-sm font-bold text-ink">{i + 1}</span>
-                    <span className="ltr-isolate text-xs text-ink-soft">
+                    <span className="text-base font-bold text-ink">{i + 1}</span>
+                    <span className="ltr-isolate text-base leading-tight text-ink-soft">
                       {lang === 'ar' ? s.time.replace(/ s$/, ' ث') : s.time}
                     </span>
                   </li>

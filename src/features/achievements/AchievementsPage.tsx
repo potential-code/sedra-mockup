@@ -16,7 +16,7 @@ import {
 import { PageHeading } from '@/components/learner/PageHeading'
 import { ProgressMeter } from '@/components/learner/ProgressMeter'
 import { ProgressRing } from '@/components/learner/ProgressRing'
-import { Reveal, stagger } from '@/components/motion/Reveal'
+import { Reveal } from '@/components/motion/Reveal'
 import { getUnit } from '@/content'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
@@ -49,7 +49,7 @@ export function AchievementsPage() {
     <div className="container-page grid grid-cols-1 gap-10 py-8 [&_:is(h2,h3,h4)]:break-words [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink">
       {/* Header band */}
       <Reveal>
-        <div className="motif-tree grid grid-cols-1 gap-6 rounded-3xl bg-white p-6 shadow-md md:grid-cols-[1fr_auto] md:items-center md:p-10">
+        <div className="grid grid-cols-1 gap-6 rounded-3xl bg-white p-6 shadow-md md:grid-cols-[1fr_auto] md:items-center md:p-10">
           <PageHeading
             title={t('achievements.heading')}
             pageTitle={t('achievements.pageTitle')}
@@ -147,13 +147,8 @@ export function AchievementsPage() {
                 <p className="m-0">{t('achievements.journeyEmpty')}</p>
               </li>
             ) : null}
-            {finished.map((u, i) => (
-              <Reveal
-                as="li"
-                key={u.id}
-                delay={stagger(i, 0.05)}
-                className="relative flex max-w-none items-center gap-4"
-              >
+            {finished.map((u) => (
+              <li key={u.id} className="relative flex max-w-none items-center gap-4">
                 <span
                   aria-hidden="true"
                   className="grid size-12 shrink-0 place-items-center rounded-full bg-sedra-green text-white shadow-md"
@@ -161,7 +156,7 @@ export function AchievementsPage() {
                   {u.badge ? <Award className="size-6" /> : <CircleCheck className="size-6" />}
                 </span>
                 <div className="grid min-w-0 flex-1 gap-0.5 rounded-2xl bg-white px-4 py-3 shadow-sm">
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-success">
+                  <span className="inline-flex items-center gap-1.5 text-base font-semibold text-success">
                     <CircleCheck aria-hidden="true" className="size-4" />
                     {t('achievements.journeyDone')}
                   </span>
@@ -176,7 +171,7 @@ export function AchievementsPage() {
                     </span>
                   ) : null}
                 </div>
-              </Reveal>
+              </li>
             ))}
             {next ? (
               <li className="relative flex max-w-none items-center gap-4">
@@ -191,7 +186,7 @@ export function AchievementsPage() {
                   params={unitLinkParams(next)}
                   className="group grid min-h-12 min-w-0 flex-1 gap-0.5 rounded-2xl border-2 border-dashed border-sedra-green bg-sedra-pale-50 px-4 py-3 no-underline transition-colors hover:bg-white"
                 >
-                  <span className="text-sm font-semibold text-sedra-green">
+                  <span className="text-base font-semibold text-sedra-green">
                     {t('achievements.journeyNext')}
                   </span>
                   <span className="inline-flex items-center gap-2 font-semibold text-ink underline underline-offset-4 group-hover:no-underline">
@@ -214,7 +209,7 @@ export function AchievementsPage() {
             aria-labelledby="ach-hf"
             className={cn(
               'grid grid-cols-1 overflow-hidden rounded-3xl shadow-md',
-              hfDone ? 'bg-sedra-green-800 motif-tree-light' : 'bg-white',
+              hfDone ? 'bg-sedra-green-800' : 'bg-white',
             )}
           >
             {hfCourse?.image ? (
@@ -249,14 +244,12 @@ export function AchievementsPage() {
               {t('achievements.progressHeading')}
             </h2>
             <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0">
-              {PROGRAMMES.map((p, i) => {
+              {PROGRAMMES.map((p) => {
                 const course = findCourse(p)
                 const done = completedCount(learner, courseUnits(p))
                 return (
-                  <Reveal
-                    as="li"
+                  <li
                     key={p}
-                    delay={stagger(i)}
                     className="flex max-w-none items-center gap-4 rounded-2xl bg-white p-4 shadow-sm"
                   >
                     <ProgressRing value={done / UNITS_PER_COURSE} size={64} stroke={8}>
@@ -273,7 +266,7 @@ export function AchievementsPage() {
                         {t('shared.unitsComplete', { done, total: UNITS_PER_COURSE })}
                       </span>
                     </div>
-                  </Reveal>
+                  </li>
                 )
               })}
             </ul>

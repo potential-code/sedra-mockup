@@ -1,5 +1,5 @@
 import { Link, Outlet } from '@tanstack/react-router'
-import { Award, FolderOpen, Settings2 } from 'lucide-react'
+import { Award, FolderOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PageTransition } from '@/components/motion/PageTransition'
 import { LeafBorder, ValuesBand } from '@/components/shared/Motifs'
@@ -31,7 +31,6 @@ export function LearnerShell() {
     { key: 'resources', label: tl('nav.resources'), to: '/resources', icon: FolderOpen },
     { key: 'achievements', label: tl('nav.achievements'), to: '/achievements', icon: Award },
     ...core.slice(3),
-    { key: 'preferences', label: t('preferences'), to: '/preferences', icon: Settings2 },
   ]
 
   return (

@@ -57,5 +57,10 @@
   "logout": "Log out",
   "signedInAs": "Signed in as",
   "menu": "Menu",
-  "closeMenu": "Close menu"
+  "closeMenu": "Close menu",
+  "prefsPanel": {
+    "autoSave": "Changes save automatically.",
+    "all": "All preferences",
+    "close": "Close preferences"
+  }
 }

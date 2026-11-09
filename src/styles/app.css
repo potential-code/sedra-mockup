@@ -322,6 +322,14 @@ html[data-motion="reduce"] *::after {
   background: url("../assets/motifs/motif-leaf-border.png") repeat-x left top / auto 100%;
 }
 
+/* Narrow screens stack text over the whole card, so the tree would sit behind words: hide it. */
+@media (width < 48rem) {
+  .motif-tree::after,
+  .motif-tree-light::after {
+    display: none;
+  }
+}
+
 html[data-contrast="high"] .leaf-border,
 html[data-contrast="high"] .motif-tree::after,
 html[data-contrast="high"] .motif-tree-light::after {

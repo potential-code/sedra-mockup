@@ -60,7 +60,7 @@ const STEP_ICONS: Record<UnitStep, LucideIcon> = {
 }
 /** White buttons on the green banner (green text on white: 6.48:1). */
 const BANNER_BTN = 'bg-white text-sedra-green shadow-sm hover:bg-sedra-pale-100'
-const PRIMARY_BTN = 'flex-1 shadow-md sm:flex-none'
+const PRIMARY_BTN = 'flex-[1_1_10rem] shadow-md sm:flex-none'
 
 /** Set before in-page navigation to another unit so its h1 receives focus on arrival. */
 let focusHeadingOnMount = false
@@ -224,7 +224,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
                 aria-hidden="true"
                 className="absolute inset-0 -z-10 bg-gradient-to-t from-sedra-green-800 via-sedra-green-800/90 to-sedra-green-800/80"
               />
-              <div className="motif-tree-light flex flex-col gap-4 p-3 @md:p-6 @2xl:flex-row @2xl:items-end @2xl:gap-6">
+              <div className="flex flex-col gap-4 p-3 @md:p-6 @2xl:flex-row @2xl:items-end @2xl:gap-6">
                 <div className="flex min-w-0 flex-1 flex-col gap-3">
                   <Link
                     to="/programmes/$programmeId"
@@ -234,7 +234,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
                     <ArrowLeft aria-hidden="true" className="size-5 rtl-mirror" />
                     {t('nav.backToCourse', { course: l(course.title) })}
                   </Link>
-                  <p className="m-0 inline-flex items-center gap-2 self-start rounded-full bg-white px-3 py-1 text-sm font-bold text-sedra-green shadow-sm">
+                  <p className="m-0 inline-flex items-center gap-2 self-start rounded-full bg-white px-3 py-1 text-base font-bold text-sedra-green shadow-sm">
                     <Layers aria-hidden="true" className="size-4" />
                     {t('unitOf', { n: unit.order, total: units.length })}
                   </p>
@@ -389,53 +389,46 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
 
           {/* Sticky action area: the one prominent next step (brief §3 mobile layout). */}
           <div className="sticky bottom-[calc(4rem+1px+env(safe-area-inset-bottom)+0.5rem)] z-30 flex flex-wrap items-center gap-2 rounded-2xl border bg-white/95 p-3 shadow-pop backdrop-blur-md lg:bottom-4">
+            {/* Same order on every step: Back (start), step position, then the one primary Next (end). */}
+            {step === 'check' && (
+              <Button variant="outline" onClick={() => goStep('media')}>
+                <ArrowLeft aria-hidden="true" className="rtl-mirror" />
+                {t('actions.backToLesson')}
+              </Button>
+            )}
+            {step === 'practice' && (
+              <Button variant="outline" onClick={() => goStep('check')}>
+                <ArrowLeft aria-hidden="true" className="rtl-mirror" />
+                {t('actions.backToQuestion')}
+              </Button>
+            )}
+            {step === 'check' && !progress.checkReviewed ? (
+              <p className="m-0 flex-1 basis-48 text-base text-ink-soft">
+                {t('actions.checkHint')}
+              </p>
+            ) : (
+              <p className="m-0 hidden flex-1 items-center gap-2 text-base font-semibold text-ink-soft sm:flex">
+                <StepIcon aria-hidden="true" className="size-5" />
+                {t('actions.stepOf', { n: stepIndex + 1 })}
+              </p>
+            )}
+            {step === 'check' && progress.checkReviewed && (
+              <Button variant="outline" onClick={() => goStep('practice')}>
+                {t('actions.toPractice')}
+              </Button>
+            )}
             {step === 'media' && (
               <Button size="lg" className={PRIMARY_BTN} onClick={() => goStep('check')}>
                 {t('actions.toQuestion')}
                 <ArrowRight aria-hidden="true" className="rtl-mirror" />
               </Button>
             )}
-            {step === 'check' && !progress.checkReviewed && (
-              <>
-                <p className="m-0 flex-1 basis-48 text-base text-ink-soft">
-                  {t('actions.checkHint')}
-                </p>
-                <Button variant="outline" onClick={() => goStep('media')}>
-                  <ArrowLeft aria-hidden="true" className="rtl-mirror" />
-                  {t('actions.backToLesson')}
-                </Button>
-              </>
-            )}
-            {step === 'check' && progress.checkReviewed && (
-              <>
-                <Button size="lg" className={PRIMARY_BTN} onClick={goNext}>
-                  {isLast ? <Flag aria-hidden="true" /> : null}
-                  {nextLabel}
-                  {!isLast && <ArrowRight aria-hidden="true" className="rtl-mirror" />}
-                </Button>
-                <Button variant="outline" onClick={() => goStep('practice')}>
-                  {t('actions.toPractice')}
-                </Button>
-              </>
-            )}
-            {step === 'practice' && (
-              <>
-                <Button size="lg" className={PRIMARY_BTN} onClick={goNext}>
-                  {isLast ? <Flag aria-hidden="true" /> : null}
-                  {nextLabel}
-                  {!isLast && <ArrowRight aria-hidden="true" className="rtl-mirror" />}
-                </Button>
-                <Button variant="outline" onClick={() => goStep('check')}>
-                  <ArrowLeft aria-hidden="true" className="rtl-mirror" />
-                  {t('actions.backToQuestion')}
-                </Button>
-              </>
-            )}
-            {!(step === 'check' && !progress.checkReviewed) && (
-              <p className="m-0 ms-auto hidden items-center gap-2 text-base font-semibold text-ink-soft sm:flex">
-                <StepIcon aria-hidden="true" className="size-5" />
-                {t('actions.stepOf', { n: stepIndex + 1 })}
-              </p>
+            {((step === 'check' && progress.checkReviewed) || step === 'practice') && (
+              <Button size="lg" className={PRIMARY_BTN} onClick={goNext}>
+                {isLast ? <Flag aria-hidden="true" /> : null}
+                {nextLabel}
+                {!isLast && <ArrowRight aria-hidden="true" className="rtl-mirror" />}
+              </Button>
             )}
           </div>
 
@@ -475,7 +468,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
             </h2>
             {!simplified && (
               <div className="mt-2">
-                <p className="m-0 text-sm font-semibold text-ink-soft">
+                <p className="m-0 text-base font-semibold text-ink-soft">
                   {t('outline.progress', { done: doneInCourse, total: units.length })}
                 </p>
                 <div
@@ -566,7 +559,7 @@ function AfterReview({
       {unit.badge && unitComplete && (
         <section
           aria-labelledby="badge-title"
-          className="motif-tree flex items-center gap-4 rounded-3xl border-2 border-sedra-green bg-white p-5 shadow-md"
+          className="flex items-center gap-4 rounded-3xl border-2 border-sedra-green bg-white p-5 shadow-md"
         >
           <span
             aria-hidden="true"

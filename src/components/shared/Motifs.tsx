@@ -17,7 +17,7 @@ export function ValuesBand({ className }: { className?: string }) {
     <ul
       aria-label={t('values.label')}
       className={cn(
-        'm-0 flex list-none flex-wrap items-center justify-center gap-x-6 gap-y-1 bg-sedra-green px-4 py-2 text-sm font-semibold text-white',
+        'm-0 flex list-none flex-wrap items-center justify-center gap-x-6 gap-y-1 bg-sedra-green px-4 py-2 text-base font-semibold text-white',
         className,
       )}
     >

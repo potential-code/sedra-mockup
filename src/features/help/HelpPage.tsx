@@ -26,13 +26,13 @@ import { useTranslation } from 'react-i18next'
 import { DemoTag } from '@/components/learner/DemoTag'
 import { formatUaeDateTime } from '@/components/learner/learning'
 import { ReadAloud } from '@/components/learner/ReadAloud'
-import { Reveal, stagger } from '@/components/motion/Reveal'
+import { Reveal } from '@/components/motion/Reveal'
 import { Button } from '@/components/ui/button'
 import { usePageTitle } from '@/hooks/use-page-title'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
-import { useSession } from '@/store/actions'
+import { usePrefs, useSession } from '@/store/actions'
 import { addSupportRequest, useSupportRequests } from '@/store/support-actions'
 
 type Topic = SupportRequest['topic']
@@ -225,11 +225,7 @@ function SupportForm() {
             />
           </div>
 
-          <Button
-            type="submit"
-            size="lg"
-            className="justify-self-start shadow-md motion-safe:transition-transform motion-safe:active:scale-[0.97]"
-          >
+          <Button type="submit" size="lg" className="justify-self-start shadow-md">
             <Send aria-hidden="true" className="rtl-mirror" />
             {t('help.send')}
           </Button>
@@ -303,7 +299,7 @@ function TopicTiles({
               key={v}
               className={cn(
                 'relative flex min-h-12 cursor-pointer items-center gap-4 rounded-2xl border-2 bg-white p-4 text-ink sm:flex-col sm:items-start sm:p-5',
-                'motion-safe:transition-[transform,box-shadow] motion-safe:duration-200 hover:shadow-md motion-safe:active:scale-[0.98]',
+                'transition-shadow hover:shadow-md',
                 'has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink',
                 checked
                   ? 'border-sedra-green bg-sedra-pale-50 shadow-md ring-2 ring-sedra-green'
@@ -354,10 +350,16 @@ function TopicTiles({
 export function HelpPage() {
   const { t } = useTranslation('learner')
   usePageTitle(t('help.pageTitle'))
+  const simplified = usePrefs().view === 'simplified'
   const tips = TIPS.map(({ n }) => t(`help.tip${n}`))
   return (
     <div className="container-page grid grid-cols-1 [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink [&_:is(h2,h3,h4)]:break-words gap-12 py-8">
-      <Reveal className="motif-tree grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-md lg:grid-cols-[1.1fr_1fr]">
+      <Reveal
+        className={cn(
+          'motif-tree grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-md',
+          !simplified && 'lg:grid-cols-[1.1fr_1fr]',
+        )}
+      >
         <div className="grid content-center gap-5 p-6 md:p-10">
           <span
             aria-hidden="true"
@@ -370,7 +372,7 @@ export function HelpPage() {
           <div className="flex flex-wrap gap-3">
             <Button
               size="lg"
-              className="shadow-md motion-safe:transition-transform motion-safe:active:scale-[0.97]"
+              variant="outline"
               onClick={() => {
                 const el = document.getElementById('support-form')
                 el?.scrollIntoView({ block: 'start' })
@@ -385,15 +387,17 @@ export function HelpPage() {
             <BackToLearning />
           </div>
         </div>
-        <div className="relative min-h-60">
-          <img
-            src={asset('images/supporter.webp')}
-            alt={t('help.supporterAlt')}
-            width={1200}
-            height={896}
-            className="absolute inset-0 size-full object-cover"
-          />
-        </div>
+        {simplified ? null : (
+          <div className="relative min-h-60">
+            <img
+              src={asset('images/supporter.webp')}
+              alt={t('help.supporterAlt')}
+              width={1200}
+              height={896}
+              className="absolute inset-0 size-full object-cover"
+            />
+          </div>
+        )}
       </Reveal>
 
       <section aria-labelledby="tips-heading" className="grid grid-cols-1 gap-5">
@@ -405,14 +409,14 @@ export function HelpPage() {
         </div>
         <ol className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
           {TIPS.map(({ n, icon: Icon }, i) => (
-            <Reveal as="li" key={n} delay={stagger(i)}>
-              <div className="card-pop grid h-full grid-cols-[auto_1fr] items-start gap-4 p-5">
+            <li key={n} className="max-w-none">
+              <div className="grid h-full rounded-2xl bg-white shadow-md grid-cols-[auto_1fr] items-start gap-4 p-5">
                 <span
                   aria-hidden="true"
                   className="relative flex size-14 items-center justify-center rounded-2xl bg-sedra-pale-100 text-sedra-green"
                 >
                   <Icon className="size-7" />
-                  <span className="absolute -end-2 -top-2 flex size-7 items-center justify-center rounded-full bg-sedra-green text-sm font-bold text-white shadow-sm">
+                  <span className="absolute -end-2 -top-2 flex size-7 items-center justify-center rounded-full bg-sedra-green text-base font-bold text-white shadow-sm">
                     {n}
                   </span>
                 </span>
@@ -421,19 +425,17 @@ export function HelpPage() {
                   {tips[i]}
                 </p>
               </div>
-            </Reveal>
+            </li>
           ))}
         </ol>
       </section>
 
-      <Reveal>
-        <SupportForm />
-      </Reveal>
+      <SupportForm />
 
-      <Reveal>
+      {simplified ? null : (
         <section
           aria-labelledby="supporter-heading"
-          className="motif-tree-light grid grid-cols-1 overflow-hidden rounded-3xl bg-sedra-green-800 shadow-lg md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
+          className="grid grid-cols-1 overflow-hidden rounded-3xl bg-sedra-green-800 shadow-lg md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
         >
           <img
             src={asset('images/supporter.webp')}
@@ -464,7 +466,7 @@ export function HelpPage() {
             </ul>
           </div>
         </section>
-      </Reveal>
+      )}
 
       <BackToLearning />
     </div>

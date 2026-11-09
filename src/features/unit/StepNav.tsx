@@ -89,7 +89,7 @@ export function StepNav({
                         ? 'scale-110 border-sedra-green bg-sedra-green text-white shadow-md'
                         : st.done
                           ? 'border-success bg-success-soft text-success'
-                          : 'border-border bg-white text-ink-soft group-hover:-translate-y-0.5 group-hover:border-sedra-green group-hover:text-sedra-green',
+                          : 'border-border bg-white text-ink-soft group-hover:border-sedra-green group-hover:text-sedra-green',
                     )}
                   >
                     <Icon className="size-5" strokeWidth={st.done ? 3 : 2} />
@@ -101,7 +101,7 @@ export function StepNav({
                   </span>
                   <span
                     className={cn(
-                      'text-sm leading-tight @md:text-base',
+                      'text-base leading-tight',
                       current ? 'font-bold text-sedra-green' : 'font-semibold',
                     )}
                   >
@@ -110,7 +110,7 @@ export function StepNav({
                   </span>
                   <span
                     className={cn(
-                      'text-sm leading-tight',
+                      'text-base leading-tight',
                       st.done ? 'font-semibold text-success' : 'text-ink-soft',
                     )}
                   >

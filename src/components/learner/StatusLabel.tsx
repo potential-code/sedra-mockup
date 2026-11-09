@@ -24,7 +24,7 @@ export function StatusLabel({
     <span
       className={cn(
         'inline-flex w-fit items-center gap-1.5 rounded-full border font-semibold',
-        size === 'sm' ? 'px-2.5 py-0.5 text-sm' : 'px-3 py-1 text-base',
+        size === 'sm' ? 'px-2.5 py-0.5 text-base' : 'px-3 py-1 text-base',
         status === 'complete' && 'border-success bg-success-soft text-success',
         status === 'inProgress' && 'border-info bg-info-soft text-info',
         status === 'notStarted' && 'border-border bg-white text-ink-soft',

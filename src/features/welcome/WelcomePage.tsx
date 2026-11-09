@@ -4,7 +4,7 @@ import { ArrowRight, ChevronDown, CircleHelp, Eye, EyeOff, LogIn, Mail } from 'l
 import { type FormEvent, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DemoTag } from '@/components/learner/DemoTag'
-import { Reveal, stagger } from '@/components/motion/Reveal'
+import { Reveal } from '@/components/motion/Reveal'
 import { announce } from '@/components/shared/LiveRegion'
 import { Button } from '@/components/ui/button'
 import { usePageTitle } from '@/hooks/use-page-title'
@@ -67,19 +67,19 @@ export function WelcomePage() {
           <p className="m-0 text-base text-ink-soft">{t('welcome.pickLead')}</p>
         </div>
         <ul className="m-0 grid list-none gap-3 p-0">
-          {PERSONAS.map((p, i) => {
+          {PERSONAS.map((p) => {
             const name = l(p.name)
             const staff = p.role === 'admin'
             return (
-              <Reveal as="li" key={p.id} delay={stagger(i, 0.08)} className="max-w-none">
+              <li key={p.id} className="max-w-none">
                 <button
                   type="button"
                   onClick={() => choose(p)}
                   aria-label={`${t('welcome.choose', { name })}. ${l(p.description)}`}
                   className={cn(
                     'group flex min-h-24 w-full items-center gap-4 rounded-2xl border-2 bg-white p-3 pe-4 text-start shadow-md sm:gap-5 sm:p-4',
-                    'transition-[translate,scale,box-shadow,border-color] duration-200 ease-out',
-                    'hover:-translate-y-1 hover:border-sedra-green hover:shadow-pop focus-visible:-translate-y-1 focus-visible:border-sedra-green active:scale-[0.98]',
+                    'transition-[box-shadow,border-color] duration-200 ease-out',
+                    'hover:border-sedra-green hover:shadow-pop focus-visible:border-sedra-green',
                     staff ? 'border-border' : 'border-transparent',
                   )}
                 >
@@ -96,7 +96,7 @@ export function WelcomePage() {
                     <span className="flex flex-wrap items-center gap-2">
                       <span className="text-xl font-bold text-sedra-green">{name}</span>
                       {staff ? (
-                        <span className="rounded-full bg-sedra-pale-100 px-2.5 py-0.5 text-sm font-semibold text-ink">
+                        <span className="rounded-full bg-sedra-pale-100 px-2.5 py-0.5 text-base font-semibold text-ink">
                           {t('welcome.staffTag')}
                         </span>
                       ) : null}
@@ -110,106 +110,104 @@ export function WelcomePage() {
                     <ArrowRight className="rtl-mirror size-6" />
                   </span>
                 </button>
-              </Reveal>
+              </li>
             )
           })}
         </ul>
       </section>
 
       {/* Secondary: email sign-in (demo), collapsed by default. */}
-      <Reveal delay={0.3}>
-        <section
-          aria-labelledby={`${id}-form`}
-          className="grid grid-cols-1 overflow-hidden rounded-2xl bg-sedra-pale-50 ring-1 ring-border"
-        >
-          <h2 id={`${id}-form`} className="m-0 text-xl">
-            <button
-              type="button"
-              aria-expanded={formOpen}
-              aria-controls={`${id}-form-body`}
-              onClick={() => setFormOpen((o) => !o)}
-              className="flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start text-sedra-green hover:bg-sedra-pale-100 sm:px-5"
-            >
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-sedra-green shadow-sm">
-                <Mail aria-hidden="true" className="size-5" />
-              </span>
-              <span className="grid flex-1">
-                <span>{t('welcome.emailToggle')}</span>
-                <span className="text-base font-normal text-ink-soft">
-                  {t('welcome.emailToggleHint')}
-                </span>
-              </span>
-              <ChevronDown
-                aria-hidden="true"
-                className={cn(
-                  'size-6 shrink-0 transition-transform duration-200',
-                  formOpen && 'rotate-180',
-                )}
-              />
-            </button>
-          </h2>
-
-          <div
-            id={`${id}-form-body`}
-            hidden={!formOpen}
-            className="grid grid-cols-1 gap-5 border-t bg-white p-4 sm:p-5"
+      <section
+        aria-labelledby={`${id}-form`}
+        className="grid grid-cols-1 overflow-hidden rounded-2xl bg-sedra-pale-50 ring-1 ring-border"
+      >
+        <h2 id={`${id}-form`} className="m-0 text-xl">
+          <button
+            type="button"
+            aria-expanded={formOpen}
+            aria-controls={`${id}-form-body`}
+            onClick={() => setFormOpen((o) => !o)}
+            className="flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start text-sedra-green hover:bg-sedra-pale-100 sm:px-5"
           >
-            <DemoTag />
-            <form onSubmit={onSubmit} className="grid grid-cols-1 gap-5" noValidate>
-              <div className="grid grid-cols-1 gap-2">
-                <label htmlFor={`${id}-email`} className="font-semibold">
-                  {t('welcome.email')}
-                </label>
-                <p id={`${id}-email-hint`} className="m-0 text-base text-ink-soft">
-                  {t('welcome.emailHint')}
-                </p>
-                <input
-                  id={`${id}-email`}
-                  type="email"
-                  autoComplete="email"
-                  dir="ltr"
-                  aria-describedby={`${id}-email-hint`}
-                  className={`${fieldClass} text-start`}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-1 gap-2">
-                <label htmlFor={`${id}-password`} className="font-semibold">
-                  {t('welcome.password')}
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  <input
-                    id={`${id}-password`}
-                    type={show ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    dir="ltr"
-                    className={`${fieldClass} min-w-0 flex-1 basis-48`}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    aria-controls={`${id}-password`}
-                    onClick={togglePassword}
-                  >
-                    {show ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-                    {show ? t('welcome.hidePassword') : t('welcome.showPassword')}
-                  </Button>
-                </div>
-              </div>
-              <p className="m-0 rounded-xl bg-notice-soft p-3 text-base text-notice">
-                {t('welcome.demoNote')}
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-sedra-green shadow-sm">
+              <Mail aria-hidden="true" className="size-5" />
+            </span>
+            <span className="grid flex-1">
+              <span>{t('welcome.emailToggle')}</span>
+              <span className="text-base font-normal text-ink-soft">
+                {t('welcome.emailToggleHint')}
+              </span>
+            </span>
+            <ChevronDown
+              aria-hidden="true"
+              className={cn(
+                'size-6 shrink-0 transition-transform duration-200',
+                formOpen && 'rotate-180',
+              )}
+            />
+          </button>
+        </h2>
+
+        <div
+          id={`${id}-form-body`}
+          hidden={!formOpen}
+          className="grid grid-cols-1 gap-5 border-t bg-white p-4 sm:p-5"
+        >
+          <DemoTag />
+          <form onSubmit={onSubmit} className="grid grid-cols-1 gap-5" noValidate>
+            <div className="grid grid-cols-1 gap-2">
+              <label htmlFor={`${id}-email`} className="font-semibold">
+                {t('welcome.email')}
+              </label>
+              <p id={`${id}-email-hint`} className="m-0 text-base text-ink-soft">
+                {t('welcome.emailHint')}
               </p>
-              <Button type="submit" size="lg" className="active:scale-[0.98]">
-                <LogIn aria-hidden="true" className="rtl-mirror" />
-                {t('welcome.submit')}
-              </Button>
-            </form>
-          </div>
-        </section>
-      </Reveal>
+              <input
+                id={`${id}-email`}
+                type="email"
+                autoComplete="email"
+                dir="ltr"
+                aria-describedby={`${id}-email-hint`}
+                className={`${fieldClass} text-start`}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              <label htmlFor={`${id}-password`} className="font-semibold">
+                {t('welcome.password')}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <input
+                  id={`${id}-password`}
+                  type={show ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  dir="ltr"
+                  className={`${fieldClass} min-w-0 flex-1 basis-48`}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  aria-controls={`${id}-password`}
+                  onClick={togglePassword}
+                >
+                  {show ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+                  {show ? t('welcome.hidePassword') : t('welcome.showPassword')}
+                </Button>
+              </div>
+            </div>
+            <p className="m-0 rounded-xl bg-notice-soft p-3 text-base text-notice">
+              {t('welcome.demoNote')}
+            </p>
+            <Button type="submit" size="lg">
+              <LogIn aria-hidden="true" className="rtl-mirror" />
+              {t('welcome.submit')}
+            </Button>
+          </form>
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 gap-2">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-1">

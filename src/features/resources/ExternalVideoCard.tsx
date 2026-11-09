@@ -54,7 +54,7 @@ export function ExternalVideoCard() {
           href={EXT01.originalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-12 items-center gap-2 rounded-xl border-2 border-sedra-green bg-white px-4 font-semibold text-sedra-green hover:bg-sedra-pale-50 motion-safe:transition-transform motion-safe:active:scale-[0.97]"
+          className="inline-flex min-h-12 items-center gap-2 rounded-xl border-2 border-sedra-green bg-white px-4 font-semibold text-sedra-green hover:bg-sedra-pale-50"
         >
           <ExternalLink aria-hidden="true" className="size-5" />
           {l(EXT01.fallbackLabel)}

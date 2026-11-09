@@ -66,7 +66,7 @@ export function UnitOutline({
               <span
                 aria-hidden="true"
                 className={cn(
-                  'relative z-10 ms-1 flex size-9 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold',
+                  'relative z-10 ms-1 flex size-9 shrink-0 items-center justify-center rounded-full border-2 text-base font-bold',
                   current
                     ? 'border-sedra-green bg-sedra-green text-white ring-4 ring-sedra-pale'
                     : complete
@@ -83,7 +83,7 @@ export function UnitOutline({
                 </span>
                 <span
                   className={cn(
-                    'mt-0.5 flex items-center gap-1 text-sm',
+                    'mt-0.5 flex items-center gap-1 text-base',
                     complete ? 'font-semibold text-success' : 'text-ink-soft',
                   )}
                 >

@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ReadAloud } from '@/components/learner/ReadAloud'
-import { Reveal, stagger } from '@/components/motion/Reveal'
 import { cn } from '@/lib/utils'
 
 /*
@@ -75,12 +74,11 @@ export function StopThinkDoGuide() {
       </div>
 
       <ol className="m-0 grid list-none grid-cols-1 gap-4 p-0 md:grid-cols-3">
-        {STEPS.map(({ key, n, icon: Icon, card, disc, num }, i) => (
-          <Reveal as="li" key={key} delay={stagger(i, 0.1)}>
+        {STEPS.map(({ key, n, icon: Icon, card, disc, num }) => (
+          <li key={key} className="max-w-none">
             <div
               className={cn(
                 'relative grid h-full content-start gap-3 overflow-hidden rounded-3xl p-6 shadow-lg',
-                'motion-safe:transition-transform motion-safe:duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:-rotate-1',
                 card,
               )}
             >
@@ -109,7 +107,7 @@ export function StopThinkDoGuide() {
               <p className="m-0 text-lg">{t(`resources.${key}Body`)}</p>
               <span aria-hidden="true" className="mt-auto h-1.5 w-12 rounded-full bg-sedra-lime" />
             </div>
-          </Reveal>
+          </li>
         ))}
       </ol>
 
@@ -125,7 +123,7 @@ export function StopThinkDoGuide() {
           {WAYS.map(({ n, icon: Icon }) => (
             <li
               key={n}
-              className="flex items-start gap-3 rounded-2xl border-2 border-sedra-pale-100 bg-sedra-pale-50 p-4 sm:grid sm:content-start sm:gap-2 motion-safe:transition-transform motion-safe:hover:-translate-y-0.5"
+              className="flex items-start gap-3 rounded-2xl border-2 border-sedra-pale-100 bg-sedra-pale-50 p-4 sm:grid sm:content-start sm:gap-2"
             >
               <span
                 aria-hidden="true"

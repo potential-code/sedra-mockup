@@ -198,6 +198,7 @@
     "pendingBody": "The recording is not ready yet. It will have captions and a transcript.",
     "captions": "Captions: pending",
     "transcript": "Transcript: pending",
+    "recordingNotReady": "Recording not ready yet",
     "viewRecording": "View recording",
     "viewDisabled": "View recording is not available yet because the recording is pending.",
     "noPenalty": "Missing a session is okay. Recordings are separate from your course progress.",

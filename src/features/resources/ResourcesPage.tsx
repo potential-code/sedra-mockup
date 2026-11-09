@@ -27,9 +27,9 @@ function CourseHeader({ programmeId }: { programmeId: ProgrammeId }) {
   const { l } = useLocalized()
   const course = findCourse(programmeId)
   return (
-    <Reveal className="motif-tree-light grid grid-cols-1 overflow-hidden rounded-3xl bg-sedra-green-800 shadow-lg md:grid-cols-[1.2fr_1fr]">
+    <div className="motif-tree-light grid grid-cols-1 overflow-hidden rounded-3xl bg-sedra-green-800 shadow-lg md:grid-cols-[1.2fr_1fr]">
       <div className="grid content-center gap-3 p-6 md:order-none md:p-9">
-        <p className="m-0 w-fit rounded-full bg-white/15 px-3 py-1 text-sm font-semibold text-white ring-1 ring-white/40">
+        <p className="m-0 w-fit rounded-full bg-white/15 px-3 py-1 text-base font-semibold text-white ring-1 ring-white/40">
           {t(`common:${PROGRAMME_LABEL_KEY[programmeId]}`)}
         </p>
         <h2
@@ -50,7 +50,7 @@ function CourseHeader({ programmeId }: { programmeId: ProgrammeId }) {
           className="order-first aspect-[16/9] size-full object-cover md:order-none md:aspect-auto md:max-h-80"
         />
       ) : null}
-    </Reveal>
+    </div>
   )
 }
 
@@ -87,7 +87,7 @@ function JumpLinks() {
             <li key={p}>
               <Button
                 variant="secondary"
-                className="rounded-full motion-safe:transition-transform motion-safe:active:scale-[0.97]"
+                className="rounded-full"
                 onClick={() => {
                   const h = document.getElementById(`${SECTION_ID[p]}-h`)
                   h?.scrollIntoView({ block: 'start' })
@@ -164,12 +164,8 @@ export function ResourcesPage() {
         >
           {optionalOpen ? (
             <>
-              <Reveal>
-                <PlaybookCard />
-              </Reveal>
-              <Reveal delay={0.08}>
-                <ExternalVideoCard />
-              </Reveal>
+              <PlaybookCard />
+              <ExternalVideoCard />
             </>
           ) : null}
         </div>

@@ -53,7 +53,7 @@ export const Storyboard = forwardRef<HTMLHeadingElement, Props>(function Storybo
             <article className="min-w-0 flex-1 rounded-2xl border bg-white p-4 shadow-sm">
               <h4 className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-lg font-bold text-ink">
                 {t('read.scene', { n: i + 1 })}
-                <span className="inline-flex items-center gap-1 rounded-full bg-sedra-pale-50 px-2.5 py-0.5 text-sm font-semibold text-ink-soft ring-1 ring-border">
+                <span className="inline-flex items-center gap-1 rounded-full bg-sedra-pale-50 px-2.5 py-0.5 text-base font-semibold text-ink-soft ring-1 ring-border">
                   <Clock aria-hidden="true" className="size-4" />
                   <span className="ltr-isolate">
                     {lang === 'ar' ? s.time.replace(/ s$/, ' ث') : s.time}

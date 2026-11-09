@@ -13,19 +13,20 @@ import {
   PlayCircle,
   Video,
 } from 'lucide-react'
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ChoiceGroup } from '@/components/learner/ChoiceGroup'
 import { DemoTag } from '@/components/learner/DemoTag'
 import { formatUaeDateTime, PROGRAMME_LABEL_KEY, sortByStart } from '@/components/learner/learning'
-import { Reveal, stagger } from '@/components/motion/Reveal'
+import { Reveal } from '@/components/motion/Reveal'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePageTitle } from '@/hooks/use-page-title'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
+import { usePrefs } from '@/store/actions'
 import { useDb } from '@/store/db'
 
 type Filter = 'all' | ProgrammeId
@@ -55,7 +56,7 @@ function ProgrammeChip({ programmeId }: { programmeId: ProgrammeId }) {
   const { t } = useTranslation('learner')
   const Icon = PROGRAMME_ICON[programmeId]
   return (
-    <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-sedra-pale-100 px-3 py-1 text-sm font-semibold text-ink">
+    <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-sedra-pale-100 px-3 py-1 text-base font-semibold text-ink">
       <Icon aria-hidden="true" className="size-4 text-sedra-green" />
       {t(`common:${PROGRAMME_LABEL_KEY[programmeId]}`)}
     </span>
@@ -83,20 +84,18 @@ function TimeChip({ s }: { s: LiveSession }) {
   )
 }
 
-function UpcomingCard({ s }: { s: LiveSession }) {
+function UpcomingCard({ s, primary }: { s: LiveSession; primary: boolean }) {
   const { t } = useTranslation('learner')
   const { l, lang } = useLocalized()
   const p = uaeParts(s.startsAt, lang)
   return (
-    <article className="card-pop grid h-full grid-cols-[auto_1fr] overflow-hidden">
+    <article className="grid h-full grid-cols-[auto_1fr] overflow-hidden rounded-2xl bg-white shadow-md">
       {/* Calendar tile: decorative copy of the date that TimeChip reads out in full. */}
       <div
         aria-hidden="true"
         className="flex w-20 flex-col items-center justify-center gap-0.5 bg-sedra-green px-2 py-5 text-white sm:w-28"
       >
-        <span className="text-sm font-semibold uppercase tracking-wide opacity-90">
-          {p.weekday}
-        </span>
+        <span className="text-base font-semibold">{p.weekday}</span>
         <span className="text-4xl leading-none font-bold sm:text-5xl">{p.day}</span>
         <span className="text-base font-semibold">{p.month}</span>
         <span className="mt-2 h-1.5 w-8 rounded-full bg-sedra-lime" />
@@ -117,7 +116,8 @@ function UpcomingCard({ s }: { s: LiveSession }) {
         </div>
         <Button
           size="lg"
-          className="justify-self-start shadow-md motion-safe:transition-transform motion-safe:active:scale-[0.97]"
+          variant={primary ? 'default' : 'outline'}
+          className={cn('justify-self-start', primary && 'shadow-md')}
           onClick={() => toast.info(t('sessions.joinToast'))}
         >
           <Video aria-hidden="true" />
@@ -132,9 +132,8 @@ function UpcomingCard({ s }: { s: LiveSession }) {
 function RecordingCard({ s }: { s: LiveSession }) {
   const { t } = useTranslation('learner')
   const { l } = useLocalized()
-  const reasonId = useId()
   return (
-    <article className="card-pop group grid h-full content-start overflow-hidden">
+    <article className="grid h-full content-start overflow-hidden rounded-2xl bg-white shadow-md">
       <div className="relative aspect-video overflow-hidden bg-sedra-green-800">
         <img
           src={asset(RECORDING_THUMB[s.programmeId])}
@@ -142,7 +141,7 @@ function RecordingCard({ s }: { s: LiveSession }) {
           width={1200}
           height={896}
           loading="lazy"
-          className="size-full object-cover opacity-80 motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.04]"
+          className="size-full object-cover opacity-80"
         />
         <div aria-hidden="true" className="absolute inset-0 bg-sedra-green-800/45" />
         {/* Decorative play glyph: the recording is pending, so it is not a control. */}
@@ -152,7 +151,7 @@ function RecordingCard({ s }: { s: LiveSession }) {
         >
           <Play className="ms-1 size-7 fill-current" />
         </span>
-        <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-sm font-semibold text-notice shadow-md">
+        <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-base font-semibold text-notice shadow-md">
           <Hourglass aria-hidden="true" className="size-4" />
           {t('sessions.pendingRecording')}
         </span>
@@ -175,33 +174,28 @@ function RecordingCard({ s }: { s: LiveSession }) {
             {t('sessions.transcript')}
           </li>
         </ul>
-        {/* Focusable but unavailable: the reason is visible and announced (brief §3). */}
-        <Button
-          variant="secondary"
-          aria-disabled="true"
-          aria-describedby={reasonId}
-          className="justify-self-start cursor-not-allowed opacity-80 hover:bg-sedra-pale-100"
-          onClick={(e) => e.preventDefault()}
-        >
-          <PlayCircle aria-hidden="true" />
-          {t('sessions.viewRecording')}
-        </Button>
-        <p id={reasonId} className="m-0 flex items-start gap-2 text-base text-ink-soft">
-          <Info aria-hidden="true" className="mt-1 size-5 shrink-0" />
-          {t('sessions.viewDisabled')}
+        {/* Plain status, not a control: there is nothing to open until the recording exists. */}
+        <p className="m-0 flex items-center gap-2 font-semibold text-notice">
+          <Hourglass aria-hidden="true" className="size-5 shrink-0" />
+          {t('sessions.recordingNotReady')}
         </p>
       </div>
     </article>
   )
 }
 
-function Hero({ next }: { next: LiveSession | undefined }) {
+function Hero({ next, simplified }: { next: LiveSession | undefined; simplified: boolean }) {
   const { t } = useTranslation('learner')
   const { l, lang } = useLocalized()
   usePageTitle(t('sessions.pageTitle'))
   const p = next ? uaeParts(next.startsAt, lang) : undefined
   return (
-    <Reveal className="motif-tree grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-md lg:grid-cols-[1.15fr_1fr]">
+    <Reveal
+      className={cn(
+        'motif-tree grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-md',
+        !simplified && 'lg:grid-cols-[1.15fr_1fr]',
+      )}
+    >
       <div className="grid content-center gap-4 p-6 md:p-10">
         <h1 className="m-0 text-4xl break-words md:text-5xl">{t('sessions.heading')}</h1>
         <p className="m-0 text-lg text-ink">{t('sessions.lead')}</p>
@@ -209,19 +203,17 @@ function Hero({ next }: { next: LiveSession | undefined }) {
           <HeartHandshake aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
           {t('sessions.noPenalty')}
         </p>
-        {next && p ? (
+        {next && p && !simplified ? (
           <div className="mt-2 flex items-center gap-4 rounded-2xl border-2 border-sedra-pale bg-sedra-pale-50 p-3">
             <div
               aria-hidden="true"
               className="flex size-16 shrink-0 flex-col items-center justify-center rounded-xl bg-sedra-green text-white shadow-md"
             >
               <span className="text-2xl leading-none font-bold">{p.day}</span>
-              <span className="text-sm font-semibold">{p.month}</span>
+              <span className="text-base font-semibold">{p.month}</span>
             </div>
             <div className="grid min-w-0 gap-0.5">
-              <p className="m-0 text-sm font-bold tracking-wide text-sedra-green uppercase">
-                {t('sessions.next')}
-              </p>
+              <p className="m-0 text-base font-bold text-sedra-green">{t('sessions.next')}</p>
               <p className="m-0 font-semibold text-ink">{l(next.title)}</p>
               <p className="m-0 text-base text-ink-soft">
                 {formatUaeDateTime(next.startsAt, lang)} ({t('shared.uaeTime')})
@@ -230,19 +222,21 @@ function Hero({ next }: { next: LiveSession | undefined }) {
           </div>
         ) : null}
       </div>
-      <div className="relative min-h-56 lg:min-h-full">
-        <img
-          src={asset('images/home-hero.webp')}
-          alt={t('sessions.heroAlt')}
-          width={1600}
-          height={893}
-          className="absolute inset-0 size-full object-cover"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-y-0 start-0 hidden w-24 bg-linear-to-r from-white to-transparent lg:block rtl:bg-linear-to-l"
-        />
-      </div>
+      {simplified ? null : (
+        <div className="relative min-h-56 lg:min-h-full">
+          <img
+            src={asset('images/home-hero.webp')}
+            alt={t('sessions.heroAlt')}
+            width={1600}
+            height={893}
+            className="absolute inset-0 size-full object-cover"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-y-0 start-0 hidden w-24 bg-linear-to-r from-white to-transparent lg:block rtl:bg-linear-to-l"
+          />
+        </div>
+      )}
     </Reveal>
   )
 }
@@ -254,6 +248,7 @@ export function SessionsPage() {
   const sessions = useDb((db) => db.sessions)
   const [filter, setFilter] = useState<Filter>('all')
   const [tab, setTab] = useState('upcoming')
+  const simplified = usePrefs().view === 'simplified'
 
   const shown = sortByStart(sessions.filter((s) => filter === 'all' || s.programmeId === filter))
   const upcoming = shown.filter((s) => s.attendanceStatus === 'upcoming')
@@ -266,13 +261,13 @@ export function SessionsPage() {
     'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ink',
   )
   const countClass =
-    'rounded-full bg-sedra-pale-100 px-2 text-sm text-ink group-data-[state=active]/trigger:bg-white group-data-[state=active]/trigger:text-sedra-green'
+    'rounded-full bg-sedra-pale-100 px-2 text-base text-ink group-data-[state=active]/trigger:bg-white group-data-[state=active]/trigger:text-sedra-green'
 
   return (
     <div className="container-page grid grid-cols-1 [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink [&_:is(h2,h3,h4)]:break-words gap-8 py-8">
-      <Hero next={next} />
+      <Hero next={next} simplified={simplified} />
 
-      <Reveal delay={0.08} className="rounded-2xl bg-white p-5 shadow-sm md:p-6">
+      <div className="rounded-2xl bg-white p-5 shadow-sm md:p-6">
         <ChoiceGroup
           legend={t('sessions.filter')}
           name="programme-filter"
@@ -284,7 +279,7 @@ export function SessionsPage() {
             { value: 'hospitality', label: t('common:hospitalityForAll') },
           ]}
         />
-      </Reveal>
+      </div>
 
       <Tabs value={tab} onValueChange={setTab} dir={dir} className="gap-6">
         <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-full bg-white p-1.5 shadow-md group-data-[orientation=horizontal]/tabs:h-auto sm:inline-flex sm:w-fit">
@@ -302,20 +297,20 @@ export function SessionsPage() {
         <TabsContent value="upcoming" className="grid grid-cols-1 gap-4">
           {upcoming.length === 0 ? <p className="m-0">{t('sessions.noUpcoming')}</p> : null}
           <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 lg:grid-cols-2">
-            {upcoming.map((s, i) => (
-              <Reveal as="li" key={s.id} delay={stagger(i)}>
-                <UpcomingCard s={s} />
-              </Reveal>
+            {upcoming.map((s) => (
+              <li key={s.id} className="max-w-none">
+                <UpcomingCard s={s} primary={s.id === upcoming[0]?.id} />
+              </li>
             ))}
           </ul>
         </TabsContent>
         <TabsContent value="recordings" className="grid grid-cols-1 gap-4">
           {recordings.length === 0 ? <p className="m-0">{t('sessions.noRecordings')}</p> : null}
           <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 md:grid-cols-2 xl:grid-cols-3">
-            {recordings.map((s, i) => (
-              <Reveal as="li" key={s.id} delay={stagger(i)}>
+            {recordings.map((s) => (
+              <li key={s.id} className="max-w-none">
                 <RecordingCard s={s} />
-              </Reveal>
+              </li>
             ))}
           </ul>
         </TabsContent>
