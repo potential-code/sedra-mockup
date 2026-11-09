@@ -50,10 +50,11 @@ export const PERSONAS: Persona[] = [
 
 export function seedLearners(): Record<'new-learner' | 'noor', LearnerState> {
   return {
-    'new-learner': { onboarded: false, progress: {} },
+    'new-learner': { onboarded: false, enrolled: ['life-skills', 'hospitality'], progress: {} },
     // Noor finished LS01; next step is LS02 Stop Think Do (brief §2 dashboard copy).
     noor: {
       onboarded: true,
+      enrolled: ['life-skills', 'hospitality'],
       progress: {
         LS01: {
           watchedOrRead: true,

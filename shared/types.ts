@@ -173,6 +173,12 @@ export interface Persona {
 
 export interface LearnerState {
   onboarded: boolean
+  /** Programmes SEDRA enrolled this learner in (brief §2 'enrolled programme cards'). */
+  enrolled: ProgrammeId[]
+  /** Name from an accepted invitation (demo); falls back to the persona name. */
+  displayName?: string
+  /** Invitation this learner accepted (demo). */
+  invitationId?: string
   progress: Partial<Record<UnitId, UnitProgress>>
   lastLocation?: LastLocation
   lastProgramme?: ProgrammeId
@@ -193,6 +199,8 @@ export interface LiveSession {
   timezone: 'Asia/Dubai'
   accessLink: string
   attendanceStatus: 'upcoming' | 'attended' | 'not-attended'
+  /** Admin can cancel a session (demo). */
+  cancelled?: boolean
   recordingStatus: 'pending' | 'available'
   demo: true
 }
@@ -226,4 +234,36 @@ export interface ContentDraft {
   fields: Record<string, string>
   reviewStatus: 'draft' | 'in-review' | 'approved'
   updatedAt: string
+}
+
+/* ---------- Admin-managed demo records ---------- */
+
+/** Learner invitation (brief §2 'learner invitation entry'; §1 invitations are simulated). */
+export interface Invitation {
+  id: string
+  name: string
+  email: string
+  lang: Lang
+  programmes: ProgrammeId[]
+  status: 'pending' | 'accepted'
+  createdAt: string
+  acceptedAt?: string
+}
+
+/** Admin edit of an existing unit (only the 16 units in the 2 courses; no new units). */
+export interface UnitEdit {
+  unit: Unit
+  /** Unpublished units are hidden from learners. */
+  published: boolean
+  updatedAt: string
+}
+
+/** Admin-added resource card (HTML text, optional link). */
+export interface CustomResource {
+  id: string
+  courseId: CourseId
+  title: Localized
+  body: Localized
+  url?: string
+  createdAt: string
 }

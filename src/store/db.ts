@@ -1,11 +1,15 @@
 import type {
   AdminLearner,
   ContentDraft,
+  CustomResource,
+  Invitation,
   LearnerState,
   LiveSession,
   PersonaId,
   Prefs,
   SupportRequest,
+  UnitEdit,
+  UnitId,
 } from '@shared/types'
 import { useSyncExternalStore } from 'react'
 import { seedAdminLearners } from '@/mocks/admin-seed'
@@ -17,7 +21,7 @@ import { DEFAULT_PREFS, seedLearners, seedSessions, seedSupportRequests } from '
  * never loses the last step (walkthrough A: refresh and resume).
  */
 const KEY = 'sedra-demo-db'
-const VERSION = 1
+const VERSION = 2
 
 export type LearnerPersonaId = Exclude<PersonaId, 'admin'>
 
@@ -30,6 +34,9 @@ export interface DemoDb {
   supportRequests: SupportRequest[]
   adminLearners: AdminLearner[]
   contentDrafts: ContentDraft[]
+  invitations: Invitation[]
+  unitEdits: Partial<Record<UnitId, UnitEdit>>
+  customResources: CustomResource[]
 }
 
 function seed(keep?: Pick<DemoDb, 'session' | 'prefs'>): DemoDb {
@@ -42,6 +49,9 @@ function seed(keep?: Pick<DemoDb, 'session' | 'prefs'>): DemoDb {
     supportRequests: seedSupportRequests(),
     adminLearners: seedAdminLearners(),
     contentDrafts: [],
+    invitations: [],
+    unitEdits: {},
+    customResources: [],
   }
 }
 
