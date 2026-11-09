@@ -10,7 +10,9 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ReadAloud } from '@/components/learner/ReadAloud'
+import { useLocalized } from '@/i18n'
 import { cn } from '@/lib/utils'
+import { useResourceText } from '@/store/admin-content'
 
 /*
   Step colours (all measured on the token values; high contrast swaps every fill to black/white):
@@ -57,20 +59,27 @@ const WAYS = [
  */
 export function StopThinkDoGuide() {
   const { t } = useTranslation('learner')
+  const { lang: uiLang } = useLocalized()
+  const edited = useResourceText('stopThinkDo', uiLang)
+  const heading = edited.title ?? t('resources.guideHeading')
+  const intro = edited.body ?? t('resources.guideIntro')
   const whys = [1, 2, 3, 4] as const
   const readText = [
-    t('resources.guideIntro'),
-    ...STEPS.map((s) => `${s.n}. ${t(`resources.${s.key}`)}. ${t(`resources.${s.key}Body`)}`),
+    intro,
+    ...STEPS.map(
+      (s) =>
+        `${s.n}. ${edited.field(s.key) ?? t(`resources.${s.key}`)}. ${edited.field(`${s.key}Body`) ?? t(`resources.${s.key}Body`)}`,
+    ),
   ].join(' ')
 
   return (
     <section aria-labelledby="guide-heading" className="grid grid-cols-1 gap-6">
       <div className="grid grid-cols-1 gap-2">
         <h3 id="guide-heading" className="m-0 text-3xl">
-          {t('resources.guideHeading')}
+          {heading}
         </h3>
-        <p className="m-0 text-lg">{t('resources.guideIntro')}</p>
-        <ReadAloud text={readText} what={t('resources.guideHeading')} />
+        <p className="m-0 text-lg">{intro}</p>
+        <ReadAloud text={readText} what={heading} />
       </div>
 
       <ol className="m-0 grid list-none grid-cols-1 gap-4 p-0 md:grid-cols-3">
@@ -102,9 +111,11 @@ export function StopThinkDoGuide() {
               </span>
               <h4 className="m-0 text-3xl font-bold text-current">
                 <span className="sr-only">{n}. </span>
-                {t(`resources.${key}`)}
+                {edited.field(key) ?? t(`resources.${key}`)}
               </h4>
-              <p className="m-0 text-lg">{t(`resources.${key}Body`)}</p>
+              <p className="m-0 text-lg">
+                {edited.field(`${key}Body`) ?? t(`resources.${key}Body`)}
+              </p>
               <span aria-hidden="true" className="mt-auto h-1.5 w-12 rounded-full bg-sedra-lime" />
             </div>
           </li>

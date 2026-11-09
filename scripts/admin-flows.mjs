@@ -1,4 +1,4 @@
-// Admin authoring flows (demo db): edit + publish, unpublish, new session, invitation, resource.
+// Admin authoring flows (demo db): edit + save a unit, unpublish the course, new session, invitation, resource.
 // Each admin change is checked from the learner side (Noor). PASS/FAIL lines + SUMMARY.
 // Usage: node scripts/admin-flows.mjs   (BASE=http://127.0.0.1:5194/ by default)
 import {
@@ -38,7 +38,7 @@ const INVITEE = 'Mariam Test'
 try {
   await signIn(page, 'SEDRA admin')
 
-  // (a) edit LS01 title (EN), publish, check the learner side.
+  // (a) edit LS01 title (EN), save, check the learner side.
   try {
     await go('/admin/content')
     R.ok(/Healthy Communication/.test(await bodyText()), 'Courses list shows Healthy Communication')
@@ -50,12 +50,12 @@ try {
     R.ok(/Course structure/.test(await bodyText()), 'Course builder opens from the list')
     await go('/admin/content/LS01')
     await page.fill('#f-title', NEW_TITLE)
-    await page.getByRole('button', { name: 'Publish (demo)', exact: true }).click()
+    await page.getByRole('button', { name: 'Save changes', exact: true }).click()
     await page.waitForTimeout(400)
     const db = await readDb(page)
     R.ok(
       db.unitEdits?.LS01?.unit?.title?.en === NEW_TITLE && db.unitEdits.LS01.published === true,
-      'Publish writes unitEdits.LS01 (published)',
+      'Save changes writes unitEdits.LS01',
       JSON.stringify(db.unitEdits?.LS01?.unit?.title),
     )
     R.ok(
@@ -64,11 +64,11 @@ try {
     )
     R.ok(
       await page
-        .getByText('Changes are live for learners in this demo', { exact: false })
+        .getByText('Learners see the change in this demo', { exact: false })
         .first()
         .isVisible()
         .catch(() => false),
-      "Toast 'Changes are live for learners in this demo'",
+      "Toast 'Learners see the change in this demo'",
     )
     await asPersona('noor')
     await go('/programmes/life-skills')
@@ -76,37 +76,45 @@ try {
     await go(unitPath('LS01'))
     R.ok((await bodyText()).includes(NEW_TITLE), 'Learner LS01 unit page shows the new title')
   } catch (e) {
-    R.ok(false, '(a) edit + publish flow ran', e.message.split('\n')[0])
+    R.ok(false, '(a) edit + save flow ran', e.message.split('\n')[0])
   }
 
-  // (b) unpublish LS03 from the course builder.
+  // (b) publishing is per course: unpublish Healthy Communication, check learners, publish again.
   try {
     await asPersona('admin')
     await go('/admin/courses/healthy-communication')
     const ls03Title = (await page.locator('#bu-LS03').innerText()).trim()
-    await page.getByRole('button', { name: 'Unpublish LS03' }).click()
+    await page.getByRole('button', { name: 'Unpublish course' }).click()
     await page.waitForTimeout(300)
-    const db = await readDb(page)
-    R.ok(db.unitEdits?.LS03?.published === false, 'Unpublish writes unitEdits.LS03.published=false')
+    let db = await readDb(page)
     R.ok(
-      await page.getByRole('button', { name: 'Publish LS03' }).isVisible(),
-      'Builder shows Publish LS03 after unpublishing',
+      db.courseUnpublished?.['healthy-communication'] === true,
+      'Unpublish writes courseUnpublished[healthy-communication]=true',
+    )
+    R.ok(
+      await page.getByRole('button', { name: 'Publish course' }).isVisible(),
+      'Builder shows Publish course after unpublishing',
     )
     await asPersona('noor')
-    await go('/programmes/life-skills')
-    const txt = await bodyText()
-    const hidden = !txt.includes(ls03Title) || /unavailable|not available/i.test(txt)
-    R.ok(hidden, 'Learner programme page hides LS03 (or marks it unavailable)', ls03Title)
     await go(unitPath('LS03'))
     const unitTxt = await bodyText()
     R.ok(
       /unavailable|not available|not published|isn't available|is not open/i.test(unitTxt) ||
         !unitTxt.includes(ls03Title),
-      'Learner LS03 unit page is unavailable',
+      'Learner LS03 unit page is unavailable while the course is unpublished',
       unitTxt.slice(0, 160),
     )
+    await asPersona('admin')
+    await go('/admin/courses/healthy-communication')
+    await page.getByRole('button', { name: 'Publish course' }).click()
+    await page.waitForTimeout(300)
+    db = await readDb(page)
+    R.ok(
+      !db.courseUnpublished?.['healthy-communication'],
+      'Publish course makes it visible again',
+    )
   } catch (e) {
-    R.ok(false, '(b) unpublish flow ran', e.message.split('\n')[0])
+    R.ok(false, '(b) course unpublish flow ran', e.message.split('\n')[0])
   }
 
   // (c) create a session, check learner /sessions.

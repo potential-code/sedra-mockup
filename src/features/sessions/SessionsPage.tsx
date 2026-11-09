@@ -124,7 +124,6 @@ function UpcomingCard({ s, primary }: { s: LiveSession; primary: boolean }) {
               {t('sessions.cancelled')}
             </span>
           ) : null}
-          <DemoTag />
         </div>
         <h3 className="m-0 text-xl">{l(s.title)}</h3>
         <TimeChip s={s} />
@@ -186,7 +185,6 @@ function RecordingCard({ s }: { s: LiveSession }) {
       <div className="grid content-start gap-3 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <ProgrammeChip programmeId={s.programmeId} />
-          <DemoTag />
         </div>
         <h3 className="m-0 text-xl">{l(s.title)}</h3>
         <TimeChip s={s} />

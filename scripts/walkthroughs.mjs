@@ -106,6 +106,12 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
       JSON.stringify(db0.prefs),
     )
 
+    // The seed has Noor at LS07 (badges demo). This walkthrough tests LS02, so start her there.
+    await patchDb(page, (db) => {
+      db.learners.noor.progress = { LS01: db.learners.noor.progress.LS01 }
+      db.learners.noor.lastLocation = { unitId: 'LS02', step: 'media' }
+      return db
+    })
     await page.goto(url('/learn'))
     await page.getByRole('link', { name: 'Continue learning' }).first().click()
     await page.waitForURL(/units\/LS02/, { timeout: 5000 }).catch(() => {})
@@ -518,6 +524,13 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     await signIn(page, 'Noor')
     await page.goto(url('/resources'))
     await page.waitForTimeout(400)
+    R.ok(
+      (await page.locator('iframe').count()) === 0,
+      'EXT01 hidden from learners before SEDRA approves it',
+    )
+    await patchDb(page, (db) => ({ ...db, ext01Approved: true }))
+    await page.goto(url('/resources'))
+    await page.waitForTimeout(400)
     const f = await page
       .locator('iframe')
       .first()
@@ -535,8 +548,8 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
       'Fallback link href exact',
     )
     R.ok(
-      await visible(page, 'pending content and accessibility review'),
-      "Label 'pending content and accessibility review' visible",
+      !(await visible(page, 'pending content and accessibility review')),
+      'Review status is admin-only (not shown to learners)',
     )
     R.ok(await visible(page, 'Open video on YouTube'), "Fallback label 'Open video on YouTube'")
   } catch (e) {

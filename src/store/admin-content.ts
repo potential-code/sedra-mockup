@@ -9,8 +9,16 @@ import type {
   UnitEdit,
   UnitId,
 } from '@shared/types'
-import { getUnit, isUnitPublished } from '@/content'
-import { getDb, update, useDb } from './db'
+import { useMemo } from 'react'
+import { isUnitPublished } from '@/content'
+import {
+  type AddedBlock,
+  type AddedUnit,
+  type BuiltInResourceKey,
+  getDb,
+  update,
+  useDb,
+} from './db'
 
 /**
  * Admin authoring writes (demo only). Everything stays in this browser's demo db.
@@ -82,7 +90,23 @@ export function unitFromFields(current: Unit, lang: Lang, f: Record<string, stri
     practice: {
       ...current.practice,
       prompt: setL(current.practice.prompt, lang, f.practice_prompt ?? ''),
+      ...practiceChoices(current, lang, f),
     },
+  }
+}
+
+/** Practice answer choices from the editor (one per line) merged into the other language. */
+function practiceChoices(current: Unit, lang: Lang, f: Partial<Record<string, string>>) {
+  const lines = (f.practice_choices ?? '')
+    .split('\n')
+    .map((x) => x.trim())
+    .filter(Boolean)
+  const choices = lines.map((line, i) =>
+    setL(current.practice.choices?.[i] ?? { en: '', ar: '' }, lang, line),
+  )
+  return {
+    choices: choices.length > 0 ? choices : undefined,
+    multiple: choices.length > 0 && f.practice_multiple === 'yes',
   }
 }
 
@@ -92,12 +116,16 @@ export function publishUnit(unit: Unit) {
   update((db) => ({ ...db, unitEdits: { ...db.unitEdits, [unit.id]: edit } }))
 }
 
-/** Publish or unpublish a unit without changing its content. */
-export function setUnitPublished(id: UnitId, published: boolean) {
-  const unit = getUnit(id)
-  if (!unit) return
-  const edit: UnitEdit = { unit, published, updatedAt: new Date().toISOString() }
-  update((db) => ({ ...db, unitEdits: { ...db.unitEdits, [id]: edit } }))
+/** Publish or unpublish a whole course (units have no separate publish). */
+export function setCoursePublished(id: CourseId, published: boolean) {
+  update((db) => ({
+    ...db,
+    courseUnpublished: { ...(db.courseUnpublished ?? {}), [id]: !published },
+  }))
+}
+
+export function useCoursePublished(id: CourseId): boolean {
+  return useDb((db) => !db.courseUnpublished?.[id])
 }
 
 export { isUnitPublished }
@@ -175,4 +203,163 @@ export function isHttpsUrl(v: string): boolean {
   } catch {
     return false
   }
+}
+
+/** Demo: SEDRA edits a course's title and purpose. Learner pages show the new text. */
+export function saveCourseEdit(courseId: CourseId, edit: { title: Localized; purpose: Localized }) {
+  update((db) => ({ ...db, courseEdits: { ...(db.courseEdits ?? {}), [courseId]: edit } }))
+}
+
+export function useCourseEdits() {
+  return useDb((db) => db.courseEdits ?? EMPTY_OBJ)
+}
+
+/** Demo: SEDRA edits a built-in resource's title and short description in one language. */
+export function saveResourceEdit(
+  key: BuiltInResourceKey,
+  lang: Lang,
+  text: { title: string; body: string; fields?: Record<string, string> },
+) {
+  update((db) => {
+    const prev = db.resourceEdits?.[key] ?? { title: {}, body: {} }
+    const fields = { ...(prev.fields ?? {}) }
+    for (const [k, v] of Object.entries(text.fields ?? {})) fields[k] = { ...fields[k], [lang]: v }
+    return {
+      ...db,
+      resourceEdits: {
+        ...(db.resourceEdits ?? {}),
+        [key]: {
+          title: { ...prev.title, [lang]: text.title },
+          body: { ...prev.body, [lang]: text.body },
+          fields,
+        },
+      },
+    }
+  })
+}
+
+/** Saved override for one built-in resource in one language (undefined = use the default text). */
+export function useResourceText(key: BuiltInResourceKey, lang: Lang) {
+  const edit = useDb((db) => db.resourceEdits?.[key])
+  return {
+    title: edit?.title[lang],
+    body: edit?.body[lang],
+    field: (k: string) => edit?.fields?.[k]?.[lang],
+  }
+}
+
+/* ---------- demo: add units and learning blocks ---------- */
+
+const newId = (p: string) =>
+  `${p}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`
+
+const EMPTY_UNITS: AddedUnit[] = []
+const EMPTY_OBJ = {}
+
+export function useAddedUnits(courseId: CourseId): AddedUnit[] {
+  // Select the stored array (stable reference), then filter: a fresh array per read loops React.
+  const all = useDb((db) => db.addedUnits ?? EMPTY_UNITS)
+  return useMemo(() => all.filter((u) => u.courseId === courseId), [all, courseId])
+}
+
+export function addUnit(
+  input: Omit<AddedUnit, 'id' | 'blocks'> & { blocks: Omit<AddedBlock, 'id'>[] },
+) {
+  const unit: AddedUnit = {
+    ...input,
+    id: newId('unit'),
+    blocks: input.blocks.map((b) => ({ ...b, id: newId('block') })),
+  }
+  update((db) => ({ ...db, addedUnits: [...(db.addedUnits ?? []), unit] }))
+  return unit
+}
+
+export function removeAddedUnit(id: string) {
+  update((db) => ({ ...db, addedUnits: (db.addedUnits ?? []).filter((u) => u.id !== id) }))
+}
+
+/** Extra blocks on any unit (built-in unit ID or an added unit's ID). */
+export function useAddedBlocks(unitId: string): AddedBlock[] {
+  return useDb(
+    (db) =>
+      db.addedBlocks?.[unitId] ??
+      (db.addedUnits ?? []).find((u) => u.id === unitId)?.blocks ??
+      EMPTY_BLOCKS,
+  )
+}
+const EMPTY_BLOCKS: AddedBlock[] = []
+
+export function addBlock(unitId: string, block: Omit<AddedBlock, 'id'>) {
+  const b: AddedBlock = { ...block, id: newId('block') }
+  update((db) => {
+    const added = (db.addedUnits ?? []).find((u) => u.id === unitId)
+    if (added) {
+      return {
+        ...db,
+        addedUnits: db.addedUnits.map((u) =>
+          u.id === unitId ? { ...u, blocks: [...u.blocks, b] } : u,
+        ),
+      }
+    }
+    return {
+      ...db,
+      addedBlocks: {
+        ...(db.addedBlocks ?? {}),
+        [unitId]: [...(db.addedBlocks?.[unitId] ?? []), b],
+      },
+    }
+  })
+}
+
+export function removeBlock(unitId: string, blockId: string) {
+  update((db) => {
+    const added = (db.addedUnits ?? []).find((u) => u.id === unitId)
+    if (added) {
+      return {
+        ...db,
+        addedUnits: db.addedUnits.map((u) =>
+          u.id === unitId ? { ...u, blocks: u.blocks.filter((x) => x.id !== blockId) } : u,
+        ),
+      }
+    }
+    return {
+      ...db,
+      addedBlocks: {
+        ...(db.addedBlocks ?? {}),
+        [unitId]: (db.addedBlocks?.[unitId] ?? []).filter((x) => x.id !== blockId),
+      },
+    }
+  })
+}
+
+export function updateBlock(unitId: string, block: AddedBlock) {
+  update((db) => {
+    const added = (db.addedUnits ?? []).find((u) => u.id === unitId)
+    if (added) {
+      return {
+        ...db,
+        addedUnits: db.addedUnits.map((u) =>
+          u.id === unitId
+            ? { ...u, blocks: u.blocks.map((x) => (x.id === block.id ? block : x)) }
+            : u,
+        ),
+      }
+    }
+    return {
+      ...db,
+      addedBlocks: {
+        ...(db.addedBlocks ?? {}),
+        [unitId]: (db.addedBlocks?.[unitId] ?? []).map((x) => (x.id === block.id ? block : x)),
+      },
+    }
+  })
+}
+
+/** EXT01 review: learners see the video only after SEDRA approves it. */
+export function useExt01Approved(): boolean {
+  return useDb((db) => db.ext01Approved === true)
+}
+
+export function setExt01Approved(approved: boolean) {
+  update((db) => ({ ...db, ext01Approved: approved }))
 }

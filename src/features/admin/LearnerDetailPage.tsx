@@ -17,7 +17,6 @@ import {
   AdminPageHeader,
   Avatar,
   Chip,
-  DemoTag,
   IconCircle,
   Notice,
   Panel,
@@ -31,6 +30,7 @@ import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 import { isActive, UNITS_PER_COURSE, useAdminLearners } from '@/store/admin-actions'
+import { useSupportRequests } from '@/store/support-actions'
 
 const COURSE_BY_PROGRAMME: Record<ProgrammeId, CourseId> = {
   'life-skills': 'healthy-communication',
@@ -98,7 +98,6 @@ export function LearnerDetailPage() {
             <StatusLabel tone={active ? 'done' : 'neutral'}>
               {active ? t('learners.activeYes') : t('learners.activeNo')}
             </StatusLabel>
-            <DemoTag label={t('learnerDetail.fictional')} />
           </div>
         </div>
       </header>
@@ -234,11 +233,7 @@ export function LearnerDetailPage() {
                   {t('learners.cols.support')}
                 </dt>
                 <dd className="ms-7 m-0 mt-1">
-                  {learner.supportFlag ? (
-                    <StatusLabel tone="warning">{t('learners.supportOpen')}</StatusLabel>
-                  ) : (
-                    <StatusLabel tone="neutral">{t('learners.supportNone')}</StatusLabel>
-                  )}
+                  <LearnerRequests learnerId={learner.id} flagged={learner.supportFlag} />
                 </dd>
               </div>
             </dl>
@@ -249,6 +244,49 @@ export function LearnerDetailPage() {
       <Notice className="mt-6">
         <p>{t('learnerDetail.privacy')}</p>
       </Notice>
+    </div>
+  )
+}
+
+/** This learner's support requests: topic, status, message and when it arrived (UAE time). */
+function LearnerRequests({ learnerId, flagged }: { learnerId: string; flagged: boolean }) {
+  const { t } = useTranslation('admin')
+  const f = useUaeFormat()
+  const requests = useSupportRequests().filter((r) => r.learnerId === learnerId)
+  if (requests.length === 0) {
+    return flagged ? (
+      <StatusLabel tone="warning">{t('learners.supportOpen')}</StatusLabel>
+    ) : (
+      <StatusLabel tone="neutral">{t('learners.supportNone')}</StatusLabel>
+    )
+  }
+  return (
+    <div className="flex flex-col gap-2">
+      <ul className="m-0 flex list-none flex-col gap-2 p-0">
+        {requests.map((r) => (
+          <li key={r.id} className="max-w-none rounded-xl border bg-sedra-pale-50 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-semibold text-ink">{t(`support.topics.${r.topic}`)}</span>
+              <StatusLabel tone={r.status === 'open' ? 'warning' : 'done'}>
+                {t(`support.status.${r.status}`)}
+              </StatusLabel>
+            </div>
+            <p className="m-0 mt-1 text-ink" dir="auto">
+              {r.message}
+            </p>
+            <p className="m-0 mt-1 text-sm text-ink-soft">
+              {t('support.cols.received')}: {f.dateTime(r.createdAt)}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <Link
+        to="/admin"
+        hash="ov-support"
+        className="inline-flex min-h-12 items-center font-semibold text-sedra-green underline underline-offset-4"
+      >
+        {t('learnerDetail.allRequests')}
+      </Link>
     </div>
   )
 }

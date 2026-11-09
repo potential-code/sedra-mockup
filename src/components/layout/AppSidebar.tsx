@@ -25,7 +25,7 @@ export interface SidebarItem {
 
 /**
  * Desktop sidebar (lg+) on SEDRA dark green, and the same content in a slide-in sheet on smaller
- * screens. Logo sits on its own white card (brief §4: white background and clear space).
+ * screens. Logo is the white version on the dark green.
  */
 export function AppSidebar({
   items,
@@ -46,10 +46,10 @@ export function AppSidebar({
       <Link
         to={homeTo}
         onClick={onNavigate}
-        className="self-start rounded-2xl bg-white px-4 py-2 shadow-md"
+        className="self-start rounded-2xl px-1 py-1"
         aria-label={t('nav.home')}
       >
-        <Logo className="h-16" />
+        <Logo variant="white" className="h-28" />
       </Link>
 
       <nav aria-label={navLabel} className="flex-1">
@@ -103,7 +103,7 @@ export function AppSidebar({
           className="me-auto min-w-12 shrink-0 rounded-lg"
           aria-label={t('nav.home')}
         >
-          <Logo className="h-12" />
+          <Logo className="h-14" />
         </Link>
         {/* Language is also inside the menu; hidden here on very narrow screens to avoid overflow. */}
         <div className="hidden min-[400px]:block">

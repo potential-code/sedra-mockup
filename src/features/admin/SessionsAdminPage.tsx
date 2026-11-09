@@ -13,13 +13,12 @@ import {
   Video,
   X,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
   AdminPageHeader,
   Chip,
-  DemoTag,
   IconCircle,
   Notice,
   SelectField,
@@ -40,6 +39,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { saveSession, useAdminSessions } from '@/store/admin-actions'
@@ -63,9 +63,11 @@ export function SessionsAdminPage() {
 
   return (
     <div>
-      <AdminPageHeader title={t('sessions.title')} intro={t('sessions.intro')} icon={CalendarDays}>
-        <DemoTag />
-      </AdminPageHeader>
+      <AdminPageHeader
+        title={t('sessions.title')}
+        intro={t('sessions.intro')}
+        icon={CalendarDays}
+      />
 
       <Notice className="mb-6">
         <p>{t('sessions.integrationNote')}</p>
@@ -78,15 +80,13 @@ export function SessionsAdminPage() {
           }}
           type="button"
           onClick={() => setEditing(NEW)}
-          aria-expanded={editing === NEW}
+          aria-haspopup="dialog"
         >
           <Plus aria-hidden="true" />
           {t('sessions.new')}
         </Button>
         <p className="m-0 text-sm text-ink-soft">{t('sessions.newDefaultsNote')}</p>
       </div>
-
-      {editing === NEW ? <SessionForm key={NEW} onClose={close} /> : null}
 
       <ul className="m-0 grid list-none gap-5 p-0 lg:grid-cols-2">
         {sessions.map((s, i) => (
@@ -103,9 +103,18 @@ export function SessionsAdminPage() {
         ))}
       </ul>
 
-      {current && editing !== NEW ? (
-        <SessionForm key={current.id} session={current} onClose={close} />
-      ) : null}
+      {/* New and edit open in one popup; focus returns to the button that opened it. */}
+      <Dialog open={editing !== null} onOpenChange={(o) => (o ? null : close())}>
+        <DialogContent
+          className="max-h-[92dvh] overflow-y-auto rounded-2xl bg-white p-5 sm:max-w-3xl sm:p-6"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+          {editing === NEW ? <SessionForm key={NEW} onClose={close} /> : null}
+          {current && editing !== NEW ? (
+            <SessionForm key={current.id} session={current} onClose={close} />
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -149,9 +158,6 @@ function SessionCard({
           className="size-full object-cover"
         />
         <div aria-hidden="true" className="absolute inset-0 bg-sedra-green-800/35" />
-        <div className="absolute top-3 end-3">
-          <DemoTag />
-        </div>
       </div>
       <div className="flex flex-1 flex-col gap-4 p-5 pt-0">
         <div className="-mt-10 flex items-end gap-4">
@@ -255,7 +261,7 @@ function SessionCard({
             type="button"
             variant="outline"
             onClick={onEdit}
-            aria-expanded={editing}
+            aria-haspopup="dialog"
             aria-label={t('sessions.editTitle', { title: l(s.title) })}
           >
             <Pencil aria-hidden="true" />
@@ -344,7 +350,6 @@ type FormErrors = Partial<Record<keyof FormState, string>>
 function SessionForm({ session, onClose }: { session?: LiveSession; onClose: () => void }) {
   const { t } = useTranslation('admin')
   const { l } = useLocalized()
-  const headingRef = useRef<HTMLHeadingElement>(null)
   const isNew = !session
   const { date, time } = session ? toUaeParts(session.startsAt) : { date: '', time: '16:00' }
   const [s, setS] = useState<FormState>({
@@ -358,10 +363,6 @@ function SessionForm({ session, onClose }: { session?: LiveSession; onClose: () 
     recordingStatus: session?.recordingStatus ?? 'pending',
   })
   const [errors, setErrors] = useState<FormErrors>({})
-
-  useEffect(() => {
-    headingRef.current?.focus()
-  }, [])
 
   const set =
     <K extends keyof FormState>(k: K) =>
@@ -411,22 +412,20 @@ function SessionForm({ session, onClose }: { session?: LiveSession; onClose: () 
   const err = (k: keyof FormState) => (errors[k] ? t(errors[k]) : undefined)
 
   return (
-    <section
-      id="session-editor"
-      aria-labelledby="session-editor-title"
-      className="mt-8 rounded-3xl bg-white ring-2 ring-sedra-green/40 p-4 shadow-lg sm:p-7"
-    >
-      <div className="mb-5 flex items-center gap-3">
+    <div id="session-editor">
+      <div className="mb-5 flex items-center gap-3 pe-12">
         <IconCircle icon={Pencil} size="lg" />
         <div className="min-w-0">
-          <h2 id="session-editor-title" ref={headingRef} tabIndex={-1} className="m-0 text-2xl">
-            {session
-              ? t('sessions.editTitle', { title: l(session.title) })
-              : t('sessions.newTitle')}
-          </h2>
-          <p className="m-0 text-ink-soft">
+          <DialogTitle asChild>
+            <h2 id="session-editor-title" className="m-0 text-2xl">
+              {session
+                ? t('sessions.editTitle', { title: l(session.title) })
+                : t('sessions.newTitle')}
+            </h2>
+          </DialogTitle>
+          <DialogDescription className="m-0 text-base text-ink-soft">
             {isNew ? t('sessions.newIntro') : t('sessions.editIntro')}
-          </p>
+          </DialogDescription>
         </div>
       </div>
       <form
@@ -550,6 +549,6 @@ function SessionForm({ session, onClose }: { session?: LiveSession; onClose: () 
           </Button>
         </div>
       </form>
-    </section>
+    </div>
   )
 }

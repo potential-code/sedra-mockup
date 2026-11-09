@@ -1,16 +1,20 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft, ExternalLink, Info, MonitorPlay } from 'lucide-react'
+import { ArrowLeft, ExternalLink, MonitorPlay } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { EXT01 } from '@/content'
 import { useLocalized } from '@/i18n'
+import { useExt01Approved } from '@/store/admin-content'
 
 /**
  * EXT01 (brief §9): responsive embed, titled iframe, no autoplay, visible YouTube fallback and
  * Back to course. Optional; never part of completion. Its subject is not described (not reviewed).
  */
 export function ExternalVideoCard() {
+  // Hidden until SEDRA approves it after content and accessibility review (brief §9, §10).
+  const approved = useExt01Approved()
   const { t } = useTranslation('learner')
   const { l } = useLocalized()
+  if (!approved) return null
   return (
     <section
       id="ext01"
@@ -31,10 +35,6 @@ export function ExternalVideoCard() {
           <p className="m-0 text-base">{t('resources.extNote')}</p>
         </div>
       </div>
-      <p className="m-0 flex items-start gap-2 rounded-xl border-2 border-notice bg-notice-soft p-3 font-semibold text-notice">
-        <Info aria-hidden="true" className="mt-1 size-5 shrink-0" />
-        {t('resources.extLabel')}
-      </p>
       {/* Framed player: dark green mat + deep shadow so the third-party embed reads as a "screen". */}
       <div className="rounded-2xl bg-sedra-green-800 p-2 shadow-pop">
         <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-ink">

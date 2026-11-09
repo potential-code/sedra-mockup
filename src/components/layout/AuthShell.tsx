@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { Reveal } from '@/components/motion/Reveal'
 import { PreferencesButton } from '@/components/preferences/PreferencesButton'
 import { Logo } from '@/components/shared/Logo'
+import treeWhite from '@/assets/motifs/motif-tree-white.png'
 import { asset } from '@/lib/asset'
 import { LanguageSwitch } from './LanguageSwitch'
 
 /**
- * Split-screen sign-in: photo panel with SEDRA green scrim (no tree motif: the text sits at the
- * bottom, where the tree would be) on one side,
+ * Split-screen sign-in: photo panel with SEDRA green scrim (faint tree motif down the end side, clear of the
+ * bottom text) on one side,
  * the sign-in content on the other. Collapses to a short photo banner on small screens.
  */
 export function AuthShell() {
@@ -27,12 +28,20 @@ export function AuthShell() {
             aria-hidden="true"
             className="absolute inset-0 -z-10 bg-gradient-to-t from-sedra-green-800 via-sedra-green-800/85 to-sedra-green-800/40"
           />
+          {/* Large faint tree down the end side, clear of the text at the bottom (decorative). */}
+          <img
+            src={treeWhite}
+            alt=""
+            width={676}
+            height={464}
+            className="pointer-events-none absolute -end-16 top-[30%] -z-10 hidden w-[min(30vw,28rem)] opacity-10 lg:block"
+          />
           <Link
             to="/"
-            className="self-start rounded-2xl bg-white px-4 py-2 shadow-lg"
+            className="self-start rounded-2xl"
             aria-label={t('home.title')}
           >
-            <Logo className="h-14 lg:h-20" />
+            <Logo variant="white" className="h-20 lg:h-28" />
           </Link>
           <Reveal className="grid max-w-md gap-3">
             <p className="m-0 text-3xl font-bold leading-tight text-white lg:text-4xl">

@@ -9,7 +9,7 @@ import type {
   UnitId,
   UnitProgress,
 } from '@shared/types'
-import { COURSES, getUnit, isUnitPublished, unitsForCourse } from '@/content'
+import { COURSES, getUnit, isUnitPublished, unitsForCourse, withCourseEdit } from '@/content'
 import { getUnitProgress, isUnitComplete } from '@/store/actions'
 
 /** Shared learner helpers: unit status, course progress, next step, UAE time. */
@@ -29,7 +29,8 @@ export function isProgrammeId(v: string): v is ProgrammeId {
 
 /** Safe version of courseForProgramme (content may still be loading in the demo build). */
 export function findCourse(programmeId: ProgrammeId): Course | undefined {
-  return COURSES.find((c) => c.programmeId === programmeId)
+  const c = COURSES.find((x) => x.programmeId === programmeId)
+  return c ? withCourseEdit(c) : undefined
 }
 
 /** Published units of a programme's course (learners never see unpublished units). */
@@ -93,6 +94,23 @@ export function nextStepUnit(learner: LearnerState | null): Unit | undefined {
     if (u) return u
   }
   return undefined
+}
+
+/**
+ * Where a course card opens: the unit view (it already shows the course menu), at the last unit
+ * the learner had open in this course, else the first incomplete unit, else unit 1.
+ */
+export function entryUnit(
+  learner: LearnerState | null,
+  programmeId: ProgrammeId,
+): Unit | undefined {
+  const units = courseUnits(programmeId)
+  const lastId = learner?.lastLocation?.unitId
+  return (
+    units.find((u) => u.id === lastId) ??
+    units.find((u) => !isUnitComplete(getUnitProgress(learner, u.id))) ??
+    units[0]
+  )
 }
 
 export function unitLinkParams(u: Pick<Unit, 'courseId' | 'id'>): {

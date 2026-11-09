@@ -154,43 +154,46 @@ export function LessonMedia({
       </fieldset>
 
       {mode === 'watch' ? (
-        <div className="grid gap-5 @2xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] @2xl:items-start">
-          <VideoPlayer
-            ref={playerRef}
-            src={video.video}
-            captions={video.captions}
-            poster={video.poster}
-            posterAlt={l(video.posterAlt)}
-            label={t('player.label', { title: l(unit.title) })}
-            mediaLang="en"
-            captionsDefault={prefs.captions}
-            onEnded={onDone}
-          />
-          <div className="flex min-w-0 flex-col gap-4">
-            <TranscriptPanel
-              lang="en"
-              sources={[
-                {
-                  label: t('common:readTranscript'),
-                  path: video.transcript,
-                  fallback: narration,
-                },
-                {
-                  label: t('transcript.descriptive'),
-                  path: video.descriptiveTranscript,
-                  fallback: unit.scenes
-                    .map((s) => `${s.visual.en}\n${s.narration.en}`)
-                    .join('\n\n'),
-                },
-              ]}
+        <div className="flex flex-col gap-5">
+          {/* Video on the left; what you do next (watched, summary) and the scrolling transcript on the right. */}
+          <div className="grid gap-5 @2xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] @2xl:items-start">
+            <VideoPlayer
+              ref={playerRef}
+              src={video.video}
+              captions={video.captions}
+              poster={video.poster}
+              posterAlt={l(video.posterAlt)}
+              label={t('player.label', { title: l(unit.title) })}
+              mediaLang="en"
+              captionsDefault={prefs.captions}
+              onEnded={onDone}
             />
-            <DoneControl
-              done={done}
-              onDone={onDone}
-              doneText={t('media.watchedStatus')}
-              actionText={t('media.markWatched')}
-            />
-            <SummaryCard unit={unit} />
+            <div className="flex min-w-0 flex-col gap-4">
+              <DoneControl
+                done={done}
+                onDone={onDone}
+                doneText={t('media.watchedStatus')}
+                actionText={t('media.markWatched')}
+              />
+              <SummaryCard unit={unit} />
+              <TranscriptPanel
+                lang="en"
+                sources={[
+                  {
+                    label: t('common:readTranscript'),
+                    path: video.transcript,
+                    fallback: narration,
+                  },
+                  {
+                    label: t('transcript.descriptive'),
+                    path: video.descriptiveTranscript,
+                    fallback: unit.scenes
+                      .map((s) => `${s.visual.en}\n${s.narration.en}`)
+                      .join('\n\n'),
+                  },
+                ]}
+              />
+            </div>
           </div>
         </div>
       ) : (

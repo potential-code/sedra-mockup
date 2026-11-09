@@ -58,7 +58,7 @@ export function TranscriptPanel({ sources, lang }: { sources: TranscriptSource[]
           <ScrollText aria-hidden="true" className="size-5 shrink-0" />
           {t('transcript.title')}
         </h3>
-        <div className="grid gap-2">
+        <div className="grid gap-2 sm:grid-cols-2">
           {sources.map((s, i) => {
             const active = open === i
             return (
@@ -82,7 +82,14 @@ export function TranscriptPanel({ sources, lang }: { sources: TranscriptSource[]
           })}
         </div>
       </div>
-      <div id={`${id}-panel`} className="px-4 py-3">
+      {/* Long text scrolls inside the panel so the page stays short; focusable so keyboard users can scroll it. */}
+      <section
+        id={`${id}-panel`}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region must be keyboard reachable
+        tabIndex={0}
+        aria-labelledby={titleId}
+        className="max-h-80 overflow-y-auto px-4 py-3 focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
+      >
         {open === null ? (
           <p className="m-0 text-base text-ink-soft">{t('transcript.hint')}</p>
         ) : text === undefined ? (
@@ -99,7 +106,7 @@ export function TranscriptPanel({ sources, lang }: { sources: TranscriptSource[]
             {text}
           </motion.div>
         )}
-      </div>
+      </section>
     </section>
   )
 }

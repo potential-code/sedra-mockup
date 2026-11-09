@@ -38,6 +38,7 @@ import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 import { getUnitProgress, setLastProgramme, useLearner, usePrefs } from '@/store/actions'
+import { useExt01Approved } from '@/store/admin-content'
 
 const CHIP =
   'inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-base font-semibold'
@@ -153,6 +154,7 @@ export function ProgrammePage() {
   const { programmeId } = useParams({ from: '/_learner/programmes/$programmeId' })
   const learner = useLearner()
   const simplified = usePrefs().view === 'simplified'
+  const extApproved = useExt01Approved()
   const enrolled = isProgrammeId(programmeId) && isEnrolled(learner, programmeId)
 
   useEffect(() => {
@@ -280,7 +282,7 @@ export function ProgrammePage() {
                 </div>
                 <div className="grid min-w-0 grid-cols-1 gap-3">
                   <UnitCard u={u} status={status} current={u.id === current} />
-                  {u.id === 'LS01' && !simplified ? (
+                  {u.id === 'LS01' && !simplified && extApproved ? (
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border-2 border-dashed border-sedra-pale bg-white/70 px-4 py-1">
                       <Link
                         to="/resources"

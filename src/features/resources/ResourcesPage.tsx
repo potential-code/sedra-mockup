@@ -1,6 +1,6 @@
 import type { ProgrammeId } from '@shared/types'
 import { useLocation } from '@tanstack/react-router'
-import { ArrowDown, ChevronDown, ExternalLink, FileText, Printer } from 'lucide-react'
+import { ChevronDown, ExternalLink, FileText } from 'lucide-react'
 import { type ReactNode, useDeferredValue, useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { enrolledProgrammes, findCourse, PROGRAMME_LABEL_KEY } from '@/components/learner/learning'
@@ -11,6 +11,7 @@ import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 import { useLearner, usePrefs } from '@/store/actions'
+import { useExt01Approved } from '@/store/admin-content'
 import { useDb } from '@/store/db'
 import { ExternalVideoCard } from './ExternalVideoCard'
 import { PlaybookCard } from './PlaybookCard'
@@ -124,36 +125,52 @@ function CourseSection({
   )
 }
 
-/** Big buttons that move to a course section and focus its heading (hash routing safe). */
-function JumpLinks({ programmes }: { programmes: ProgrammeId[] }) {
+type CourseFilterValue = 'all' | ProgrammeId
+
+/** Course filter: show everything, or only one course's resources (no scrolling to find them). */
+function CourseFilter({
+  programmes,
+  value,
+  onChange,
+}: {
+  programmes: ProgrammeId[]
+  value: CourseFilterValue
+  onChange: (v: CourseFilterValue) => void
+}) {
   const { t } = useTranslation('learner')
   const { l } = useLocalized()
   if (programmes.length < 2) return null
+  const options: { key: CourseFilterValue; label: string }[] = [
+    { key: 'all', label: t('resources.filterAll') },
+    ...programmes.map((p) => {
+      const course = findCourse(p)
+      return {
+        key: p as CourseFilterValue,
+        label: course ? l(course.title) : t(`common:${PROGRAMME_LABEL_KEY[p]}`),
+      }
+    }),
+  ]
   return (
-    <nav aria-label={t('resources.jumpLabel')} className="grid gap-2">
-      <p className="m-0 text-base font-semibold text-ink">{t('resources.jumpLabel')}</p>
+    <fieldset className="m-0 grid gap-2 border-0 p-0">
+      <legend className="mb-2 p-0 text-base font-semibold text-ink">
+        {t('resources.filterLabel')}
+      </legend>
       <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-        {programmes.map((p) => {
-          const course = findCourse(p)
-          return (
-            <li key={p}>
-              <Button
-                variant="secondary"
-                className="rounded-full"
-                onClick={() => {
-                  const h = document.getElementById(`${SECTION_ID[p]}-h`)
-                  h?.scrollIntoView({ block: 'start' })
-                  h?.focus({ preventScroll: true })
-                }}
-              >
-                <ArrowDown aria-hidden="true" />
-                {course ? l(course.title) : t(`common:${PROGRAMME_LABEL_KEY[p]}`)}
-              </Button>
-            </li>
-          )
-        })}
+        {options.map((o) => (
+          <li key={o.key}>
+            <Button
+              type="button"
+              variant={value === o.key ? 'default' : 'secondary'}
+              className="rounded-full"
+              aria-pressed={value === o.key}
+              onClick={() => onChange(o.key)}
+            >
+              {o.label}
+            </Button>
+          </li>
+        ))}
       </ul>
-    </nav>
+    </fieldset>
   )
 }
 
@@ -171,11 +188,13 @@ export function ResourcesPage() {
   const simplified = view === 'simplified'
   const [showOptional, setShowOptional] = useState(hash === 'ext01')
   const [query, setQuery] = useState('')
+  const extApproved = useExt01Approved()
+  const [course, setCourse] = useState<CourseFilterValue>('all')
   const q = useDeferredValue(query).trim().toLocaleLowerCase()
   // Enrolled programmes only (SEDRA manages enrolment).
   const programmes = enrolledProgrammes(useLearner())
-  const hasLs = programmes.includes('life-skills')
-  const hasHf = programmes.includes('hospitality')
+  const hasLs = programmes.includes('life-skills') && (course === 'all' || course === 'life-skills')
+  const hasHf = programmes.includes('hospitality') && (course === 'all' || course === 'hospitality')
   const lsCount = useMatchingUnits('life-skills', q).length
   const hfCount = useMatchingUnits('hospitality', q).length
   const count = (hasLs ? lsCount : 0) + (hasHf ? hfCount : 0)
@@ -183,6 +202,7 @@ export function ResourcesPage() {
   useEffect(() => {
     if (hash === 'ext01') {
       setShowOptional(true)
+      setCourse('all')
       requestAnimationFrame(() => document.getElementById('ext01')?.scrollIntoView())
     }
   }, [hash])
@@ -197,7 +217,7 @@ export function ResourcesPage() {
           <p className="m-0 text-lg text-ink">{t('resources.lead')}</p>
         </div>
         <SummarySearch id={id} query={query} onChange={setQuery} count={count} />
-        <JumpLinks programmes={programmes} />
+        <CourseFilter programmes={programmes} value={course} onChange={setCourse} />
       </Reveal>
 
       {hasLs ? (
@@ -218,7 +238,10 @@ export function ResourcesPage() {
           <div
             id="optional-resources"
             hidden={!optionalOpen}
-            className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
+            className={cn(
+              'grid grid-cols-1 items-stretch gap-6',
+              extApproved && 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]',
+            )}
           >
             {optionalOpen ? (
               <>
@@ -235,24 +258,6 @@ export function ResourcesPage() {
         <CourseSection programmeId="hospitality">
           <SummaryGrid programmeId="hospitality" q={q} headingId={`${id}-hf`} />
         </CourseSection>
-      ) : null}
-
-      {optionalOpen ? (
-        <section
-          aria-labelledby="print-heading"
-          className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-dashed border-border p-5"
-        >
-          <div className="grid gap-1">
-            <h2 id="print-heading" className="m-0 text-xl">
-              {t('resources.downloadsHeading')}
-            </h2>
-            <p className="m-0 text-base">{t('resources.downloadsBody')}</p>
-          </div>
-          <Button variant="outline" onClick={() => window.print()}>
-            <Printer aria-hidden="true" />
-            {t('resources.print')}
-          </Button>
-        </section>
       ) : null}
     </div>
   )

@@ -1,4 +1,12 @@
-import type { LearnerState, LiveSession, Persona, Prefs, SupportRequest } from '@shared/types'
+import type {
+  LearnerState,
+  LiveSession,
+  OptionId,
+  Persona,
+  Prefs,
+  SupportRequest,
+  UnitProgress,
+} from '@shared/types'
 
 /** All people and records here are fictional demo data (brief §1). */
 
@@ -48,24 +56,34 @@ export const PERSONAS: Persona[] = [
   },
 ]
 
+function doneUnit(selected: OptionId): UnitProgress {
+  return {
+    watchedOrRead: true,
+    checkReviewed: true,
+    checkOutcome: 'correct',
+    selected,
+    attempts: 1,
+    practice: 'done',
+  }
+}
+
 export function seedLearners(): Record<'new-learner' | 'noor', LearnerState> {
   return {
     'new-learner': { onboarded: false, enrolled: ['life-skills', 'hospitality'], progress: {} },
-    // Noor finished LS01; next step is LS02 Stop Think Do (brief §2 dashboard copy).
+    // Noor has finished LS01-LS06, so the LS02, LS04 and LS06 badges show as earned.
+    // Her next step is LS07.
     noor: {
       onboarded: true,
       enrolled: ['life-skills', 'hospitality'],
       progress: {
-        LS01: {
-          watchedOrRead: true,
-          checkReviewed: true,
-          checkOutcome: 'correct',
-          selected: 'A',
-          attempts: 1,
-          practice: 'done',
-        },
+        LS01: doneUnit('A'),
+        LS02: doneUnit('A'),
+        LS03: doneUnit('A'),
+        LS04: doneUnit('A'),
+        LS05: doneUnit('A'),
+        LS06: doneUnit('A'),
       },
-      lastLocation: { unitId: 'LS02', step: 'media' },
+      lastLocation: { unitId: 'LS07', step: 'media' },
       lastProgramme: 'life-skills',
     },
   }

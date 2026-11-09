@@ -1,4 +1,4 @@
-import type { Unit } from '@shared/types'
+import type { Unit, UnitStep } from '@shared/types'
 import { Link } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +6,8 @@ import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 import { getUnitProgress, isUnitComplete, useLearner } from '@/store/actions'
+
+const BLOCKS: UnitStep[] = ['media', 'check', 'practice']
 
 /**
  * Compact course outline (brief §3: desktop shows the same sequence with an outline), drawn as
@@ -17,11 +19,16 @@ export function UnitOutline({
   currentId,
   onNavigate,
   thumbnails = true,
+  step,
+  onStep,
 }: {
   units: Unit[]
   currentId: string
   onNavigate?: () => void
   thumbnails?: boolean
+  /** Current learning block and its setter: shows the blocks under the current unit. */
+  step?: UnitStep
+  onStep?: (s: UnitStep) => void
 }) {
   const { t } = useTranslation('unit')
   const { l } = useLocalized()
@@ -105,6 +112,51 @@ export function UnitOutline({
                 />
               )}
             </Link>
+            {current && step && onStep && (
+              <div className="ms-14 mt-1 mb-2">
+                <p id={`blocks-${u.id}`} className="m-0 text-base font-semibold text-ink-soft">
+                  {t('outline.blocks')}
+                </p>
+                <ul
+                  aria-labelledby={`blocks-${u.id}`}
+                  className="m-0 flex list-none flex-col gap-1 p-0"
+                >
+                  {BLOCKS.map((b) => {
+                    const text =
+                      b === 'media'
+                        ? p.watchedOrRead
+                          ? t('steps.done')
+                          : t('steps.notYet')
+                        : b === 'check'
+                          ? p.checkReviewed
+                            ? t('steps.reviewed')
+                            : t('steps.notYet')
+                          : p.practice
+                            ? t(`practice.status.${p.practice}`)
+                            : t('steps.optional')
+                    const here = b === step
+                    return (
+                      <li key={b} className="max-w-none">
+                        <button
+                          type="button"
+                          onClick={() => onStep(b)}
+                          aria-current={here ? 'step' : undefined}
+                          className={cn(
+                            'flex min-h-12 w-full items-center justify-between gap-2 rounded-xl px-3 py-1 text-start text-base text-ink transition-colors',
+                            here
+                              ? 'bg-white font-bold text-sedra-green ring-2 ring-sedra-green'
+                              : 'hover:bg-sedra-pale-50',
+                          )}
+                        >
+                          <span>{t(`steps.${b}`)}</span>
+                          <span className="text-ink-soft">{text}</span>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )}
           </li>
         )
       })}

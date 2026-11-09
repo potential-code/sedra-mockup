@@ -18,7 +18,7 @@ export function PublicShell() {
             className="me-auto rounded-lg"
             aria-label={t('home.title', { defaultValue: 'Home' })}
           >
-            <Logo className="h-14 md:h-16" />
+            <Logo className="h-16 md:h-20" />
           </Link>
           <LanguageSwitch />
           <PreferencesButton iconOnlyNarrow />

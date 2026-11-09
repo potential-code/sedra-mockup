@@ -47,14 +47,28 @@ export function ReadAloud({
       window.clearTimeout(timer.current)
       timer.current = window.setTimeout(() => setReading(false), 8000)
     }
-    if (synth && typeof SpeechSynthesisUtterance !== 'undefined' && synth.getVoices().length > 0) {
+    if (synth && typeof SpeechSynthesisUtterance !== 'undefined') {
       synth.cancel()
       const u = new SpeechSynthesisUtterance(text)
       u.lang = lang === 'ar' ? 'ar' : 'en'
       u.rate = 0.9
+      let started = false
+      u.onstart = () => {
+        started = true
+        window.clearTimeout(timer.current)
+      }
       u.onend = () => setReading(false)
-      u.onerror = simulate
+      u.onerror = (e) => {
+        if (e.error !== 'canceled' && e.error !== 'interrupted') simulate()
+      }
       synth.speak(u)
+      // Voices often load late, or the device has none: if nothing starts, show the demo state.
+      timer.current = window.setTimeout(() => {
+        if (!started) {
+          synth.cancel()
+          simulate()
+        }
+      }, 2000)
     } else {
       simulate()
     }

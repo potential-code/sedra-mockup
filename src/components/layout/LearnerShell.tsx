@@ -1,7 +1,7 @@
 import { Link, Outlet } from '@tanstack/react-router'
 import { Award, FolderOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { enrolledProgrammes } from '@/components/learner/learning'
+import { enrolledProgrammes, entryUnit } from '@/components/learner/learning'
 import { PageTransition } from '@/components/motion/PageTransition'
 import { LEARNER_NAV } from '@/config/nav'
 import { cn } from '@/lib/utils'
@@ -16,18 +16,27 @@ export function LearnerShell() {
   const { t } = useTranslation()
   const tl = useTranslation('learner').t
   const learner = useLearner()
-  // Learn opens the last programme the learner used, else their first enrolled programme.
+  // Learn opens the unit view (it already shows the course details and menu) for the last
+  // programme the learner used, else their first enrolled programme.
   const enrolled = enrolledProgrammes(learner)
   const last = learner?.lastProgramme
   const programmeId = last && enrolled.includes(last) ? last : (enrolled[0] ?? 'life-skills')
 
-  const core: SidebarItem[] = LEARNER_NAV.map((item) => ({
-    key: item.key,
-    label: t(`nav.${item.key}`),
-    to: item.to,
-    icon: item.icon,
-    params: item.key === 'learn' ? { programmeId } : undefined,
-  }))
+  const learnUnit = entryUnit(learner, programmeId)
+  const learnParams: Record<string, string> = learnUnit
+    ? { courseId: learnUnit.courseId, unitId: learnUnit.id }
+    : { programmeId }
+  const core: SidebarItem[] = LEARNER_NAV.map((item) =>
+    item.key === 'learn'
+      ? {
+          key: item.key,
+          label: t(`nav.${item.key}`),
+          to: learnUnit ? '/courses/$courseId/units/$unitId' : item.to,
+          icon: item.icon,
+          params: learnParams,
+        }
+      : { key: item.key, label: t(`nav.${item.key}`), to: item.to, icon: item.icon },
+  )
   const sidebarItems: SidebarItem[] = [
     ...core.slice(0, 3),
     { key: 'resources', label: tl('nav.resources'), to: '/resources', icon: FolderOpen },

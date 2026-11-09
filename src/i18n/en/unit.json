@@ -81,7 +81,7 @@
     "title": "Summary",
     "readAloud": "Read aloud",
     "stop": "Stop reading",
-    "simulated": "Demo: read-aloud is simulated. The underlined sentence shows where the voice would be."
+    "simulated": "No voice was found on this device, so this is a demo. The underlined sentence shows where the voice would be."
   },
   "check": {
     "errorSummaryTitle": "There is a problem",
@@ -170,7 +170,8 @@
     "complete": "Complete",
     "inProgress": "In progress",
     "notStarted": "Not started",
-    "progress": "{{done}} of {{total}} units complete"
+    "progress": "{{done}} of {{total}} units complete",
+    "blocks": "Learning blocks"
   },
   "leave": {
     "title": "Leave this unit?",
@@ -187,5 +188,9 @@
     "title": "This unit is not available right now",
     "body": "This unit is not available right now. Choose another unit from your programme.",
     "back": "Back to the programme"
+  },
+  "courses": {
+    "label": "Your courses",
+    "current": "You are here"
   }
 }

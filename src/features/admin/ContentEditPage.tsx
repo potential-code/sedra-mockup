@@ -6,17 +6,14 @@ import {
   Captions,
   CircleCheck,
   Eye,
-  EyeOff,
   FileText,
   FileVideo,
-  Hash,
   Languages,
   ListChecks,
   type LucideIcon,
   Pencil,
   Save,
   Send,
-  ShieldCheck,
   Sprout,
   Video,
 } from 'lucide-react'
@@ -25,15 +22,14 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
   AdminPageHeader,
-  DemoTag,
   FieldCode,
   FieldError,
   IconCircle,
-  Notice,
   SelectField,
   StatusLabel,
   TextField,
 } from '@/components/admin/AdminUi'
+import { ContentLangSwitch, useContentLang } from '@/components/admin/ContentLangSwitch'
 import { useUaeFormat } from '@/components/admin/format'
 import { announce } from '@/components/shared/LiveRegion'
 import { Button } from '@/components/ui/button'
@@ -42,13 +38,12 @@ import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 import { getContentDraft, saveContentDraft, useContentDrafts } from '@/store/admin-actions'
-import { publishUnit, setUnitPublished, unitFromFields, useUnitEdits } from '@/store/admin-content'
+import { publishUnit, unitFromFields } from '@/store/admin-content'
 import {
   type FieldErrors,
   type FieldKey,
   type Fields,
   fieldsFromUnit,
-  REVIEW_STATUSES,
   type ReviewStatus,
   validateForPublish,
 } from './content-fields'
@@ -109,14 +104,12 @@ function Editor({ unit }: { unit: Unit }) {
   const { l } = useLocalized()
   const f = useUaeFormat()
   const drafts = useContentDrafts()
-  const edits = useUnitEdits()
-  const published = edits[unit.id]?.published ?? true
   // Both language drafts live in state, so switching language never loses entered text.
   const [byLang, setByLang] = useState<Record<Lang, Fields>>(() => ({
     en: initialFields(unit, 'en'),
     ar: initialFields(unit, 'ar'),
   }))
-  const [lang, setLang] = useState<Lang>('en')
+  const lang = useContentLang()
   const [errors, setErrors] = useState<FieldErrors>({})
   const summaryRef = useRef<HTMLDivElement>(null)
 
@@ -163,21 +156,10 @@ function Editor({ unit }: { unit: Unit }) {
     announce(`${t('editor.publishToast')} ${t('editor.liveToast')}`)
   }
 
-  function onUnpublish() {
-    setUnitPublished(unit.id as UnitId, false)
-    toast.success(t('editor.unpublishedToast'), { description: t('editor.liveToast') })
-    announce(`${t('editor.unpublishedToast')} ${t('editor.liveToast')}`)
-  }
-
   function onChooseFile(file: File | undefined) {
     if (!file) return
     // Simulated: only the file name is recorded. Nothing is uploaded or played to learners.
     set('video_url')(file.name)
-  }
-
-  function switchLang(next: Lang) {
-    setLang(next)
-    setErrors({})
   }
 
   const errorEntries = Object.entries(errors) as [FieldKey, string][]
@@ -201,18 +183,7 @@ function Editor({ unit }: { unit: Unit }) {
         title={t('editor.title', { id: unit.id, title: l(unit.title) })}
         intro={t('editor.intro')}
         icon={Pencil}
-      >
-        {published ? (
-          <StatusLabel tone="done" icon={Eye}>
-            {t('editor.statusPublished')}
-          </StatusLabel>
-        ) : (
-          <StatusLabel tone="neutral" icon={EyeOff}>
-            {t('editor.statusUnpublished')}
-          </StatusLabel>
-        )}
-        <DemoTag label={t('editor.demoTag')} />
-      </AdminPageHeader>
+      />
 
       {errorEntries.length > 0 ? (
         <div
@@ -253,52 +224,18 @@ function Editor({ unit }: { unit: Unit }) {
           className="flex min-w-0 flex-col gap-6"
         >
           <Section id="sec-language" title={t('editor.sections.language')} icon={Languages}>
-            <fieldset className="m-0 border-0 p-0" aria-describedby="lang-hint">
-              <legend className="font-semibold text-ink">
-                {t('editor.fields.language')}
-                <FieldCode code="language" />
-              </legend>
-              <p id="lang-hint" className="m-0 mb-2 text-sm text-ink-soft">
-                {t('editor.languageHint')}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {(['en', 'ar'] as const).map((code) => (
-                  <label
-                    key={code}
-                    className="flex min-h-12 cursor-pointer items-center gap-2 rounded-full border-2 border-input bg-white px-5 font-semibold transition-colors hover:border-sedra-green has-[:checked]:border-sedra-green has-[:checked]:bg-sedra-pale-100"
-                  >
-                    <input
-                      type="radio"
-                      id={code === 'en' ? 'f-language' : 'f-language-ar'}
-                      name="draft-language"
-                      value={code}
-                      checked={lang === code}
-                      onChange={() => switchLang(code)}
-                      className="size-5 accent-sedra-green"
-                    />
-                    {t(`editor.lang.${code}`)}
-                  </label>
-                ))}
-              </div>
-              {errors.language ? (
-                <FieldError id="f-language-error">{t(errors.language)}</FieldError>
-              ) : null}
-            </fieldset>
+            <p id="lang-hint" className="m-0 text-sm text-ink-soft">
+              {t('editor.languageHint')}
+            </p>
+            <ContentLangSwitch onChange={() => setErrors({})} />
+            {errors.language ? (
+              <FieldError id="f-language-error">{t(errors.language)}</FieldError>
+            ) : null}
             <p className="m-0 text-sm text-ink-soft">
               {saved
                 ? t('editor.lastSaved', { date: f.dateTime(saved.updatedAt) })
                 : t('editor.notSaved')}
             </p>
-          </Section>
-
-          <Section id="sec-ids" title={t('editor.sections.identifiers')} icon={Hash}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {field('programme_id', { readOnly: true, dir: 'ltr' })}
-              {field('course_id', { readOnly: true, dir: 'ltr' })}
-              {field('unit_id', { readOnly: true, dir: 'ltr' })}
-              {field('order', { readOnly: true, dir: 'ltr' })}
-            </div>
-            <p className="m-0 text-sm text-ink-soft">{t('editor.identifiersHint')}</p>
           </Section>
 
           <Section id="sec-lesson" title={t('editor.sections.lesson')} icon={FileText}>
@@ -401,28 +338,23 @@ function Editor({ unit }: { unit: Unit }) {
 
           <Section id="sec-practice" title={t('editor.sections.practice')} icon={Sprout}>
             {field('practice_prompt', { multiline: true, rows: 3 })}
-          </Section>
-
-          <Section
-            id="sec-review"
-            title={t('editor.sections.review')}
-            icon={ShieldCheck}
-            tint="notice"
-          >
+            {field('practice_choices', {
+              multiline: true,
+              rows: 4,
+              hint: t('editor.practiceChoicesHint'),
+            })}
             <SelectField
-              id="f-review_status"
-              label={t('editor.fields.review_status')}
-              code="review_status"
-              value={fields.review_status}
-              onChange={set('review_status')}
-              hint={t('editor.reviewHint')}
-              options={REVIEW_STATUSES.map((s) => ({ value: s, label: t(`review.${s}`) }))}
+              id="f-practice_multiple"
+              label={t('editor.fields.practice_multiple')}
+              value={fields.practice_multiple}
+              onChange={set('practice_multiple')}
+              options={[
+                { value: 'no', label: t('editor.practiceOne') },
+                { value: 'yes', label: t('editor.practiceMany') },
+              ]}
             />
+            <p className="m-0 text-sm text-ink-soft">{t('editor.practiceNote')}</p>
           </Section>
-
-          <Notice>
-            <p>{t('editor.simulated')}</p>
-          </Notice>
 
           {/* Sticky action bar: Save and Publish stay in reach while scrolling a long form. */}
           <div className="sticky bottom-3 z-20 flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-white/95 p-3 shadow-pop backdrop-blur sm:p-4">
@@ -439,20 +371,9 @@ function Editor({ unit }: { unit: Unit }) {
               <Save aria-hidden="true" />
               {t('editor.saveDraft')}
             </Button>
-            {published ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onUnpublish}
-                className="flex-1 sm:flex-none"
-              >
-                <EyeOff aria-hidden="true" />
-                {t('editor.unpublish')}
-              </Button>
-            ) : null}
             <Button type="button" onClick={onPublish} className="flex-1 sm:flex-none">
               <Send aria-hidden="true" className="rtl-mirror" />
-              {t('editor.publish')}
+              {t('editor.saveLive')}
             </Button>
           </div>
         </form>
@@ -468,10 +389,7 @@ function UnitPreview({ unit, fields, dir }: { unit: Unit; fields: Fields; dir: '
   const { t } = useTranslation('admin')
   const options = (['A', 'B', 'C'] as const).map((id) => ({ id, text: fields[`options_${id}`] }))
   return (
-    <aside
-      aria-labelledby="preview-h"
-      className="flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100dvh-3rem)] xl:overflow-y-auto"
-    >
+    <aside aria-labelledby="preview-h" className="flex flex-col gap-3">
       <h2 id="preview-h" className="m-0 flex items-center gap-2 text-xl">
         <Eye aria-hidden="true" className="size-5" />
         {t('editor.preview.heading')}
@@ -504,9 +422,6 @@ function UnitPreview({ unit, fields, dir }: { unit: Unit; fields: Fields; dir: '
             ) : (
               <StatusLabel tone="pending">{t('media.pending')}</StatusLabel>
             )}
-            <StatusLabel tone={fields.review_status === 'approved' ? 'done' : 'info'}>
-              {t(`review.${fields.review_status}`)}
-            </StatusLabel>
           </div>
           <div className="rounded-xl bg-sedra-pale-50 p-3">
             <p className="m-0 mb-2 font-semibold text-ink">

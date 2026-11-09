@@ -6,6 +6,7 @@ import { PLAYBOOK_MESSAGE_KEYS } from '@/features/unit/PracticePanel'
 import { useLocalized } from '@/i18n'
 import { cn } from '@/lib/utils'
 import { useLearner } from '@/store/actions'
+import { useResourceText } from '@/store/admin-content'
 
 /**
  * Visual "My communication playbook" card (brief §2 Resources, LS08). Shows the learner's saved
@@ -14,6 +15,10 @@ import { useLearner } from '@/store/actions'
  */
 export function PlaybookCard() {
   const { t } = useTranslation('learner')
+  const { lang: uiLang } = useLocalized()
+  const edited = useResourceText('playbook', uiLang)
+  const heading = edited.title ?? t('resources.playbookHeading')
+  const intro = edited.body ?? t('resources.playbookIntro')
   const { l } = useLocalized()
   const learner = useLearner()
   const ls08 = getUnit('LS08')
@@ -55,9 +60,9 @@ export function PlaybookCard() {
         </span>
         <div className="grid min-w-0 grid-cols-1 gap-1">
           <h3 id="playbook-heading" className="m-0 text-2xl text-white">
-            {t('resources.playbookHeading')}
+            {heading}
           </h3>
-          <p className="m-0 text-white">{t('resources.playbookIntro')}</p>
+          <p className="m-0 text-white">{intro}</p>
         </div>
       </div>
       <ol

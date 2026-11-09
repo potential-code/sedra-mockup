@@ -30,7 +30,7 @@ export function SiteFooter({
           <div className="container-page grid gap-8 py-10 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
             <div className="grid content-start gap-3">
               <Link to="/" className="w-fit rounded-lg" aria-label={t('footer.home')}>
-                <Logo className="h-16" />
+                <Logo className="h-20" />
               </Link>
               <p className="m-0 text-ink-soft">{t('footer.about')}</p>
             </div>

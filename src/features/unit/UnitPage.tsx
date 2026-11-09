@@ -20,8 +20,16 @@ import { motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KnowledgeCheck } from '@/components/check/KnowledgeCheck'
-import { isEnrolled } from '@/components/learner/learning'
+import {
+  completedCount,
+  courseUnits,
+  enrolledProgrammes,
+  entryUnit,
+  isEnrolled,
+  PROGRAMME_LABEL_KEY,
+} from '@/components/learner/learning'
 import { NotEnrolled } from '@/components/learner/NotEnrolled'
+import { ProgressRing } from '@/components/learner/ProgressRing'
 import type { VideoPlayerHandle } from '@/components/player/VideoPlayer'
 import { announce } from '@/components/shared/LiveRegion'
 import {
@@ -49,6 +57,7 @@ import {
   useLearner,
   usePrefs,
 } from '@/store/actions'
+import { useExt01Approved } from '@/store/admin-content'
 import { LessonMedia, type MediaMode, videoFor } from './LessonMedia'
 import { PracticePanel } from './PracticePanel'
 import { StepNav } from './StepNav'
@@ -112,6 +121,96 @@ function UnitNotFound() {
         </Button>
       </div>
     </div>
+  )
+}
+
+/** Course details on top (name, purpose, progress); the course menu and unit sit below it. */
+function CourseCard({
+  course,
+  programmeId,
+  simplified,
+}: {
+  course: Course
+  programmeId: ProgrammeId
+  simplified: boolean
+}) {
+  const { t } = useTranslation('unit')
+  const { l } = useLocalized()
+  const learner = useLearner()
+  const programmes = enrolledProgrammes(learner)
+  const units = unitsForCourse(course.id, { publishedOnly: true })
+  const done = units.filter((u) => isUnitComplete(getUnitProgress(learner, u.id))).length
+  return (
+    // Slim course bar: name, progress and course switch in one row so the unit starts near the top.
+    <section
+      aria-labelledby="course-card-title"
+      className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl bg-white p-3 shadow-md lg:mb-5"
+    >
+      <div className="flex min-w-0 flex-1 basis-72 items-center gap-3">
+        {!simplified && course.image ? (
+          <img
+            src={asset(course.image)}
+            alt=""
+            width={160}
+            height={120}
+            className="hidden aspect-[4/3] w-16 shrink-0 rounded-xl object-cover sm:block"
+          />
+        ) : null}
+        <div className="min-w-0">
+          <p id="course-card-title" className="m-0 text-lg leading-snug font-bold text-sedra-green">
+            {t(`common:${PROGRAMME_LABEL_KEY[programmeId]}`)}
+          </p>
+          <p className="m-0 text-base text-ink-soft">{l(course.title)}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        <ProgressRing value={done / Math.max(1, units.length)} size={44} stroke={5}>
+          <span aria-hidden="true" className="text-sm font-bold text-ink">
+            {done}/{units.length}
+          </span>
+        </ProgressRing>
+        <span className="text-base font-semibold text-ink">
+          {t('learner:shared.unitsComplete', { done, total: units.length })}
+        </span>
+      </div>
+      {programmes.length > 1 && (
+        <nav aria-label={t('courses.label')} className="flex flex-wrap items-center gap-2">
+          <span className="text-base font-semibold text-ink-soft">{t('courses.label')}:</span>
+          <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+            {programmes.map((p) => {
+              const target = entryUnit(learner, p)
+              const here = p === programmeId
+              if (!target) return null
+              const us = courseUnits(p)
+              const d = completedCount(learner, us)
+              return (
+                <li key={p} className="max-w-none">
+                  <Link
+                    to="/courses/$courseId/units/$unitId"
+                    params={{ courseId: target.courseId, unitId: target.id }}
+                    aria-current={here ? 'true' : undefined}
+                    className={cn(
+                      'inline-flex min-h-12 items-center gap-2 rounded-full border-2 px-4 font-semibold transition-colors',
+                      here
+                        ? 'border-sedra-green bg-sedra-green text-white'
+                        : 'border-sedra-pale bg-white text-sedra-green hover:border-sedra-green',
+                    )}
+                  >
+                    {t(`common:${PROGRAMME_LABEL_KEY[p]}`)}
+                    <span
+                      className={cn('text-sm font-normal', here ? 'text-white' : 'text-ink-soft')}
+                    >
+                      {d}/{us.length}
+                    </span>
+                    {here ? <span className="sr-only">({t('courses.current')})</span> : null}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+      )}
+    </section>
   )
 }
 
@@ -236,11 +335,12 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
 
   return (
     <div className="container-page py-4 md:py-6">
+      <CourseCard course={course} programmeId={unit.programmeId} simplified={simplified} />
       <div className="lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start lg:gap-8 xl:grid-cols-[20rem_minmax(0,1fr)]">
         {/* Course outline with course progress on the start side (template unit player). */}
         <aside
           aria-labelledby="outline-title"
-          className="sticky top-4 hidden overflow-hidden rounded-3xl bg-white shadow-md lg:block"
+          className="hidden overflow-hidden rounded-3xl bg-white shadow-md lg:block"
         >
           <div className="bg-sedra-pale-50 px-4 pt-4 pb-3">
             <h2 id="outline-title" className="m-0 text-lg">
@@ -267,10 +367,12 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
               </div>
             )}
           </div>
-          <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto p-2">
+          <div className="p-2">
             <UnitOutline
               units={published}
               currentId={unit.id}
+              step={step}
+              onStep={(s) => goStep(s)}
               onNavigate={() => {
                 focusHeadingOnMount = true
               }}
@@ -295,14 +397,6 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
               />
               <div className="flex flex-col gap-4 p-3 @md:p-6 @2xl:flex-row @2xl:items-end @2xl:gap-6">
                 <div className="flex min-w-0 flex-1 flex-col gap-3">
-                  <Link
-                    to="/programmes/$programmeId"
-                    params={{ programmeId: unit.programmeId }}
-                    className="flex min-h-12 items-center gap-2 self-start rounded-lg font-semibold text-white underline-offset-4 hover:underline"
-                  >
-                    <ArrowLeft aria-hidden="true" className="size-5 rtl-mirror" />
-                    {t('nav.backToCourse', { course: l(course.title) })}
-                  </Link>
                   <p className="m-0 inline-flex items-center gap-2 self-start rounded-full bg-white px-3 py-1 text-base font-bold text-sedra-green shadow-sm">
                     <Layers aria-hidden="true" className="size-4" />
                     {t('unitOf', { n: unit.order, total: units.length })}
@@ -478,12 +572,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
                 {t('nav.previousUnit')}
               </Button>
             ) : (
-              <Button asChild variant="outline">
-                <Link to="/programmes/$programmeId" params={{ programmeId: unit.programmeId }}>
-                  <ListOrdered aria-hidden="true" />
-                  {t('nav.courseOverview')}
-                </Link>
-              </Button>
+              <span aria-hidden="true" className="hidden sm:block sm:w-0" />
             )}
             <p className="m-0 flex flex-1 basis-32 items-center justify-center gap-2 text-base font-semibold text-ink-soft">
               <Layers aria-hidden="true" className="size-5" />
@@ -522,6 +611,8 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
               <UnitOutline
                 units={published}
                 currentId={unit.id}
+                step={step}
+                onStep={(s) => goStep(s)}
                 onNavigate={() => {
                   focusHeadingOnMount = true
                 }}
@@ -581,6 +672,7 @@ function AfterReview({
   unfinishedInCourse: number
 }) {
   const { t } = useTranslation('unit')
+  const extApproved = useExt01Approved()
   const { l } = useLocalized()
   if (!unit.badge && !isLast && !(unit.id === 'LS01' && !simplified)) return null
   const finished = unfinishedInCourse === 0
@@ -658,7 +750,7 @@ function AfterReview({
           </div>
         </section>
       )}
-      {unit.id === 'LS01' && !simplified && (
+      {unit.id === 'LS01' && !simplified && extApproved && (
         <Link
           to="/resources"
           hash="ext01"

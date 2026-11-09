@@ -24,11 +24,43 @@ import { cn } from '@/lib/utils'
 export type Tint = 'green' | 'info' | 'notice' | 'brown' | 'success'
 
 export const TINTS: Record<Tint, string> = {
-  green: 'bg-sedra-pale-100 text-sedra-green',
-  info: 'bg-info-soft text-info',
-  notice: 'bg-notice-soft text-notice',
-  brown: 'bg-[#f1ece0] text-[#5f5233]',
-  success: 'bg-success-soft text-success',
+  green: 'bg-gradient-to-br from-sedra-pale-100 to-sedra-pale text-sedra-green ring-sedra-green/15',
+  info: 'bg-gradient-to-br from-info-soft to-[#d6e2f2] text-info ring-info/15',
+  notice: 'bg-gradient-to-br from-notice-soft to-[#f3e3bf] text-notice ring-notice/20',
+  brown: 'bg-gradient-to-br from-[#f1ece0] to-[#e4dac4] text-[#5f5233] ring-[#5f5233]/15',
+  success: 'bg-gradient-to-br from-success-soft to-[#cfe5c8] text-success ring-success/15',
+}
+
+/**
+ * Brand stat cards: a subtle same-hue gradient plus a soft coloured shadow so they pop out.
+ * Text colour is checked against the lighter end of each gradient (>= 4.5:1).
+ */
+const POP = 'pop-lift shadow-[0_14px_30px_-12px_rgb(45_64_25/0.45),0_4px_10px_-4px_rgb(45_64_25/0.25)]'
+export const BRAND_CARDS = {
+  forest: `bg-gradient-to-br from-sedra-green-800 via-sedra-green-800 to-[#3a5128] text-white ${POP}`,
+  green: `bg-gradient-to-br from-[#4d6b2f] to-sedra-green-800 text-white ${POP}`,
+  pale: `bg-gradient-to-br from-sedra-pale-50 via-sedra-pale-100 to-sedra-pale text-sedra-green-800 ${POP}`,
+  brown: `bg-gradient-to-br from-sedra-brown to-[#5f5233] text-white ${POP}`,
+  cream: `bg-gradient-to-br from-[#fdf9ef] to-notice-soft text-ink ${POP}`,
+} as const
+export type BrandCard = keyof typeof BRAND_CARDS
+
+/** Icon colour per tint (icons sit bare, without a box). */
+export const ICON_COLOR: Record<Tint, string> = {
+  green: 'text-sedra-green',
+  info: 'text-info',
+  notice: 'text-notice',
+  brown: 'text-[#5f5233]',
+  success: 'text-success',
+}
+
+/** Accent stripe colour per tint (top edge of stat cards, start edge of panel headers). */
+export const ACCENTS: Record<Tint, string> = {
+  green: 'bg-sedra-green',
+  info: 'bg-info',
+  notice: 'bg-notice',
+  brown: 'bg-[#8a7a4f]',
+  success: 'bg-success',
 }
 
 /** Decorative tinted circle around an icon. The meaning is always in adjacent text. */
@@ -43,19 +75,18 @@ export function IconCircle({
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }) {
-  const box = size === 'lg' ? 'size-14' : size === 'sm' ? 'size-9' : 'size-11'
-  const ico = size === 'lg' ? 'size-7' : size === 'sm' ? 'size-4.5' : 'size-5.5'
+  // Bare icon in the tint colour: no box behind it.
+  const ico = size === 'lg' ? 'size-10' : size === 'sm' ? 'size-6' : 'size-8'
   return (
     <span
       aria-hidden="true"
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-full',
-        box,
-        TINTS[tint],
+        'inline-flex shrink-0 items-center justify-center',
+        ICON_COLOR[tint],
         className,
       )}
     >
-      <Icon className={ico} />
+      <Icon className={ico} strokeWidth={1.75} />
     </span>
   )
 }
@@ -190,7 +221,7 @@ export function Notice({ children, className }: { children: ReactNode; className
         className,
       )}
     >
-      <IconCircle icon={Info} tint="info" size="sm" className="bg-white" />
+      <IconCircle icon={Info} tint="info" size="sm" />
       <div className="min-w-0 self-center [&_p]:m-0">{children}</div>
     </div>
   )
@@ -220,11 +251,19 @@ export function Panel({
   return (
     <section
       aria-labelledby={id}
-      className={cn('flex min-w-0 flex-col gap-4 rounded-2xl bg-white p-5 shadow-md', className)}
+      className={cn(
+        'flex min-w-0 flex-col gap-4 overflow-hidden rounded-2xl border border-sedra-pale/70 bg-white p-5 shadow-md',
+        className,
+      )}
     >
-      <div className="flex flex-wrap items-center gap-3">
+      {/* Header strip: tinted band with an accent edge so panels read as distinct cards. */}
+      <div className="relative -mx-5 -mt-5 flex flex-wrap items-center gap-3 border-b border-sedra-pale/70 bg-gradient-to-b from-sedra-pale-50 to-white px-5 py-4">
+        <span
+          aria-hidden="true"
+          className={cn('absolute inset-y-0 start-0 w-1.5', ACCENTS[tint ?? 'green'])}
+        />
         {icon ? <IconCircle icon={icon} tint={tint} /> : null}
-        <H id={id} className="m-0 min-w-0 flex-1 text-xl sm:text-2xl">
+        <H id={id} className="m-0 min-w-0 flex-1 basis-48 text-xl sm:text-2xl">
           {title}
         </H>
         {aside}

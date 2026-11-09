@@ -1,6 +1,8 @@
 import type {
   AdminLearner,
   ContentDraft,
+  Course,
+  CourseId,
   CustomResource,
   Invitation,
   LearnerState,
@@ -21,7 +23,7 @@ import { DEFAULT_PREFS, seedLearners, seedSessions, seedSupportRequests } from '
  * never loses the last step (walkthrough A: refresh and resume).
  */
 const KEY = 'sedra-demo-db'
-const VERSION = 2
+const VERSION = 9
 
 export type LearnerPersonaId = Exclude<PersonaId, 'admin'>
 
@@ -37,6 +39,42 @@ export interface DemoDb {
   invitations: Invitation[]
   unitEdits: Partial<Record<UnitId, UnitEdit>>
   customResources: CustomResource[]
+  /** SEDRA admin edits to course title and purpose (demo only). */
+  courseEdits: Partial<Record<CourseId, Pick<Course, 'title' | 'purpose'>>>
+  /** Publishing is per course, not per unit. Missing = published. */
+  courseUnpublished: Partial<Record<CourseId, boolean>>
+  /** SEDRA edits to the built-in resources (title and short description, per language). */
+  resourceEdits: Partial<Record<BuiltInResourceKey, ResourceTextEdit>>
+  /** Demo only: units SEDRA adds in the course builder (admin side; learners do not see them). */
+  addedUnits: AddedUnit[]
+  /** Demo only: extra learning blocks SEDRA adds to existing units. */
+  addedBlocks: Partial<Record<string, AddedBlock[]>>
+  /** EXT01 is hidden from learners until SEDRA approves it after review (brief §9). */
+  ext01Approved: boolean
+}
+
+export type BlockType = 'video' | 'text' | 'question' | 'practice'
+export interface AddedBlock {
+  id: string
+  type: BlockType
+  title: string
+  description: string
+}
+export interface AddedUnit {
+  id: string
+  courseId: CourseId
+  title: string
+  description: string
+  lang: 'en' | 'ar'
+  blocks: AddedBlock[]
+}
+
+export type BuiltInResourceKey = 'stopThinkDo' | 'playbook' | 'hospitalityPlan'
+export interface ResourceTextEdit {
+  title: Partial<Record<'en' | 'ar', string>>
+  body: Partial<Record<'en' | 'ar', string>>
+  /** Content fields inside the resource (e.g. Stop Think Do step names and texts). */
+  fields?: Partial<Record<string, Partial<Record<'en' | 'ar', string>>>>
 }
 
 function seed(keep?: Pick<DemoDb, 'session' | 'prefs'>): DemoDb {
@@ -52,6 +90,12 @@ function seed(keep?: Pick<DemoDb, 'session' | 'prefs'>): DemoDb {
     invitations: [],
     unitEdits: {},
     customResources: [],
+    courseEdits: {},
+    courseUnpublished: {},
+    resourceEdits: {},
+    addedUnits: [],
+    addedBlocks: {},
+    ext01Approved: false,
   }
 }
 

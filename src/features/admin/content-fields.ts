@@ -27,6 +27,8 @@ export const FIELD_KEYS = [
   'feedback_correct',
   'feedback_retry',
   'practice_prompt',
+  'practice_choices',
+  'practice_multiple',
   'media_status',
   'review_status',
 ] as const
@@ -58,6 +60,8 @@ export const SCREEN_ORDER: FieldKey[] = [
   'feedback_correct',
   'feedback_retry',
   'practice_prompt',
+  'practice_choices',
+  'practice_multiple',
   'review_status',
 ]
 export type Fields = Record<FieldKey, string>
@@ -92,6 +96,9 @@ export function fieldsFromUnit(unit: Unit, lang: Lang): Fields {
     feedback_correct: unit.check.feedbackCorrect[lang],
     feedback_retry: unit.check.feedbackRetry[lang],
     practice_prompt: unit.practice.prompt[lang],
+    // One answer choice per line; empty means Done / Later / With help buttons only.
+    practice_choices: (unit.practice.choices ?? []).map((c) => c[lang]).join('\n'),
+    practice_multiple: unit.practice.multiple ? 'yes' : 'no',
     // Only English sample videos exist (LS02, HF01); Arabic drafts show the pending panel.
     media_status: media ? 'sample' : 'pending',
     review_status: 'draft',

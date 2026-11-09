@@ -3,14 +3,7 @@ import { AlertTriangle, ExternalLink, FilePlus2, Pencil, Plus, Save, Trash2 } fr
 import { type ReactNode, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import {
-  Chip,
-  DemoTag,
-  IconCircle,
-  SelectField,
-  StatusLabel,
-  TextField,
-} from '@/components/admin/AdminUi'
+import { Chip, IconCircle, SelectField, StatusLabel, TextField } from '@/components/admin/AdminUi'
 import { announce } from '@/components/shared/LiveRegion'
 import {
   AlertDialog,
@@ -47,7 +40,7 @@ export function CustomResourcesSection() {
     <section aria-labelledby="custom-res" className="mt-10 flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-3">
         <IconCircle icon={FilePlus2} />
-        <h2 id="custom-res" className="m-0 min-w-0 flex-1 text-2xl">
+        <h2 id="custom-res" className="m-0 min-w-0 flex-1 basis-48 text-2xl">
           {t('resources.custom.heading')}
         </h2>
         <ResourceDialog
@@ -86,7 +79,6 @@ function ResourceCard({ r }: { r: CustomResource }) {
     <article aria-labelledby={id} className="card-pop flex h-full flex-col gap-3 p-5">
       <div className="flex flex-wrap gap-1.5">
         <Chip>{course ? l(course.title) : r.courseId}</Chip>
-        <DemoTag />
       </div>
       <h3 id={id} className="m-0 text-lg">
         {l(r.title)}

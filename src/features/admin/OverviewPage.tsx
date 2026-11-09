@@ -10,21 +10,19 @@ import {
   LifeBuoy,
   type LucideIcon,
   MessagesSquare,
-  PieChart,
   Presentation,
   Users,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   AdminPageHeader,
-  DemoTag,
+  BRAND_CARDS,
   IconCircle,
   Panel,
   Ring,
   StatusLabel,
   type Tint,
 } from '@/components/admin/AdminUi'
-import { EnrolmentChart } from '@/components/admin/EnrolmentChart'
 import { useUaeFormat } from '@/components/admin/format'
 import { Reveal, stagger } from '@/components/motion/Reveal'
 import { COURSES } from '@/content'
@@ -38,6 +36,15 @@ const linkCls =
   'inline-flex min-h-12 items-center gap-2 font-semibold text-sedra-green underline underline-offset-4 hover:no-underline'
 
 /** /admin: illustrative overview computed from the demo db (brief §9). */
+/** Brand colour per stat card (gradient + pop shadow from BRAND_CARDS). */
+const TILE_STYLES: Partial<Record<keyof AdminMetrics, string>> = {
+  enrolled: `motif-tree-light ${BRAND_CARDS.forest}`,
+  active: BRAND_CARDS.green,
+  hcCompletions: BRAND_CARDS.pale,
+  hfCompletions: BRAND_CARDS.brown,
+  openSupport: BRAND_CARDS.cream,
+}
+
 export function OverviewPage() {
   const { t } = useTranslation('admin')
   const m = useAdminMetrics()
@@ -66,7 +73,6 @@ export function OverviewPage() {
         intro={t('overview.intro')}
         image="images/home-hero.webp"
       >
-        <DemoTag label={t('common.illustrative')} />
         <span className="text-sm text-ink-soft">
           {t('overview.timeNote', { date: f.dateTime(DEMO_NOW) })}
         </span>
@@ -81,57 +87,34 @@ export function OverviewPage() {
             <Reveal as="li" key={c.key} delay={stagger(i)} className={cn('max-w-none', c.span)}>
               <div
                 className={cn(
-                  'card-pop flex h-full items-start gap-4 p-5',
-                  c.featured && 'motif-tree-light bg-sedra-green-800 text-white',
+                  'flex h-full items-center gap-3 overflow-hidden rounded-2xl px-5 py-4',
+                  TILE_STYLES[c.key],
                 )}
               >
-                <IconCircle
-                  icon={c.icon}
-                  tint={c.tint}
-                  size="lg"
-                  className={c.featured ? 'bg-white/15 text-white' : undefined}
-                />
-                <div className="min-w-0">
-                  <p
-                    className={cn(
-                      'm-0 text-4xl leading-none font-bold tabular-nums',
-                      c.featured ? 'text-white' : 'text-sedra-green',
-                    )}
-                  >
+                <div className="min-w-0 flex-1">
+                  <p className="m-0 text-3xl leading-none font-bold tabular-nums">
                     {f.number(m[c.key])}
                   </p>
-                  <p
-                    className={cn('m-0 mt-2 font-semibold', c.featured ? 'text-white' : 'text-ink')}
-                  >
+                  <p className="m-0 mt-1.5 text-base leading-snug font-semibold">
                     {t(`overview.cards.${c.key}`)}
                   </p>
-                  <p
-                    className={cn(
-                      'm-0 mt-1 text-sm',
-                      c.featured ? 'text-white/90' : 'text-ink-soft',
-                    )}
-                  >
+                  <p className="m-0 mt-0.5 text-sm leading-snug">
                     {t(`overview.cardHints.${c.key}`)}
                   </p>
                 </div>
+                {/* Large icon on the end side, centred against the whole text block (decorative). */}
+                <c.icon
+                  aria-hidden="true"
+                  className="size-12 shrink-0 opacity-90"
+                  strokeWidth={1.5}
+                />
               </div>
             </Reveal>
           ))}
         </ul>
       </section>
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-        <Reveal>
-          <Panel
-            id="ov-defs"
-            title={t('overview.definitionsHeading')}
-            icon={PieChart}
-            className="h-full"
-          >
-            <p className="m-0 font-semibold text-ink">{t('overview.countOnce')}</p>
-            <EnrolmentChart m={m} />
-          </Panel>
-        </Reveal>
+      <div className="mt-8 grid gap-6">
         <Reveal delay={0.08}>
           <Panel
             id="ov-active"
@@ -146,7 +129,7 @@ export function OverviewPage() {
                   {Math.round((m.active / (m.enrolled || 1)) * 100)}%
                 </span>
               </Ring>
-              <p className="m-0 min-w-0 flex-1 text-lg font-semibold text-ink">
+              <p className="m-0 min-w-0 flex-1 basis-48 text-lg font-semibold text-ink">
                 {t('overview.activeShare', { active: m.active, total: m.enrolled })}
               </p>
             </div>
@@ -187,9 +170,7 @@ export function OverviewPage() {
           <h2 id="ov-support" className="m-0 text-2xl">
             {t('support.heading')}
           </h2>
-          <DemoTag />
         </div>
-        <p className="mt-0 mb-4 text-ink-soft">{t('support.intro')}</p>
         <SupportList />
       </section>
     </div>
@@ -250,7 +231,11 @@ function ProgrammeCard({
           ))}
         </dl>
         <div className="mt-auto flex flex-wrap gap-x-5">
-          <Link to="/admin/content" className={linkCls}>
+          <Link
+            to="/admin/courses/$courseId"
+            params={{ courseId: course.id }}
+            className="mt-auto inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-xl bg-sedra-green px-5 font-semibold text-white shadow-md transition-[background-color,box-shadow] hover:bg-sedra-green-800 hover:shadow-lg"
+          >
             <Presentation aria-hidden="true" className="size-5" />
             {t('overview.programmes.openContent', { course: l(course.title) })}
           </Link>
@@ -281,46 +266,57 @@ function SupportList() {
           <article
             aria-labelledby={`sr-${r.id}`}
             className={cn(
-              'card-pop flex h-full gap-4 border p-4 sm:p-5',
+              'relative flex h-full flex-col gap-3 overflow-hidden rounded-2xl border bg-white p-5 ps-6 shadow-md transition-shadow hover:shadow-lg',
               r.status === 'open' ? 'border-notice/30' : 'border-border',
             )}
           >
-            <IconCircle
-              icon={TOPIC_ICON[r.topic] ?? HelpCircle}
-              tint={r.status === 'open' ? 'notice' : 'success'}
+            {/* Status edge: amber while open, green once closed (status is also written out). */}
+            <span
+              aria-hidden="true"
+              className={cn(
+                'absolute inset-y-0 start-0 w-1.5',
+                r.status === 'open' ? 'bg-notice' : 'bg-success',
+              )}
             />
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 id={`sr-${r.id}`} className="m-0 text-lg text-ink">
-                  {t(`support.topics.${r.topic}`)}{' '}
-                  <span className="ltr-isolate text-sm font-semibold text-ink-soft">{r.id}</span>
-                </h3>
-                <StatusLabel tone={r.status === 'open' ? 'warning' : 'done'}>
-                  {t(`support.status.${r.status}`)}
-                </StatusLabel>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-1 basis-48 items-center gap-3">
+                <IconCircle
+                  icon={TOPIC_ICON[r.topic] ?? HelpCircle}
+                  tint={r.status === 'open' ? 'notice' : 'success'}
+                />
+                <div className="min-w-0">
+                  <h3 id={`sr-${r.id}`} className="m-0 text-lg text-ink">
+                    {t(`support.topics.${r.topic}`)}
+                  </h3>
+                  <p className="ltr-isolate m-0 text-sm font-semibold text-ink-soft">{r.id}</p>
+                </div>
               </div>
-              <p className="m-0 text-ink" dir="auto">
-                {r.message}
-              </p>
-              <p className="m-0 flex flex-wrap items-center gap-x-4 text-sm text-ink-soft">
-                <span>
-                  {t('support.cols.received')}: {f.dateTime(r.createdAt)}
+              <StatusLabel tone={r.status === 'open' ? 'warning' : 'done'}>
+                {t(`support.status.${r.status}`)}
+              </StatusLabel>
+            </div>
+            <p className="m-0 rounded-xl bg-sedra-pale-50 px-4 py-3 text-ink" dir="auto">
+              {r.message}
+            </p>
+            <div className="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border/60 pt-3 text-sm text-ink-soft">
+              <span>
+                {t('support.cols.received')}: {f.dateTime(r.createdAt)}
+              </span>
+              {r.learnerId?.startsWith('L-') ? (
+                <Link
+                  to="/admin/learners/$learnerId"
+                  params={{ learnerId: r.learnerId }}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-sedra-green px-4 text-base font-semibold text-white shadow-sm transition-colors hover:bg-sedra-green-800"
+                >
+                  {t('support.viewLearner')}
+                  <span className="ltr-isolate">{r.learnerId}</span>
+                  <ArrowRight aria-hidden="true" className="rtl-mirror size-4" />
+                </Link>
+              ) : (
+                <span className="inline-flex min-h-11 items-center">
+                  {t('support.fromDemoLearner')}
                 </span>
-                {r.learnerId?.startsWith('L-') ? (
-                  <Link
-                    to="/admin/learners/$learnerId"
-                    params={{ learnerId: r.learnerId }}
-                    className="inline-flex min-h-12 items-center font-semibold text-sedra-green underline underline-offset-4"
-                  >
-                    {t('support.cols.learner')}:&nbsp;
-                    <span className="ltr-isolate">{r.learnerId}</span>
-                  </Link>
-                ) : (
-                  <span className="inline-flex min-h-12 items-center">
-                    {t('support.fromDemoLearner')}
-                  </span>
-                )}
-              </p>
+              )}
             </div>
           </article>
         </Reveal>

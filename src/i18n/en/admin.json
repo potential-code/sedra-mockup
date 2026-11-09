@@ -2,7 +2,7 @@
   "nav": {
     "overview": "Overview",
     "learners": "Learners",
-    "content": "Programmes & content",
+    "content": "Programmes",
     "sessions": "Sessions",
     "resources": "Resources",
     "reports": "Reports",
@@ -14,7 +14,6 @@
   },
   "common": {
     "demo": "Demo",
-    "illustrative": "Illustrative demo data",
     "simulated": "Simulated",
     "required": "required",
     "cancel": "Cancel",
@@ -34,7 +33,6 @@
     "pending": "Video pending production"
   },
   "review": {
-    "awaiting": "Awaiting SEDRA review",
     "draft": "Draft (demo)",
     "in-review": "In review (demo)",
     "approved": "Approved in demo"
@@ -83,7 +81,6 @@
   },
   "support": {
     "heading": "Support requests",
-    "intro": "Requests saved in this demo only. No notification is sent to anyone.",
     "tableLabel": "Support requests table",
     "caption": "Support requests (demo). Times are shown in UAE time.",
     "cols": {
@@ -104,7 +101,8 @@
     },
     "fromDemoLearner": "Demo learner (Help page)",
     "empty": "No support requests in this demo.",
-    "listLabel": "Support requests"
+    "listLabel": "Support requests",
+    "viewLearner": "View learner"
   },
   "learners": {
     "title": "Learners",
@@ -135,7 +133,8 @@
       "progress": "Unit progress",
       "latest": "Latest activity",
       "checks": "Reviewed check outcomes",
-      "support": "Support"
+      "support": "Support",
+      "actions": "Details"
     },
     "unitsOf": "{{course}}: {{done}} of 8 units",
     "activeYes": "Active in the last seven days",
@@ -143,7 +142,8 @@
     "checksSummary": "{{reviewed}} reviewed, {{firstTry}} correct on first try",
     "supportOpen": "Open request",
     "supportNone": "No open request",
-    "empty": "No learners match these filters. Choose different filters."
+    "empty": "No learners match these filters. Choose different filters.",
+    "view": "View"
   },
   "learnerDetail": {
     "back": "Back to learners",
@@ -160,16 +160,14 @@
     "activityHeading": "Activity and support",
     "privacy": "This view shows learning progress only. It has no medical details, no diagnosis and no ranking against other learners.",
     "notFoundTitle": "Learner not found",
-    "notFoundBody": "There is no demo learner with this ID."
+    "notFoundBody": "There is no demo learner with this ID.",
+    "allRequests": "See all support requests"
   },
   "content": {
     "title": "Programmes & content",
     "intro": "The two SEDRA courses. Open a course to edit its units and publish or unpublish them.",
-    "reviewNote": "English text is the content-entry master. Arabic text is a draft for SEDRA review. Only LS02 and HF01 have produced English sample videos.",
     "notLoaded": "Course content is not loaded yet.",
     "courseMeta": "{{units}} units.",
-    "tableLabel": "Courses table",
-    "caption": "Courses (demo). Last updated is the latest unit change, in UAE time.",
     "cols": {
       "course": "Course",
       "status": "Status",
@@ -185,31 +183,27 @@
     "edit": "Edit {{id}}",
     "samplesMeta": "{{n}} sample video produced",
     "statusLabel": "Status",
-    "noNewCourse": "Only the two SEDRA courses are in this demo. Courses and units cannot be added or deleted.",
     "published": "Published",
     "unpublished": "Unpublished",
-    "unitsPublished": "{{published}} of {{total}} units published",
     "learnersN": "{{n}} learners",
     "updatedNever": "No changes yet",
     "open": "Open",
-    "openCourse": "Open {{course}}"
+    "openCourse": "Open {{course}}",
+    "unitsN": "{{n}} units"
   },
   "editor": {
     "back": "Back to programmes & content",
     "title": "Edit {{id}}: {{title}}",
     "intro": "Fields are filled from the current content. Publish makes your change live for learners in this demo only.",
-    "demoTag": "Demo editor. Changes stay in this browser.",
     "notFoundTitle": "Unit not found",
     "notFoundBody": "There is no unit with this ID in the demo content.",
     "sections": {
       "language": "Draft language",
-      "identifiers": "Identifiers",
       "lesson": "Lesson text",
       "media": "Video and captions",
       "alternatives": "Text alternatives",
       "check": "Check",
-      "practice": "Practice",
-      "review": "Review"
+      "practice": "Practice"
     },
     "lang": {
       "en": "English",
@@ -218,12 +212,10 @@
     "languageHint": "Switch to edit the other language. Your text in each language is kept.",
     "lastSaved": "Last saved in this demo: {{date}} (UAE time).",
     "notSaved": "No demo draft saved yet for this language.",
-    "identifiersHint": "Identifiers connect assets and progress. They cannot be changed here.",
     "alternativesHint": "A transcript and image description are an equal way to learn. Both are required.",
     "optionsLegend": "Answer options",
     "optionLetter": "Option {{letter}}",
     "chooseOne": "Choose one",
-    "reviewHint": "Review status in this demo only. SEDRA reviewers approve content before any launch.",
     "fields": {
       "programme_id": "Programme ID",
       "course_id": "Course ID",
@@ -248,7 +240,9 @@
       "feedback_retry": "Feedback to try again",
       "practice_prompt": "Practice prompt",
       "media_status": "Media status",
-      "review_status": "Review status"
+      "review_status": "Review status",
+      "practice_choices": "Answer choices",
+      "practice_multiple": "How many can learners choose?"
     },
     "hints": {
       "video_url": "The file name must contain the unit ID {{id}}. Leave empty while the video is pending.",
@@ -273,9 +267,8 @@
     "errorSummary": "There are {{n}} things to fix before publishing",
     "errorSummaryHelp": "Your text is kept. Select an item to go to it.",
     "saveDraft": "Save draft (demo)",
-    "publish": "Publish (demo)",
     "savedToast": "Draft saved in this demo. Learners do not see drafts.",
-    "publishToast": "Published in this demo. All publishing checks passed.",
+    "publishToast": "Unit saved",
     "simulated": "Simulated. Changes stay in this browser. Real publishing needs content review, hosting and permissions.",
     "barEditing": "Editing the {{lang}} text.",
     "preview": {
@@ -287,13 +280,14 @@
       "note": "Preview of the draft you are editing. Learners do not see it."
     },
     "backToCourse": "Back to course builder",
-    "statusPublished": "Published",
-    "statusUnpublished": "Unpublished: hidden from learners",
-    "liveToast": "Changes are live for learners in this demo.",
-    "unpublish": "Unpublish (demo)",
-    "unpublishedToast": "Unpublished. Learners do not see this unit in this demo.",
+    "liveToast": "Learners see the change in this demo.",
     "chooseFile": "Choose a video file (demo)",
-    "fileNotUploaded": "Demo: the file is not uploaded. Only its name is saved in the video file field."
+    "fileNotUploaded": "Demo: the file is not uploaded. Only its name is saved in the video file field.",
+    "saveLive": "Save changes",
+    "practiceChoicesHint": "One choice per line. Leave empty to show only Done, Later and With help.",
+    "practiceOne": "One choice",
+    "practiceMany": "More than one choice",
+    "practiceNote": "Practice is optional. Learners can always pick Done, Later or With help, so it never blocks progress."
   },
   "sessions": {
     "title": "Sessions",
@@ -374,7 +368,14 @@
       "reviewNote": "Before learner release, review the full video, age suitability, relevance, rights, English and Arabic captions and a descriptive alternative. Its subject is not described until it has been viewed.",
       "showPreview": "Show embed preview",
       "hidePreview": "Hide embed preview",
-      "iframeTitle": "Embedded video: {{title}} (internal review preview)"
+      "iframeTitle": "Embedded video: {{title}} (internal review preview)",
+      "approvedStatus": "Approved for learners",
+      "approve": "Approve for learners",
+      "backToReview": "Move back to review",
+      "approvedToast": "EXT01 approved. Learners can now see it.",
+      "backToReviewToast": "EXT01 is back in review. Learners do not see it.",
+      "hiddenFromLearners": "Hidden from learners until approved. The \"Watch additional video\" link after LS01 is hidden too.",
+      "visibleToLearners": "Visible to learners on Resources and after LS01."
     },
     "internal": {
       "heading": "In-platform resources",
@@ -394,7 +395,29 @@
           "title": "Hospitality practice plan",
           "body": "One welcoming action to try today, from HF08."
         }
-      }
+      },
+      "langHint": "Resource titles, descriptions and content show in this language. Switch to edit the other language.",
+      "edit": "Edit",
+      "editLabel": "Edit {{title}}",
+      "editTitle": "Edit resource",
+      "fieldTitle": "Title",
+      "fieldBody": "Short description",
+      "savedToast": "Resource saved",
+      "savedDesc": "Learners see the new text on Resources in this demo.",
+      "contentHeading": "Guide content",
+      "fields": {
+        "stop": "Step 1 name",
+        "stopBody": "Step 1 text",
+        "think": "Step 2 name",
+        "thinkBody": "Step 2 text",
+        "do": "Step 3 name",
+        "doBody": "Step 3 text"
+      },
+      "fromUnit": {
+        "playbook": "The playbook content is what each learner chooses in LS08 (their pause card and communication card). Change the choices in the LS08 practice.",
+        "hospitalityPlan": "The plan content is the HF08 practice activity. Change it in the HF08 practice."
+      },
+      "editUnit": "Edit {{id}} practice"
     },
     "custom": {
       "heading": "Added resources",
@@ -439,12 +462,7 @@
   "reports": {
     "title": "Reports",
     "intro": "A summary of the fictional demo data and a simulated export.",
-    "tableLabel": "Report summary table",
     "caption": "Report summary (illustrative demo data).",
-    "cols": {
-      "measure": "Measure",
-      "value": "Value"
-    },
     "rows": {
       "enrolled": "Unique enrolled learners",
       "lifeSkills": "Life Skills enrolments",
@@ -457,7 +475,6 @@
     },
     "exportHeading": "Export",
     "exportBody": "Download the fictional learner table as {{file}}. The first line of the file says Demo data.",
-    "exportNote": "The file is created in your browser from demo data. No server, real learner record or live system is used.",
     "export": "Export CSV (demo)",
     "exportToast": "Simulated export: demo CSV downloaded.",
     "exportDescription": "Created in this browser from fictional demo data only.",
@@ -495,34 +512,45 @@
   "builder": {
     "back": "Back to courses",
     "eyebrow": "Course builder",
-    "intro": "Edit the 8 units of this course and publish or unpublish them. Changes are live for learners in this demo.",
+    "intro": "Edit the 8 units of this course. Publishing applies to the whole course. Changes are live for learners in this demo.",
     "structure": "Course structure",
-    "structureHint": "Units are in learning order. In this demo, units cannot be added, moved or deleted.",
+    "structureHint": "Units are in learning order. Units you add appear at the end.",
     "updated": "Last change: {{date}} (UAE time)",
     "unitN": "Unit {{n}}",
     "edit": "Edit",
     "editUnit": "Edit {{id}}: {{title}}",
-    "publish": "Publish",
-    "unpublish": "Unpublish",
-    "publishUnit": "Publish {{id}}",
-    "unpublishUnit": "Unpublish {{id}}",
-    "publishedToast": "{{id}} is published.",
-    "unpublishedToast": "{{id}} is unpublished. Learners do not see it.",
     "liveToast": "Changes are live for learners in this demo.",
     "settings": "Course settings",
-    "setBySedra": "Set by SEDRA",
-    "settingsHint": "Course details are set by SEDRA. They cannot be changed in this demo.",
-    "titleEn": "Title in English",
-    "titleAr": "Title in Arabic",
-    "purposeEn": "Purpose in English",
-    "purposeAr": "Purpose in Arabic",
+    "settingsHint": "SEDRA can change the course title and purpose. Saved in this demo only.",
     "glance": "At a glance",
     "glanceUnits": "Units",
-    "glancePublished": "Published units",
     "glanceSamples": "Sample videos",
     "glanceLearners": "Learners enrolled",
     "notFoundTitle": "Course not found",
-    "notFoundBody": "There is no course with this ID in the demo."
+    "notFoundBody": "There is no course with this ID in the demo.",
+    "editSettings": "Edit course details",
+    "settingsSaved": "Course details saved",
+    "settingsSavedDesc": "Learners see the new text in this demo.",
+    "settingsRequired": "Enter this field.",
+    "settingsSave": "Save changes",
+    "publishCourse": "Publish course",
+    "unpublishCourse": "Unpublish course",
+    "coursePublished": "Course published",
+    "courseUnpublished": "Course unpublished. Learners do not see it.",
+    "langHint": "Course details, unit titles and the unit editor show this language. Switch to enter the other language.",
+    "courseTitle": "Course title",
+    "coursePurpose": "Course purpose",
+    "editingIn": "You are editing the {{lang}} text. Use the language switch to edit the other language.",
+    "glanceBlocks": "Learning blocks",
+    "blocksN": "{{n}} learning blocks",
+    "showBlocks": "Show learning blocks",
+    "optional": "optional",
+    "block": {
+      "media": "Watch or read",
+      "check": "Question",
+      "practice": "Practice"
+    },
+    "editBlock": "Edit {{block}} in {{title}}"
   },
   "invite": {
     "open": "Invite learner",
@@ -536,7 +564,6 @@
     },
     "emailHint": "For example: name@example.com. No email is sent.",
     "programmesHint": "Choose at least one programme.",
-    "noEmail": "Simulated. No email is sent and no account is created outside this browser.",
     "submit": "Create invitation (demo)",
     "errorSummary": "Fix {{n}} things to create the invitation",
     "errors": {
@@ -559,20 +586,44 @@
     "openLinkShort": "Open link (demo)",
     "openLinkFor": "Open invitation link for {{name}} (demo)"
   },
-  "accounts": {
-    "heading": "Demo learner accounts",
-    "notCounted": "Not counted in the illustrative totals",
-    "intro": "Choose the programmes each demo account is enrolled in. The learner sees only these programmes.",
-    "programmesLabel": "Enrolled programmes",
-    "persona": {
-      "noor": "Noor",
-      "new-learner": "New learner"
+  "contentLang": {
+    "label": "Content language"
+  },
+  "add": {
+    "unit": "Add unit",
+    "unitTitle": "Add a unit",
+    "unitIntro": "Demo only. Enter the {{lang}} text. Learners do not see added units in this demo.",
+    "title": "Unit title",
+    "description": "Unit description",
+    "blocksHeading": "Learning blocks",
+    "blockN": "Learning block {{n}}",
+    "anotherBlock": "Add another learning block",
+    "blockType": "Block type",
+    "blockTitle": "Block title",
+    "blockDescription": "Block description",
+    "types": {
+      "video": "Video",
+      "text": "Text to read",
+      "question": "Question",
+      "practice": "Practice"
     },
-    "kind": {
-      "noor": "returning learner",
-      "new-learner": "new or invited learner"
-    },
-    "savedToast": "Enrolment for {{name}} saved in this demo.",
-    "none": "Not enrolled in any programme"
+    "saveUnit": "Save unit",
+    "unitSaved": "Unit added",
+    "demoOnly": "Saved in this demo only.",
+    "block": "Add learning block",
+    "blockFor": "Add learning block to {{title}}",
+    "blockIntro": "Demo only. Enter the {{lang}} text.",
+    "saveBlock": "Save learning block",
+    "blockSaved": "Learning block added",
+    "blockRemoved": "Learning block removed",
+    "remove": "Remove",
+    "removeBlockN": "Remove learning block {{n}}",
+    "removeNamed": "Remove {{title}}",
+    "removeUnit": "Remove unit",
+    "unitRemoved": "Unit removed",
+    "addedTag": "Added in demo",
+    "blockUpdated": "Learning block updated",
+    "editNamed": "Edit {{title}}",
+    "editBlock": "Edit learning block"
   }
 }

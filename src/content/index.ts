@@ -14,19 +14,32 @@ export function getUnit(id: string): Unit | undefined {
   return getDb().unitEdits[base.id]?.unit ?? base
 }
 
-/** Learners only see published units; admin edits can unpublish a unit (default published). */
+/** SEDRA publishes or unpublishes a whole course (default published). */
+export function isCoursePublished(id: CourseId): boolean {
+  return !getDb().courseUnpublished?.[id]
+}
+
+/** A unit is visible to learners when its course is published (no per-unit publishing). */
 export function isUnitPublished(id: UnitId): boolean {
-  return getDb().unitEdits[id]?.published ?? true
+  const base = UNITS.find((u) => u.id === id)
+  return base ? isCoursePublished(base.courseId) : false
+}
+
+/** Course with any SEDRA admin edit (title, purpose) applied. */
+export function withCourseEdit(c: Course): Course {
+  const edit = getDb().courseEdits?.[c.id]
+  return edit ? { ...c, ...edit } : c
 }
 
 export function getCourse(id: string): Course | undefined {
-  return COURSES.find((c) => c.id === id)
+  const c = COURSES.find((x) => x.id === id)
+  return c ? withCourseEdit(c) : undefined
 }
 
 export function courseForProgramme(programmeId: ProgrammeId): Course {
   const c = COURSES.find((x) => x.programmeId === programmeId)
   if (!c) throw new Error(`No course for ${programmeId}`)
-  return c
+  return withCourseEdit(c)
 }
 
 /** Units of a course in order, with admin edits applied. Learner views pass publishedOnly. */

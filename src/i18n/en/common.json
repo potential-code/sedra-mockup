@@ -4,13 +4,11 @@
   "continueLearning": "Continue learning",
   "next": "Next",
   "back": "Back",
-  "playVideo": "Play video",
   "replay": "Replay",
   "readTranscript": "Read transcript",
   "checkAnswer": "Check answer",
   "tryAgain": "Try again",
   "needHelp": "I need help",
-  "myProgress": "My progress",
   "lifeSkills": "Life Skills",
   "hospitalityForAll": "Hospitality for All",
   "nav": {
@@ -27,9 +25,7 @@
     "switchTo": "Switch language"
   },
   "preferences": "Preferences",
-  "signOut": "Sign out",
   "demo": {
-    "banner": "Demo mockup. Fictional data. Progress is saved in this browser only and is not a production learner record.",
     "mode": "Demo mode",
     "switchUser": "Switch demo user",
     "reset": "Reset demo data",
@@ -55,7 +51,6 @@
     "home": "Go to home"
   },
   "logoAlt": "SEDRA Foundation",
-  "close": "Close",
   "values": {
     "label": "SEDRA values",
     "inclusion": "Inclusion",

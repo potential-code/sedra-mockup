@@ -12,14 +12,14 @@ import { useTranslation } from 'react-i18next'
 import { PageTransition } from '@/components/motion/PageTransition'
 import { AppSidebar, type SidebarItem } from './AppSidebar'
 
-/** Admin nav (brief §2 Admin): overview, learners, programmes/content, sessions, resources, reports. */
+/** Admin nav (brief §2 Admin): overview, reports, learners, programmes/content, sessions, resources. */
 export const ADMIN_NAV = [
   { key: 'overview', to: '/admin', icon: LayoutDashboard, exact: true },
+  { key: 'reports', to: '/admin/reports', icon: FileBarChart },
   { key: 'learners', to: '/admin/learners', icon: Users },
   { key: 'content', to: '/admin/content', icon: BookOpen },
   { key: 'sessions', to: '/admin/sessions', icon: CalendarDays },
   { key: 'resources', to: '/admin/resources', icon: FolderOpen },
-  { key: 'reports', to: '/admin/reports', icon: FileBarChart },
   { key: 'future', to: '/admin/future', icon: Lightbulb },
 ] as const
 

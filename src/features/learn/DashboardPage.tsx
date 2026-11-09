@@ -17,11 +17,13 @@ import {
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { BRAND_CARDS, type BrandCard } from '@/components/admin/AdminUi'
 import { DemoTag } from '@/components/learner/DemoTag'
 import {
   completedCount,
   courseUnits,
   enrolledProgrammes,
+  entryUnit,
   findCourse,
   formatUaeDateTime,
   hasStartedLearning,
@@ -81,29 +83,41 @@ function StatTile({
   icon: Icon,
   label,
   value,
-  tint,
+  tone,
 }: {
   icon: LucideIcon
   label: string
   value: string
-  tint: string
+  /** Brand gradient card (text colours checked for contrast in BRAND_CARDS). */
+  tone: BrandCard
 }) {
   return (
-    <div className="flex h-full items-center gap-4 rounded-2xl bg-white p-4 shadow-sm">
-      <span className={cn('grid size-12 shrink-0 place-items-center rounded-full', tint)}>
-        <Icon aria-hidden="true" className="size-6" />
+    <div className={cn('flex h-full items-center gap-4 rounded-2xl p-5', BRAND_CARDS[tone])}>
+      <span className="grid min-w-0 flex-1 gap-0.5">
+        <span className="text-base font-semibold">{label}</span>
+        <span className="text-2xl leading-tight font-bold">{value}</span>
       </span>
-      <span className="grid min-w-0">
-        <span className="text-base text-ink-soft">{label}</span>
-        <span className="text-xl font-bold text-ink">{value}</span>
-      </span>
+      {/* Large icon on the end side, centred against the text (decorative). */}
+      <Icon aria-hidden="true" className="size-14 shrink-0 opacity-90" strokeWidth={1.5} />
     </div>
   )
+}
+
+/** A course card opens the unit view directly: it already shows the course details and menu. */
+function useCourseLink() {
+  const learner = useLearner()
+  return (p: ProgrammeId) => {
+    const u = entryUnit(learner, p)
+    return u
+      ? ({ to: '/courses/$courseId/units/$unitId', params: unitLinkParams(u) } as const)
+      : ({ to: '/programmes/$programmeId', params: { programmeId: p } } as const)
+  }
 }
 
 /** First visit (no unit started): the one task is choosing where to start (brief §2, §3). */
 function ChooseStart({ programmes }: { programmes: ProgrammeId[] }) {
   const { t } = useTranslation('learner')
+  const courseLink = useCourseLink()
   const { l } = useLocalized()
   return (
     <section aria-labelledby="start-heading" className="grid grid-cols-1 gap-4">
@@ -145,8 +159,7 @@ function ChooseStart({ programmes }: { programmes: ProgrammeId[] }) {
                     </p>
                     <Button asChild size="lg" className="justify-self-start shadow-md">
                       <Link
-                        to="/programmes/$programmeId"
-                        params={{ programmeId: p }}
+                        {...courseLink(p)}
                         aria-label={t('firstRun.startLabel', { programme: name })}
                       >
                         <Play aria-hidden="true" />
@@ -171,6 +184,7 @@ export function DashboardPage() {
   const { l, lang } = useLocalized()
   const { persona } = useSession()
   const learner = useLearner()
+  const courseLink = useCourseLink()
   const { view } = usePrefs()
   const sessions = useDb((db) => db.sessions)
   const simplified = view === 'simplified'
@@ -361,7 +375,7 @@ export function DashboardPage() {
                 icon={CircleCheck}
                 label={t('dashboard.statUnits')}
                 value={t('dashboard.statUnitsValue', { done: totalDone, total: totalUnits })}
-                tint="bg-success-soft text-success"
+                tone="forest"
               />
             </li>
             {programmes.includes('life-skills') ? (
@@ -370,7 +384,7 @@ export function DashboardPage() {
                   icon={Award}
                   label={t('dashboard.statBadges')}
                   value={t('dashboard.statBadgesValue', { count: badges })}
-                  tint="bg-notice-soft text-notice"
+                  tone="brown"
                 />
               </li>
             ) : null}
@@ -379,7 +393,7 @@ export function DashboardPage() {
                 icon={CalendarClock}
                 label={t('dashboard.statSession')}
                 value={session ? `${session.weekday} ${session.day} ${session.month}` : '-'}
-                tint="bg-info-soft text-info"
+                tone="pale"
               />
             </li>
           </ul>
@@ -422,7 +436,7 @@ export function DashboardPage() {
                     </div>
                     <ProgressMeter done={completedCount(learner, units)} />
                     <Button asChild variant="outline" className="justify-self-start">
-                      <Link to="/programmes/$programmeId" params={{ programmeId: p }}>
+                      <Link {...courseLink(p)}>
                         <BookOpen aria-hidden="true" />
                         {t('dashboard.openProgramme', { programme: name })}
                       </Link>

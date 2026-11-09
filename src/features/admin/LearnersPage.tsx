@@ -1,6 +1,6 @@
 import type { AdminLearner } from '@shared/types'
 import { Link } from '@tanstack/react-router'
-import { BarChart3, Filter, Layers, Users } from 'lucide-react'
+import { ArrowRight, BarChart3, Filter, Layers, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -8,7 +8,6 @@ import {
   Avatar,
   Chip,
   captionCls,
-  DemoTag,
   ProgressMini,
   SelectField,
   StatusLabel,
@@ -17,6 +16,7 @@ import {
   thCls,
 } from '@/components/admin/AdminUi'
 import { useUaeFormat } from '@/components/admin/format'
+import { Button } from '@/components/ui/button'
 import {
   filterLearners,
   isActive,
@@ -25,7 +25,7 @@ import {
   UNITS_PER_COURSE,
   useAdminLearners,
 } from '@/store/admin-actions'
-import { DemoAccountsPanel, InvitationsPanel, InviteLearnerButton } from './LearnerInvites'
+import { InvitationsPanel, InviteLearnerButton } from './LearnerInvites'
 
 const PROGRAMME_FILTERS: ProgrammeFilter[] = ['all', 'life-skills', 'hospitality', 'both']
 const PROGRESS_FILTERS: ProgressFilter[] = ['all', 'not-started', 'in-progress', 'completed']
@@ -45,9 +45,7 @@ export function LearnersPage() {
         intro={t('learners.intro')}
         icon={Users}
         action={<InviteLearnerButton />}
-      >
-        <DemoTag label={t('common.illustrative')} />
-      </AdminPageHeader>
+      ></AdminPageHeader>
 
       <form
         aria-labelledby="lf-legend"
@@ -110,18 +108,26 @@ export function LearnersPage() {
       ) : null}
 
       <div className="hidden md:block">
-        <TableRegion label={t('learners.tableLabel')} className="max-h-[42rem] overflow-y-auto">
-          <table className="w-full min-w-[58rem] border-separate border-spacing-0">
+        <TableRegion label={t('learners.tableLabel')} className="border border-border">
+          <table className="w-full min-w-[64rem] border-separate border-spacing-0 [overflow-wrap:normal]">
             <caption className={captionCls}>{t('learners.caption')}</caption>
             <thead>
               <tr>
                 {(
-                  ['learner', 'programmes', 'progress', 'latest', 'checks', 'support'] as const
+                  [
+                    'learner',
+                    'programmes',
+                    'progress',
+                    'latest',
+                    'checks',
+                    'support',
+                    'actions',
+                  ] as const
                 ).map((c) => (
                   <th
                     key={c}
                     scope="col"
-                    className={`${thCls} sticky top-0 z-10 border-b bg-sedra-pale-50 first:ps-5`}
+                    className={`${thCls} border-e border-b border-border bg-sedra-pale-50 first:ps-5 last:border-e-0`}
                   >
                     {t(`learners.cols.${c}`)}
                   </th>
@@ -131,7 +137,7 @@ export function LearnersPage() {
             <tbody>
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={tdCls}>
+                  <td colSpan={7} className={tdCls}>
                     {t('learners.empty')}
                   </td>
                 </tr>
@@ -145,7 +151,6 @@ export function LearnersPage() {
 
       <div className="mt-10 flex flex-col gap-6">
         <InvitationsPanel />
-        <DemoAccountsPanel />
       </div>
     </div>
   )
@@ -202,15 +207,29 @@ function SupportChip({ l }: { l: AdminLearner }) {
   )
 }
 
+/** One clear action per learner: open the learner detail page. */
+function ViewDetails({ l }: { l: AdminLearner }) {
+  const { t } = useTranslation('admin')
+  return (
+    <Button asChild variant="outline" size="sm" className="whitespace-nowrap">
+      <Link to="/admin/learners/$learnerId" params={{ learnerId: l.id }}>
+        {t('learners.view')}
+        <span className="sr-only">: {l.name}</span>
+        <ArrowRight aria-hidden="true" className="rtl-mirror" />
+      </Link>
+    </Button>
+  )
+}
+
 function LearnerRow({ l }: { l: AdminLearner }) {
   const { t } = useTranslation('admin')
   const f = useUaeFormat()
-  const cell = `${tdCls} border-b border-border/60 group-last:border-0`
+  const cell = `${tdCls} border-e border-b border-border group-last:border-b-0 last:border-e-0`
   return (
     <tr className="group transition-colors even:bg-sedra-pale-50/50 hover:bg-sedra-pale-100/60">
       <th
         scope="row"
-        className={`${thCls} border-b border-border/60 ps-5 align-top group-last:border-0`}
+        className={`${thCls} border-e border-b border-border ps-5 align-top group-last:border-b-0`}
       >
         <div className="flex items-center gap-3">
           <Avatar name={l.name} />
@@ -249,6 +268,9 @@ function LearnerRow({ l }: { l: AdminLearner }) {
       <td className={cell}>
         <SupportChip l={l} />
       </td>
+      <td className={`${cell} pe-5`}>
+        <ViewDetails l={l} />
+      </td>
     </tr>
   )
 }
@@ -261,7 +283,7 @@ function LearnerCard({ l }: { l: AdminLearner }) {
     <article aria-labelledby={`lc-${l.id}`} className="card-pop flex flex-col gap-4 p-4">
       <div className="flex items-center gap-3">
         <Avatar name={l.name} />
-        <h2 id={`lc-${l.id}`} className="m-0 min-w-0 flex-1 text-lg">
+        <h2 id={`lc-${l.id}`} className="m-0 min-w-0 flex-1 basis-40 text-lg">
           <Link
             to="/admin/learners/$learnerId"
             params={{ learnerId: l.id }}

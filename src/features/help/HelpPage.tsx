@@ -7,7 +7,6 @@ import {
   CircleCheck,
   Clock,
   Compass,
-  Eye,
   FileText,
   Hand,
   Keyboard,
@@ -16,14 +15,12 @@ import {
   type LucideIcon,
   PlayCircle,
   Send,
-  ShieldCheck,
   SlidersHorizontal,
   Users,
   Video,
 } from 'lucide-react'
 import { type FormEvent, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DemoTag } from '@/components/learner/DemoTag'
 import { formatUaeDateTime } from '@/components/learner/learning'
 import { ReadAloud } from '@/components/learner/ReadAloud'
 import { Reveal } from '@/components/motion/Reveal'
@@ -54,11 +51,9 @@ const TIPS: { n: 1 | 2 | 3 | 4 | 5 | 6; icon: LucideIcon }[] = [
   { n: 5, icon: Keyboard },
   { n: 6, icon: SlidersHorizontal },
 ]
-const SUPPORTER_ICON: Record<1 | 2 | 3 | 4, LucideIcon> = {
+const SUPPORTER_ICON: Record<1 | 2, LucideIcon> = {
   1: Users,
   2: Hand,
-  3: Eye,
-  4: ShieldCheck,
 }
 
 /** "Back to learning" returns to where the learner came from (brief §2: Help returns to the original place). */
@@ -138,7 +133,6 @@ function SupportForm() {
             <h2 id={`${id}-h`} className="m-0 text-3xl">
               {t('help.formHeading')}
             </h2>
-            <DemoTag />
           </div>
           <p className="m-0">{t('help.formLead')}</p>
         </div>
@@ -449,7 +443,7 @@ export function HelpPage() {
               {t('help.supporterHeading')}
             </h2>
             <ul className="m-0 grid list-none gap-3 p-0">
-              {([1, 2, 3, 4] as const).map((n) => {
+              {([1, 2] as const).map((n) => {
                 const Icon = SUPPORTER_ICON[n]
                 return (
                   <li key={n} className="grid grid-cols-[auto_1fr] items-start gap-3">

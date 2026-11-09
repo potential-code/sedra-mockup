@@ -1,17 +1,8 @@
 import type { Invitation, Lang, ProgrammeId } from '@shared/types'
-import { AlertTriangle, CircleCheck, Link2, MailPlus, UserPlus, UserRound } from 'lucide-react'
-import { useId, useRef, useState } from 'react'
+import { AlertTriangle, CircleCheck, Link2, MailPlus, UserPlus } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
-import {
-  Chip,
-  DemoTag,
-  FieldError,
-  Notice,
-  Panel,
-  StatusLabel,
-  TextField,
-} from '@/components/admin/AdminUi'
+import { Chip, FieldError, Panel, StatusLabel, TextField } from '@/components/admin/AdminUi'
 import { useUaeFormat } from '@/components/admin/format'
 import { announce } from '@/components/shared/LiveRegion'
 import { Button } from '@/components/ui/button'
@@ -23,8 +14,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { PROGRAMME_IDS } from '@/store/admin-actions'
-import { type LearnerPersonaId, useDb } from '@/store/db'
-import { createInvitation, setEnrolment, useInvitations } from '@/store/invitations'
+import { createInvitation, useInvitations } from '@/store/invitations'
 
 /**
  * Open the demo invitation link. The /welcome route reads `invite` from its search params
@@ -155,7 +145,6 @@ function InviteForm({ onDone }: { onDone: () => void }) {
         <DialogDescription className="text-base text-ink-soft">
           {t('invite.intro')}
         </DialogDescription>
-        <DemoTag />
       </div>
 
       {errorEntries.length > 0 ? (
@@ -253,9 +242,6 @@ function InviteForm({ onDone }: { onDone: () => void }) {
           <FieldError id="inv-prog-error">{t(errors.programmes)}</FieldError>
         ) : null}
       </fieldset>
-      <Notice>
-        <p>{t('invite.noEmail')}</p>
-      </Notice>
       <div className="flex flex-wrap gap-3">
         <Button type="submit">
           <MailPlus aria-hidden="true" />
@@ -276,7 +262,7 @@ export function InvitationsPanel() {
   const f = useUaeFormat()
   const invitations = useInvitations()
   return (
-    <Panel id="inv-list-h" title={t('invite.listHeading')} icon={MailPlus} aside={<DemoTag />}>
+    <Panel id="inv-list-h" title={t('invite.listHeading')} icon={MailPlus}>
       <p className="m-0 text-ink-soft">{t('invite.listIntro')}</p>
       {invitations.length === 0 ? (
         <p className="m-0 rounded-xl bg-sedra-pale-50 p-4">{t('invite.empty')}</p>
@@ -320,79 +306,5 @@ export function InvitationsPanel() {
         </ul>
       )}
     </Panel>
-  )
-}
-
-/* ---------------------------------------------------------------- Demo accounts */
-
-const ACCOUNTS: LearnerPersonaId[] = ['noor', 'new-learner']
-
-export function DemoAccountsPanel() {
-  const { t } = useTranslation('admin')
-  const learners = useDb((db) => db.learners)
-  return (
-    <Panel
-      id="accounts-h"
-      title={t('accounts.heading')}
-      icon={UserRound}
-      aside={<DemoTag label={t('accounts.notCounted')} />}
-    >
-      <p className="m-0 text-ink-soft">{t('accounts.intro')}</p>
-      <ul className="m-0 grid list-none gap-3 p-0 lg:grid-cols-2">
-        {ACCOUNTS.map((id) => (
-          <li key={id} className="max-w-none">
-            <AccountCard
-              id={id}
-              name={learners[id]?.displayName || t(`accounts.persona.${id}`)}
-              enrolled={learners[id]?.enrolled ?? []}
-            />
-          </li>
-        ))}
-      </ul>
-    </Panel>
-  )
-}
-
-function AccountCard({
-  id,
-  name,
-  enrolled,
-}: {
-  id: LearnerPersonaId
-  name: string
-  enrolled: ProgrammeId[]
-}) {
-  const { t } = useTranslation('admin')
-  const legendId = useId()
-  function toggle(p: ProgrammeId, on: boolean) {
-    const next = PROGRAMME_IDS.filter((x) => (x === p ? on : enrolled.includes(x)))
-    setEnrolment(id, next)
-    toast.success(t('accounts.savedToast', { name }))
-    announce(t('accounts.savedToast', { name }))
-  }
-  return (
-    <fieldset className="m-0 flex h-full flex-col gap-3 rounded-2xl border border-border/70 p-4">
-      <legend id={legendId} className="px-1 text-lg font-bold text-ink">
-        <span dir="auto">{name}</span>{' '}
-        <span className="text-sm font-normal text-ink-soft">({t(`accounts.kind.${id}`)})</span>
-      </legend>
-      <p className="m-0 text-sm text-ink-soft">{t('accounts.programmesLabel')}</p>
-      <div className="flex flex-wrap gap-2">
-        {PROGRAMME_IDS.map((p) => (
-          <label key={p} className={radioCls}>
-            <input
-              type="checkbox"
-              checked={enrolled.includes(p)}
-              onChange={(e) => toggle(p, e.target.checked)}
-              className="size-5 accent-sedra-green"
-            />
-            {t(`programme.${p}`)}
-          </label>
-        ))}
-      </div>
-      {enrolled.length === 0 ? (
-        <StatusLabel tone="warning">{t('accounts.none')}</StatusLabel>
-      ) : null}
-    </fieldset>
   )
 }
