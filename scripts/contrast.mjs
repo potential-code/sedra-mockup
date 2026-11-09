@@ -21,10 +21,10 @@ const PAGES = [
   ['Noor', '/resources'],
   ['Noor', '/achievements'],
   ['Noor', '/help'],
-  ['SEDRA admin (demo)', '/admin'],
-  ['SEDRA admin (demo)', '/admin/learners'],
-  ['SEDRA admin (demo)', '/admin/content/LS02'],
-  ['SEDRA admin (demo)', '/admin/reports'],
+  ['SEDRA admin', '/admin'],
+  ['SEDRA admin', '/admin/learners'],
+  ['SEDRA admin', '/admin/content/LS02'],
+  ['SEDRA admin', '/admin/reports'],
 ]
 const VARIANTS = [
   { name: 'EN', lang: 'en', contrast: 'standard' },
@@ -37,7 +37,7 @@ const byRule = new Map()
 let total = 0
 
 for (const v of VARIANTS) {
-  for (const persona of [null, 'Noor', 'SEDRA admin (demo)']) {
+  for (const persona of [null, 'Noor', 'SEDRA admin']) {
     const pages = PAGES.filter(([p]) => p === persona)
     const ctx = await browser.newContext({ viewport: { width, height: 900 } })
     await blockThirdParty(ctx)

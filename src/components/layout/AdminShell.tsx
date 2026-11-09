@@ -11,7 +11,6 @@ import {
 import { useTranslation } from 'react-i18next'
 import { PageTransition } from '@/components/motion/PageTransition'
 import { AppSidebar, type SidebarItem } from './AppSidebar'
-import { DemoBanner } from './DemoControls'
 
 /** Admin nav (brief §2 Admin): overview, learners, programmes/content, sessions, resources, reports. */
 export const ADMIN_NAV = [
@@ -39,14 +38,8 @@ export function AdminShell() {
         items={items}
         navLabel={t('shell.navLabel', { defaultValue: 'Admin' })}
         homeTo="/admin"
-        extra={
-          <p className="m-0 rounded-xl bg-white/10 px-3 py-2 text-sm font-semibold">
-            {t('shell.badge', { defaultValue: 'Admin · demo role' })}
-          </p>
-        }
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <DemoBanner />
         <main id="main" tabIndex={-1} className="container-page flex-1 py-6 outline-none">
           <PageTransition>
             <Outlet />

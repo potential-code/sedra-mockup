@@ -3,22 +3,20 @@ import { useTranslation } from 'react-i18next'
 import { Reveal } from '@/components/motion/Reveal'
 import { PreferencesButton } from '@/components/preferences/PreferencesButton'
 import { Logo } from '@/components/shared/Logo'
-import { LeafBorder, ValuesBand } from '@/components/shared/Motifs'
 import { asset } from '@/lib/asset'
-import { DemoBanner } from './DemoControls'
 import { LanguageSwitch } from './LanguageSwitch'
 
 /**
- * Split-screen sign-in: photo panel with SEDRA green scrim + faint tree motif on one side,
+ * Split-screen sign-in: photo panel with SEDRA green scrim (no tree motif: the text sits at the
+ * bottom, where the tree would be) on one side,
  * the sign-in content on the other. Collapses to a short photo banner on small screens.
  */
 export function AuthShell() {
   const { t } = useTranslation('learner')
   return (
     <div className="flex min-h-dvh flex-col">
-      <DemoBanner />
       <div className="grid flex-1 grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-        <aside className="motif-tree-light relative flex min-h-56 flex-col justify-between overflow-hidden bg-sedra-green-800 p-6 text-white lg:sticky lg:top-0 lg:h-dvh lg:p-10">
+        <aside className="relative flex min-h-56 flex-col justify-between gap-10 overflow-hidden bg-sedra-green-800 p-6 text-white lg:sticky lg:top-0 lg:h-dvh lg:p-10">
           <img
             src={asset('images/home-hero.webp')}
             alt=""
@@ -36,16 +34,12 @@ export function AuthShell() {
           >
             <Logo className="h-14 lg:h-20" />
           </Link>
-          <Reveal className="mt-10 grid max-w-md gap-3">
+          <Reveal className="grid max-w-md gap-3">
             <p className="m-0 text-3xl font-bold leading-tight text-white lg:text-4xl">
               {t('auth.panelTitle')}
             </p>
             <p className="m-0 text-lg text-white/90">{t('auth.panelBody')}</p>
           </Reveal>
-          <div className="mt-8 hidden lg:block">
-            <LeafBorder className="opacity-90" />
-            <ValuesBand className="rounded-b-xl bg-white/15 backdrop-blur-sm" />
-          </div>
         </aside>
 
         <div className="flex flex-col bg-surface">

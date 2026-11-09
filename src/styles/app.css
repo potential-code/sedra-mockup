@@ -261,7 +261,7 @@ html[data-motion="reduce"] *::after {
 
 /* ---------- SEDRA brand motifs (from SEDRA's own materials) ----------
    Tree mark only (no wordmark), static and faint: decoration, never behind body text.
-   Leaf border: the scalloped leaf strip from SEDRA lesson slides and email signature.
+   Values band (Motifs.tsx): white tree marks + hearts on SEDRA green, static.
    Brief §4: no decorative tree animation behind text, so these never animate. */
 
 /* Card that lifts on hover/focus (motion disabled by reduced-motion rules above). */
@@ -293,7 +293,7 @@ html[data-motion="reduce"] *::after {
     width: min(70%, 34rem);
     aspect-ratio: 676 / 464;
     background: url("../assets/motifs/motif-tree-green.png") no-repeat center / contain;
-    opacity: 0.07;
+    opacity: 0.09;
     pointer-events: none;
   }
 }
@@ -316,12 +316,6 @@ html[data-motion="reduce"] *::after {
   }
 }
 
-/* Leaf scallop border strip (decorative, aria-hidden element). */
-@utility leaf-border {
-  height: 1.5rem;
-  background: url("../assets/motifs/motif-leaf-border.png") repeat-x left top / auto 100%;
-}
-
 /* Narrow screens stack text over the whole card, so the tree would sit behind words: hide it. */
 @media (width < 48rem) {
   .motif-tree::after,
@@ -330,8 +324,48 @@ html[data-motion="reduce"] *::after {
   }
 }
 
-html[data-contrast="high"] .leaf-border,
 html[data-contrast="high"] .motif-tree::after,
 html[data-contrast="high"] .motif-tree-light::after {
   display: none;
+}
+
+/* ---------- Custom scrollbars (all scroll areas) ----------
+   Thin, rounded thumb in SEDRA green on a pale track. Thumb vs track is >= 3:1 (WCAG 1.4.11).
+   Standard properties first (Firefox, Chromium 121+), WebKit pseudo-elements for older Safari. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sedra-green) var(--sedra-pale-100);
+}
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--sedra-pale-100);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--sedra-green);
+  border-radius: 999px;
+  border: 3px solid var(--sedra-pale-100);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--sedra-green-800);
+}
+/* Dark green sidebar and sheets: light thumb on a dark track. */
+aside,
+[data-slot="sheet-content"] {
+  scrollbar-color: var(--sedra-pale) var(--sedra-green-800);
+}
+aside::-webkit-scrollbar-track,
+[data-slot="sheet-content"] *::-webkit-scrollbar-track {
+  background: var(--sedra-green-800);
+}
+aside::-webkit-scrollbar-thumb,
+[data-slot="sheet-content"] *::-webkit-scrollbar-thumb {
+  background: var(--sedra-pale);
+  border-color: var(--sedra-green-800);
+}
+html[data-contrast="high"] * {
+  scrollbar-color: #000000 #ffffff;
 }

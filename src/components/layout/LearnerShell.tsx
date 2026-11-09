@@ -2,12 +2,10 @@ import { Link, Outlet } from '@tanstack/react-router'
 import { Award, FolderOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PageTransition } from '@/components/motion/PageTransition'
-import { LeafBorder, ValuesBand } from '@/components/shared/Motifs'
 import { LEARNER_NAV } from '@/config/nav'
 import { cn } from '@/lib/utils'
 import { useLearner } from '@/store/actions'
 import { AppSidebar, type SidebarItem } from './AppSidebar'
-import { DemoBanner } from './DemoControls'
 
 /**
  * Learner shell. Desktop: SEDRA-green sidebar. Mobile: top bar with menu + bottom navigation
@@ -37,19 +35,11 @@ export function LearnerShell() {
     <div className="flex min-h-dvh flex-col lg:flex-row">
       <AppSidebar items={sidebarItems} navLabel={t('nav.label')} homeTo="/learn" />
       <div className="flex min-w-0 flex-1 flex-col">
-        <DemoBanner />
-        <main id="main" tabIndex={-1} className="flex-1 pb-6 outline-none">
+        <main id="main" tabIndex={-1} className="flex-1 pb-28 outline-none lg:pb-6">
           <PageTransition>
             <Outlet />
           </PageTransition>
         </main>
-        <footer className="pb-24 lg:pb-0">
-          <LeafBorder />
-          <ValuesBand />
-          <p className="m-0 max-w-none bg-white px-4 py-3 text-center text-sm text-ink-soft">
-            {t('footer')}
-          </p>
-        </footer>
       </div>
 
       <nav

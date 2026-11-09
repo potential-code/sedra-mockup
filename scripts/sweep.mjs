@@ -41,7 +41,7 @@ const ADMIN = [
 const GROUPS = [
   ['public', null, PUBLIC],
   ['learner', 'Noor', LEARNER],
-  ['admin', 'SEDRA admin (demo)', ADMIN],
+  ['admin', 'SEDRA admin', ADMIN],
 ]
 
 const widths = (process.env.WIDTHS ?? '320,390,1440').split(',').map(Number)

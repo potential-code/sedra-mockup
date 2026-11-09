@@ -75,7 +75,7 @@ function OptionCards<T extends string>({
               options.some((o) => o.hint || o.label.length > 14)
               ? 'grid-cols-1'
               : 'grid-cols-[repeat(auto-fit,minmax(min(100%,8.5rem),1fr))]'
-            : 'grid-cols-1 gap-3 sm:grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))]',
+            : 'grid-cols-1 gap-3',
         )}
       >
         {options.map((o) => {
@@ -85,7 +85,7 @@ function OptionCards<T extends string>({
               key={o.value}
               className={cn(
                 'relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border-2 bg-white p-3 text-ink',
-                !compact && 'sm:flex-col sm:items-start sm:p-4',
+                !compact && 'sm:p-4',
                 'transition-[translate,scale,box-shadow,border-color,background-color] duration-200 ease-out active:scale-[0.98]',
                 'has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink',
                 checked
@@ -111,12 +111,7 @@ function OptionCards<T extends string>({
               >
                 {o.visual}
               </span>
-              <span
-                className={cn(
-                  'grid min-w-0 flex-1 content-start gap-0.5 pe-8',
-                  !compact && 'sm:pe-0',
-                )}
-              >
+              <span className="grid min-w-0 flex-1 content-start gap-0.5 pe-10">
                 <span className="font-semibold break-words" lang={o.lang}>
                   {o.label}
                 </span>
@@ -126,7 +121,6 @@ function OptionCards<T extends string>({
                 aria-hidden="true"
                 className={cn(
                   'absolute top-1/2 end-3 grid size-7 -translate-y-1/2 place-items-center rounded-full border-2',
-                  !compact && 'sm:top-3 sm:translate-y-0',
                   checked
                     ? 'border-sedra-green bg-sedra-green text-white'
                     : 'border-input bg-white text-transparent',

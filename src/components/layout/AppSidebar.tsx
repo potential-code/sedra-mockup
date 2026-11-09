@@ -42,7 +42,7 @@ export function AppSidebar({
   const [open, setOpen] = useState(false)
 
   const body = (onNavigate?: () => void) => (
-    <div className="motif-tree-light flex h-full flex-col gap-5 bg-sedra-green-800 p-4 text-white">
+    <div className="motif-tree-light flex min-h-full flex-col gap-5 bg-sedra-green-800 p-4 text-white">
       <Link
         to={homeTo}
         onClick={onNavigate}
@@ -77,7 +77,9 @@ export function AppSidebar({
 
       {extra}
 
-      <div className="flex flex-wrap gap-2">
+      {/* Stacked full-width so no control is clipped in the 18rem column. Solid (not see-through)
+          fills keep the faint tree motif out from behind any text. */}
+      <div className="grid grid-cols-1 gap-2 [&_button]:w-full [&_button]:justify-center">
         <PreferencesButton />
         <LanguageSwitch />
         <DemoControls />
@@ -145,23 +147,23 @@ function UserCard({ onLoggedOut }: { onLoggedOut?: () => void }) {
   const { persona } = useSession()
   if (!persona) return null
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-white/10 p-3">
-      <img
-        src={asset(persona.avatar)}
-        alt=""
-        width={48}
-        height={48}
-        className="size-12 shrink-0 rounded-full object-cover ring-2 ring-white/60"
-      />
-      <div className="min-w-0 flex-1">
-        <p className="m-0 text-xs text-white/80">{t('signedInAs')}</p>
-        <p className="m-0 font-semibold leading-tight">{l(persona.name)}</p>
+    <div className="grid gap-3 rounded-2xl bg-sedra-green p-3 ring-1 ring-white/25">
+      <div className="flex items-center gap-3">
+        <img
+          src={asset(persona.avatar)}
+          alt=""
+          width={48}
+          height={48}
+          className="size-12 shrink-0 rounded-full object-cover ring-2 ring-white/60"
+        />
+        <div className="min-w-0 flex-1">
+          <p className="m-0 text-base text-white">{t('signedInAs')}</p>
+          <p className="m-0 text-lg font-semibold leading-tight break-words">{l(persona.name)}</p>
+        </div>
       </div>
       <Button
         variant="secondary"
-        size="icon"
-        aria-label={t('logout')}
-        title={t('logout')}
+        className="w-full"
         onClick={() => {
           signOut()
           onLoggedOut?.()
@@ -169,6 +171,7 @@ function UserCard({ onLoggedOut }: { onLoggedOut?: () => void }) {
         }}
       >
         <LogOut aria-hidden="true" className="rtl-mirror" />
+        {t('logout')}
       </Button>
     </div>
   )

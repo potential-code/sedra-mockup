@@ -1,6 +1,6 @@
 import type { Persona } from '@shared/types'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowRight, ChevronDown, CircleHelp, Eye, EyeOff, LogIn, Mail } from 'lucide-react'
+import { ArrowRight, CircleHelp, Eye, EyeOff, LogIn, Mail } from 'lucide-react'
 import { type FormEvent, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DemoTag } from '@/components/learner/DemoTag'
@@ -18,9 +18,9 @@ const fieldClass =
   'min-h-12 w-full rounded-xl border-2 border-input bg-white px-4 py-2 text-lg text-ink focus-visible:border-ink'
 
 /**
- * Welcome / demo sign-in (brief §2). Persona cards are the main choice; the labelled email form
- * (password reveal and help) sits in a secondary, expandable card. The demo action opens a
- * fictional profile; no real account or email is used.
+ * Welcome / demo sign-in (brief §2). The labelled email form (password reveal and help) comes
+ * first, like a real sign-in; demo persona cards follow as the quick alternative. The demo action
+ * opens a fictional profile; no real account or email is used.
  */
 export function WelcomePage() {
   const { t } = useTranslation('learner')
@@ -31,7 +31,6 @@ export function WelcomePage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [show, setShow] = useState(false)
-  const [formOpen, setFormOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
 
   function choose(p: Persona) {
@@ -58,101 +57,20 @@ export function WelcomePage() {
         <p className="m-0 text-lg text-ink-soft">{t('welcome.lead')}</p>
       </Reveal>
 
-      {/* Main choice: three large persona cards. Each whole card is one button. */}
-      <section aria-labelledby={`${id}-personas`} className="grid grid-cols-1 gap-4">
-        <div className="grid grid-cols-1 gap-1">
-          <h2 id={`${id}-personas`} className="m-0 text-2xl">
-            {t('welcome.pickHeading')}
-          </h2>
-          <p className="m-0 text-base text-ink-soft">{t('welcome.pickLead')}</p>
-        </div>
-        <ul className="m-0 grid list-none gap-3 p-0">
-          {PERSONAS.map((p) => {
-            const name = l(p.name)
-            const staff = p.role === 'admin'
-            return (
-              <li key={p.id} className="max-w-none">
-                <button
-                  type="button"
-                  onClick={() => choose(p)}
-                  aria-label={`${t('welcome.choose', { name })}. ${l(p.description)}`}
-                  className={cn(
-                    'group flex min-h-24 w-full items-center gap-4 rounded-2xl border-2 bg-white p-3 pe-4 text-start shadow-md sm:gap-5 sm:p-4',
-                    'transition-[box-shadow,border-color] duration-200 ease-out',
-                    'hover:border-sedra-green hover:shadow-pop focus-visible:border-sedra-green',
-                    staff ? 'border-border' : 'border-transparent',
-                  )}
-                >
-                  <span className="relative shrink-0">
-                    <img
-                      src={asset(p.avatar)}
-                      alt=""
-                      width={96}
-                      height={96}
-                      className="size-16 rounded-2xl bg-sedra-pale-100 object-cover sm:size-20"
-                    />
-                  </span>
-                  <span className="grid min-w-0 flex-1 gap-0.5">
-                    <span className="flex flex-wrap items-center gap-2">
-                      <span className="text-xl font-bold text-sedra-green">{name}</span>
-                      {staff ? (
-                        <span className="rounded-full bg-sedra-pale-100 px-2.5 py-0.5 text-base font-semibold text-ink">
-                          {t('welcome.staffTag')}
-                        </span>
-                      ) : null}
-                    </span>
-                    <span className="text-base text-ink-soft">{l(p.description)}</span>
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="grid size-12 shrink-0 place-items-center rounded-full bg-sedra-pale-100 text-sedra-green transition-colors duration-200 group-hover:bg-sedra-green group-hover:text-white group-focus-visible:bg-sedra-green group-focus-visible:text-white"
-                  >
-                    <ArrowRight className="rtl-mirror size-6" />
-                  </span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      </section>
-
-      {/* Secondary: email sign-in (demo), collapsed by default. */}
+      {/* First: the email sign-in form (demo). */}
       <section
         aria-labelledby={`${id}-form`}
-        className="grid grid-cols-1 overflow-hidden rounded-2xl bg-sedra-pale-50 ring-1 ring-border"
+        className="grid grid-cols-1 gap-5 rounded-3xl bg-white p-5 shadow-md ring-1 ring-border sm:p-7"
       >
-        <h2 id={`${id}-form`} className="m-0 text-xl">
-          <button
-            type="button"
-            aria-expanded={formOpen}
-            aria-controls={`${id}-form-body`}
-            onClick={() => setFormOpen((o) => !o)}
-            className="flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start text-sedra-green hover:bg-sedra-pale-100 sm:px-5"
-          >
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-sedra-green shadow-sm">
-              <Mail aria-hidden="true" className="size-5" />
-            </span>
-            <span className="grid flex-1">
-              <span>{t('welcome.emailToggle')}</span>
-              <span className="text-base font-normal text-ink-soft">
-                {t('welcome.emailToggleHint')}
-              </span>
-            </span>
-            <ChevronDown
-              aria-hidden="true"
-              className={cn(
-                'size-6 shrink-0 transition-transform duration-200',
-                formOpen && 'rotate-180',
-              )}
-            />
-          </button>
-        </h2>
-
-        <div
-          id={`${id}-form-body`}
-          hidden={!formOpen}
-          className="grid grid-cols-1 gap-5 border-t bg-white p-4 sm:p-5"
-        >
+        <div className="flex items-center gap-3">
+          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-sedra-pale-100 text-sedra-green">
+            <Mail aria-hidden="true" className="size-6" />
+          </span>
+          <h2 id={`${id}-form`} className="m-0 text-2xl">
+            {t('welcome.formHeading')}
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 gap-5">
           <DemoTag />
           <form onSubmit={onSubmit} className="grid grid-cols-1 gap-5" noValidate>
             <div className="grid grid-cols-1 gap-2">
@@ -198,15 +116,65 @@ export function WelcomePage() {
                 </Button>
               </div>
             </div>
-            <p className="m-0 rounded-xl bg-notice-soft p-3 text-base text-notice">
-              {t('welcome.demoNote')}
-            </p>
             <Button type="submit" size="lg">
               <LogIn aria-hidden="true" className="rtl-mirror" />
               {t('welcome.submit')}
             </Button>
           </form>
         </div>
+      </section>
+
+      {/* Then: demo profile cards. Each whole card is one button. */}
+      <section aria-labelledby={`${id}-personas`} className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-1">
+          <h2 id={`${id}-personas`} className="m-0 text-2xl">
+            {t('welcome.personasHeading')}
+          </h2>
+          <p className="m-0 text-base text-ink-soft">{t('welcome.pickLead')}</p>
+        </div>
+        <ul className="m-0 grid list-none gap-3 p-0">
+          {PERSONAS.map((p) => {
+            const name = l(p.name)
+            const staff = p.role === 'admin'
+            return (
+              <li key={p.id} className="max-w-none">
+                <button
+                  type="button"
+                  onClick={() => choose(p)}
+                  aria-label={`${t('welcome.choose', { name })}. ${l(p.description)}`}
+                  className={cn(
+                    'group flex min-h-24 w-full items-center gap-4 rounded-2xl border-2 bg-white p-3 pe-4 text-start shadow-md sm:gap-5 sm:p-4',
+                    'transition-[box-shadow,border-color] duration-200 ease-out',
+                    'hover:border-sedra-green hover:shadow-pop focus-visible:border-sedra-green',
+                    staff ? 'border-border' : 'border-transparent',
+                  )}
+                >
+                  <span className="relative shrink-0">
+                    <img
+                      src={asset(p.avatar)}
+                      alt=""
+                      width={96}
+                      height={96}
+                      className="size-16 rounded-2xl bg-sedra-pale-100 object-cover sm:size-20"
+                    />
+                  </span>
+                  <span className="grid min-w-0 flex-1 gap-0.5">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="text-xl font-bold text-sedra-green">{name}</span>
+                    </span>
+                    <span className="text-base text-ink-soft">{l(p.description)}</span>
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="grid size-12 shrink-0 place-items-center rounded-full bg-sedra-pale-100 text-sedra-green transition-colors duration-200 group-hover:bg-sedra-green group-hover:text-white group-focus-visible:bg-sedra-green group-focus-visible:text-white"
+                  >
+                    <ArrowRight className="rtl-mirror size-6" />
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+        </ul>
       </section>
 
       <div className="grid grid-cols-1 gap-2">

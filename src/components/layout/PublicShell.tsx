@@ -4,14 +4,13 @@ import { useTranslation } from 'react-i18next'
 import { PreferencesButton } from '@/components/preferences/PreferencesButton'
 import { Logo } from '@/components/shared/Logo'
 import { Button } from '@/components/ui/button'
-import { DemoBanner } from './DemoControls'
 import { LanguageSwitch } from './LanguageSwitch'
+import { SiteFooter } from './SiteFooter'
 
 export function PublicShell() {
   const { t } = useTranslation('learner')
   return (
     <div className="flex min-h-dvh flex-col">
-      <DemoBanner />
       <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_rgb(45_64_25/0.06),0_6px_20px_rgb(45_64_25/0.08)]">
         <div className="container-page flex flex-wrap items-center gap-2 py-2">
           <Link
@@ -34,9 +33,7 @@ export function PublicShell() {
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
         <Outlet />
       </main>
-      <footer className="bg-white py-4">
-        <p className="container-page m-0 max-w-none text-sm text-ink-soft">{t('common:footer')}</p>
-      </footer>
+      <SiteFooter variant="public" />
     </div>
   )
 }

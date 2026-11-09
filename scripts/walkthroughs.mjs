@@ -13,6 +13,13 @@ import {
   url,
 } from './lib.mjs'
 
+/** Custom (Radix) select: open the trigger, then choose the option by its visible name. */
+async function pickOption(page, triggerSel, name) {
+  await page.click(triggerSel)
+  await page.getByRole('option', { name, exact: true }).click()
+  await page.waitForTimeout(150)
+}
+
 const browser = await launch()
 const all = []
 
@@ -447,7 +454,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
   all.push(R)
   const { ctx, page, errs } = await newPage()
   try {
-    await signIn(page, 'SEDRA admin (demo)')
+    await signIn(page, 'SEDRA admin')
     await page.goto(url('/admin'))
     await page.waitForTimeout(400)
     const values = await page
@@ -461,19 +468,19 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
       'All filter shows 40',
       await showing.innerText(),
     )
-    await page.selectOption('#filter-programme', 'life-skills')
+    await pickOption(page, '#filter-programme', 'Life Skills')
     R.ok(
       /Showing 30 of 40/.test(await showing.innerText()),
       'Life Skills filter = 30',
       await showing.innerText(),
     )
-    await page.selectOption('#filter-programme', 'hospitality')
+    await pickOption(page, '#filter-programme', 'Hospitality for All')
     R.ok(
       /Showing 24 of 40/.test(await showing.innerText()),
       'Hospitality filter = 24',
       await showing.innerText(),
     )
-    await page.selectOption('#filter-programme', 'both')
+    await pickOption(page, '#filter-programme', 'Enrolled in both')
     R.ok(
       /Showing 14 of 40/.test(await showing.innerText()),
       'Both filter = 14',

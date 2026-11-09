@@ -9,6 +9,13 @@ import {
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 
@@ -388,7 +395,10 @@ export const thCls = 'px-4 py-3 text-start align-bottom text-sm font-semibold te
 export const tdCls = 'px-4 py-3 align-top text-base'
 export const captionCls = 'px-4 pt-4 pb-2 text-start text-sm text-ink-soft'
 
-/** Native select with a visible label: simple, keyboard and screen-reader friendly. */
+/** Empty option values are not allowed by Radix Select, so '' maps to this sentinel. */
+const EMPTY = '__none__'
+
+/** Custom (Radix) select with a visible label: keyboard and screen-reader friendly. */
 export function SelectField({
   id,
   label,
@@ -416,6 +426,7 @@ export function SelectField({
   /** Rounded pill style for filter bars. */
   pill?: boolean
 }) {
+  const lang = useTranslation().i18n.language
   const describedBy = [hint ? `${id}-hint` : '', error ? `${id}-error` : '']
     .filter(Boolean)
     .join(' ')
@@ -437,24 +448,30 @@ export function SelectField({
             className="pointer-events-none absolute inset-y-0 start-4 my-auto size-5 text-sedra-green"
           />
         ) : null}
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          aria-describedby={describedBy || undefined}
-          aria-invalid={error ? true : undefined}
-          className={cn(
-            'min-h-12 w-full border-2 border-input bg-white px-3 text-base text-ink transition-colors hover:border-sedra-green aria-invalid:border-destructive',
-            pill ? 'rounded-full pe-4 font-semibold shadow-sm' : 'rounded-xl',
-            Icon && 'ps-11',
-          )}
+        <Select
+          value={value === '' ? EMPTY : value}
+          onValueChange={(v) => onChange(v === EMPTY ? '' : v)}
+          dir={lang === 'ar' ? 'rtl' : 'ltr'}
         >
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger
+            id={id}
+            aria-describedby={describedBy || undefined}
+            aria-invalid={error ? true : undefined}
+            className={cn(
+              pill ? 'rounded-full pe-4 font-semibold shadow-sm' : 'rounded-xl',
+              Icon && 'ps-11',
+            )}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((o) => (
+              <SelectItem key={o.value} value={o.value === '' ? EMPTY : o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       {error ? <FieldError id={`${id}-error`}>{error}</FieldError> : null}
     </div>

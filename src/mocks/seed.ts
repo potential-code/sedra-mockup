@@ -38,7 +38,7 @@ export const PERSONAS: Persona[] = [
   {
     id: 'admin',
     role: 'admin',
-    name: { en: 'SEDRA admin (demo)', ar: 'مشرف سدرة (تجريبي)' },
+    name: { en: 'SEDRA admin', ar: 'مشرف سدرة' },
     description: {
       en: 'Programmes, learners, sessions and reports. Fictional data only.',
       ar: 'البرامج والمتعلّمون والجلسات والتقارير. بيانات وهمية فقط.',

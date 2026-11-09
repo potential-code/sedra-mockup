@@ -40,7 +40,15 @@
     "confirm": "Reset",
     "label": "Demo"
   },
-  "footer": "Proposed experience for SEDRA review. Illustrative demo data. No accessibility or compliance certification is claimed.",
+  "footer": {
+    "about": "Short lessons, simple practice and support when you need it.",
+    "explore": "Explore",
+    "home": "Home",
+    "programmes": "Programmes",
+    "signIn": "Sign in",
+    "access": "Language and access",
+    "copy": "© {{year}} SEDRA Foundation"
+  },
   "notFound": {
     "title": "Page not found",
     "body": "This page does not exist in the demo.",

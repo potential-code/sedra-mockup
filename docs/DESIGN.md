@@ -13,7 +13,7 @@ black/white high-contrast preference (brief §3).
 - Contrast: headings `text-sedra-green` (#4b662f) or `text-ink` on white/sage; buttons white on
   `bg-sedra-green`. Never text in `sedra-lime`, `sedra-pale`, or small text in `sedra-mid`.
   White text on photos only over a green scrim.
-- Logo: `<Logo />` only, on white, never recoloured. Brand motifs (tree, leaf border) are
+- Logo: `<Logo />` only, on white, never recoloured. Brand motifs (tree watermark, values band) are
   decoration: static, `aria-hidden`, never under body text, hidden in high contrast.
 - Brief §2 achievements: badges are STATIC (no animation, no sound).
 - No em dashes in copy. Every string via i18n (EN + AR). RTL via logical classes
@@ -32,7 +32,7 @@ black/white high-contrast preference (brief §3).
 
 - `card-pop`: white card, shadow-md, lifts on hover/focus-within (transform only).
 - `motif-tree` (light panels) / `motif-tree-light` (green panels): faint tree watermark bottom-end.
-- `<LeafBorder />`, `<ValuesBand />` from `@/components/shared/Motifs`.
+- `<ValuesBand />` from `@/components/shared/Motifs` (static: tree marks, hearts, EN + AR values); `<SiteFooter />` in every shell.
 - `<Reveal delay={stagger(i)}>` from `@/components/motion/Reveal`: fade-rise on first view; static
   under reduced motion. Use for hero, card grids, sections. Do not wrap every paragraph.
 - `motion/react` for state feedback (correct-answer tick, progress fill, step change). Always

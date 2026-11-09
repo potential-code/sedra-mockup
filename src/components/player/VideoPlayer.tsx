@@ -21,6 +21,13 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 
@@ -346,18 +353,21 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
           <label htmlFor={`${ids}-speed`} className="sr-only">
             {t('player.speed')}
           </label>
-          <select
-            id={`${ids}-speed`}
-            value={speed}
-            onChange={(e) => setSpeed(Number(e.target.value))}
-            className="my-1 min-h-12 cursor-pointer rounded-full border border-white/50 bg-sedra-green-800 px-4 text-base font-semibold text-white"
-          >
-            {SPEEDS.map((s) => (
-              <option key={s} value={s}>
-                {s}×
-              </option>
-            ))}
-          </select>
+          <Select value={String(speed)} onValueChange={(v) => setSpeed(Number(v))}>
+            <SelectTrigger
+              id={`${ids}-speed`}
+              className="my-1 w-auto min-w-24 rounded-full border-white/50 bg-sedra-green-800 px-4 font-semibold text-white hover:border-white [&_svg]:text-white"
+            >
+              <SelectValue>{speed}×</SelectValue>
+            </SelectTrigger>
+            <SelectContent container={fullscreen ? wrapRef.current : null}>
+              {SPEEDS.map((s) => (
+                <SelectItem key={s} value={String(s)}>
+                  {s}×
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </section>

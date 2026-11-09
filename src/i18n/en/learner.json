@@ -57,7 +57,8 @@
     "step3Title": "Practise",
     "step3Body": "An optional activity. Do it now, later or with help.",
     "programmesLead": "Pick one to start. You can switch at any time.",
-    "accessKicker": "Our promise"
+    "accessKicker": "Our promise",
+    "heroNoTimers": "No time limits"
   },
   "welcome": {
     "pageTitle": "Sign in",
@@ -74,7 +75,7 @@
     "submit": "Sign in (demo)",
     "demoNote": "Demo: this opens the fictional learner Noor. Real emails are not sent.",
     "needHelp": "Need help signing in?",
-    "helpBody": "Ask your supporter or the SEDRA team. You can take your time. In this demo, you can also choose a profile above.",
+    "helpBody": "Ask your supporter or the SEDRA team. You can take your time. In this demo, you can also choose a profile below.",
     "personasHeading": "Or choose a demo profile",
     "personasLead": "All profiles are fictional.",
     "choose": "Continue as {{name}}",
