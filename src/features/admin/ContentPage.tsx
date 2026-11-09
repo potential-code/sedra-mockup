@@ -1,19 +1,50 @@
-import type { ContentDraft, Unit } from '@shared/types'
+import type { Course } from '@shared/types'
 import { Link } from '@tanstack/react-router'
-import { BookOpen, Languages, Pencil, Video } from 'lucide-react'
+import { BookOpen, FolderOpen, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { AdminPageHeader, DemoTag, Notice, StatusLabel } from '@/components/admin/AdminUi'
+import {
+  AdminPageHeader,
+  Chip,
+  captionCls,
+  DemoTag,
+  Notice,
+  StatusLabel,
+  TableRegion,
+  tdCls,
+  thCls,
+} from '@/components/admin/AdminUi'
+import { useUaeFormat } from '@/components/admin/format'
 import { Reveal, stagger } from '@/components/motion/Reveal'
-import { COURSES, unitsForCourse } from '@/content'
+import { COURSES } from '@/content'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
-import { useContentDrafts } from '@/store/admin-actions'
+import { useAdminLearners } from '@/store/admin-actions'
+import { latestEdit, useUnitEdits } from '@/store/admin-content'
 
-/** /admin/content: both courses and all 16 units with language, media and review status. */
+interface CourseRow {
+  course: Course
+  published: number
+  total: number
+  learners: number
+  updated?: string
+}
+
+function useCourseRows(): CourseRow[] {
+  const edits = useUnitEdits()
+  const learners = useAdminLearners()
+  return COURSES.map((course) => ({
+    course,
+    total: course.unitIds.length,
+    published: course.unitIds.filter((id) => edits[id]?.published ?? true).length,
+    learners: learners.filter((l) => l.programmes.includes(course.programmeId)).length,
+    updated: latestEdit(edits, course.unitIds),
+  }))
+}
+
+/** /admin/content: the two SEDRA courses (owner decision: no new course, no delete). */
 export function ContentPage() {
   const { t } = useTranslation('admin')
-  const { l } = useLocalized()
-  const drafts = useContentDrafts()
+  const rows = useCourseRows()
 
   return (
     <div>
@@ -21,148 +52,147 @@ export function ContentPage() {
         <DemoTag />
       </AdminPageHeader>
 
-      <Notice className="mb-8">
+      <Notice className="mb-6">
         <p>{t('content.reviewNote')}</p>
+        <p className="mt-1">{t('content.noNewCourse')}</p>
       </Notice>
 
-      {COURSES.length === 0 ? <p>{t('content.notLoaded')}</p> : null}
+      {rows.length === 0 ? <p>{t('content.notLoaded')}</p> : null}
 
-      {COURSES.map((course) => {
-        const units = unitsForCourse(course.id)
-        const headingId = `course-${course.id}`
-        const samples = units.filter((u) => u.mediaStatus === 'sample').length
-        return (
-          <section
-            key={course.id}
-            aria-labelledby={headingId}
-            className="mb-10 overflow-hidden rounded-3xl bg-white shadow-md"
-          >
-            <div className="relative isolate">
-              <img
-                src={asset(course.image)}
-                alt=""
-                width={1200}
-                height={360}
-                className="absolute inset-0 -z-10 size-full object-cover"
-              />
-              {/* Green scrim: white text on photos only over a green scrim (DESIGN.md). */}
-              <div className="flex min-h-60 flex-col justify-end gap-2 bg-gradient-to-t from-sedra-green-800 from-25% via-sedra-green-800/75 via-55% to-sedra-green-800/0 p-5 sm:p-7">
-                <p className="m-0 text-sm font-semibold tracking-wide text-white uppercase">
-                  {l(course.programmeTitle)}
-                </p>
-                <h2 id={headingId} className="m-0 text-2xl text-white sm:text-3xl">
-                  <span className="sr-only">{l(course.programmeTitle)}: </span>
-                  {l(course.title)}
-                </h2>
-                <p className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-white">
-                  <span className="inline-flex items-center gap-1.5">
-                    <BookOpen aria-hidden="true" className="size-4" />
-                    {t('content.courseMeta', { units: units.length })}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <Video aria-hidden="true" className="size-4" />
-                    {t('content.samplesMeta', { n: samples })}
-                  </span>
-                  <span className="ltr-isolate text-sm">
-                    programme_id: {course.programmeId} · course_id: {course.id}
-                  </span>
-                </p>
-              </div>
-            </div>
-            <ul
-              aria-label={t('content.tableLabel', { course: l(course.title) })}
-              className="m-0 flex list-none flex-col gap-0 p-2 sm:p-3"
-            >
-              {units.map((u, i) => (
-                <Reveal as="li" key={u.id} delay={stagger(i, 0.04)} className="max-w-none">
-                  <UnitRow unit={u} drafts={drafts.filter((d) => d.unitId === u.id)} />
-                </Reveal>
+      <ul className="m-0 flex list-none flex-col gap-4 p-0 md:hidden">
+        {rows.map((r, i) => (
+          <Reveal as="li" key={r.course.id} delay={stagger(i)} className="max-w-none">
+            <CourseCard row={r} />
+          </Reveal>
+        ))}
+      </ul>
+
+      <div className="hidden md:block">
+        <TableRegion label={t('content.tableLabel')}>
+          <table className="w-full min-w-[52rem] border-separate border-spacing-0">
+            <caption className={captionCls}>{t('content.caption')}</caption>
+            <thead>
+              <tr>
+                {(['course', 'status', 'units', 'learners', 'updated', 'actions'] as const).map(
+                  (c) => (
+                    <th
+                      key={c}
+                      scope="col"
+                      className={`${thCls} border-b bg-sedra-pale-50 first:ps-5 ${c === 'actions' ? 'text-end' : ''}`}
+                    >
+                      {t(`content.cols.${c}`)}
+                    </th>
+                  ),
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <CourseTableRow key={r.course.id} row={r} />
               ))}
-            </ul>
-          </section>
-        )
-      })}
+            </tbody>
+          </table>
+        </TableRegion>
+      </div>
     </div>
   )
 }
 
-function UnitRow({ unit, drafts }: { unit: Unit; drafts: ContentDraft[] }) {
+function CourseTableRow({ row }: { row: CourseRow }) {
   const { t } = useTranslation('admin')
   const { l } = useLocalized()
-  const latest = [...drafts].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
-  const hasEnVideo = !!unit.media?.en
-  const headingId = `unit-${unit.id}`
+  const f = useUaeFormat()
+  const cell = `${tdCls} border-b border-border/60 align-middle group-last:border-0`
   return (
-    <article
-      aria-labelledby={headingId}
-      className="group grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-3 rounded-2xl p-3 transition-colors focus-within:bg-sedra-pale-50 hover:bg-sedra-pale-50 sm:flex sm:flex-row sm:items-center sm:gap-4"
-    >
-      <div className="relative shrink-0">
-        <img
-          src={asset(`images/units/${unit.id}.webp`)}
-          alt=""
-          width={160}
-          height={120}
-          loading="lazy"
-          className="aspect-[4/3] w-full rounded-xl object-cover shadow-sm transition-transform duration-300 group-hover:scale-[1.03] sm:w-36"
-        />
-        <span className="ltr-isolate absolute top-2 start-2 hidden rounded-full bg-white px-2.5 py-0.5 text-sm font-bold text-sedra-green shadow-sm sm:inline">
-          {unit.id}
-        </span>
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div>
-          <p className="m-0 text-sm font-semibold text-ink-soft">
-            {t('content.unitOrder', { order: unit.order })} ·{' '}
-            <span className="font-normal">{unit.sourcePages}</span>
-          </p>
-          <h3 id={headingId} className="m-0 text-lg text-ink">
-            <span className="sr-only">{unit.id}: </span>
-            {l(unit.title)}
-          </h3>
-        </div>
-        <ul
-          aria-label={t('content.statusLabel')}
-          className="m-0 flex list-none flex-wrap gap-1.5 p-0"
-        >
-          <li>
-            <StatusLabel tone="done" icon={Languages}>
-              {hasEnVideo ? t('content.langEnVideo') : t('content.langEn')}
-            </StatusLabel>
-          </li>
-          <li>
-            <StatusLabel tone="pending" icon={Languages}>
-              {t('content.langAr')}
-            </StatusLabel>
-          </li>
-          <li>
-            {unit.mediaStatus === 'sample' ? (
-              <StatusLabel tone="done" icon={Video}>
-                {t('media.sample')}
-              </StatusLabel>
-            ) : (
-              <StatusLabel tone="pending">{t('media.pending')}</StatusLabel>
-            )}
-          </li>
-          <li>
-            {latest ? (
-              <StatusLabel tone={latest.reviewStatus === 'approved' ? 'done' : 'info'}>
-                {t(`review.${latest.reviewStatus}`)} ({latest.language.toUpperCase()})
-              </StatusLabel>
-            ) : (
-              <StatusLabel tone="neutral">{t('review.awaiting')}</StatusLabel>
-            )}
-          </li>
-        </ul>
-      </div>
-      <Link
-        to="/admin/content/$unitId"
-        params={{ unitId: unit.id }}
-        className="col-span-2 inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-sedra-green bg-white px-4 font-semibold text-sedra-green transition-colors hover:bg-sedra-green hover:text-white"
+    <tr className="group transition-colors hover:bg-sedra-pale-50">
+      <th
+        scope="row"
+        className={`${thCls} border-b border-border/60 ps-5 align-middle group-last:border-0`}
       >
-        <Pencil aria-hidden="true" className="size-5" />
-        {t('content.edit', { id: unit.id })}
-      </Link>
+        <div className="flex items-center gap-3">
+          <img
+            src={asset(row.course.image)}
+            alt=""
+            width={96}
+            height={72}
+            className="aspect-[4/3] w-24 shrink-0 rounded-xl object-cover shadow-sm"
+          />
+          <div className="min-w-0">
+            <span className="block text-lg font-bold text-ink">{l(row.course.title)}</span>
+            <span className="block text-sm font-normal text-ink-soft">
+              {l(row.course.programmeTitle)}
+            </span>
+          </div>
+        </div>
+      </th>
+      <td className={cell}>
+        <StatusLabel tone="done">{t('content.published')}</StatusLabel>
+      </td>
+      <td className={cell}>
+        {t('content.unitsPublished', { published: row.published, total: row.total })}
+      </td>
+      <td className={cell}>{t('content.learnersN', { n: row.learners })}</td>
+      <td className={`${cell} text-sm`}>
+        {row.updated ? f.dateTime(row.updated) : t('content.updatedNever')}
+      </td>
+      <td className={`${cell} text-end`}>
+        <OpenLink course={row.course} />
+      </td>
+    </tr>
+  )
+}
+
+function OpenLink({ course }: { course: Course }) {
+  const { t } = useTranslation('admin')
+  const { l } = useLocalized()
+  return (
+    <Link
+      to="/admin/courses/$courseId"
+      params={{ courseId: course.id }}
+      aria-label={t('content.openCourse', { course: l(course.title) })}
+      className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-sedra-green bg-white px-4 font-semibold text-sedra-green transition-colors hover:bg-sedra-green hover:text-white"
+    >
+      <FolderOpen aria-hidden="true" className="size-5" />
+      {t('content.open')}
+    </Link>
+  )
+}
+
+function CourseCard({ row }: { row: CourseRow }) {
+  const { t } = useTranslation('admin')
+  const { l } = useLocalized()
+  const f = useUaeFormat()
+  const id = `cc-${row.course.id}`
+  return (
+    <article aria-labelledby={id} className="card-pop flex flex-col overflow-hidden">
+      <img
+        src={asset(row.course.image)}
+        alt=""
+        width={640}
+        height={240}
+        className="aspect-[16/7] w-full object-cover"
+      />
+      <div className="flex flex-col gap-3 p-4">
+        <div>
+          <p className="m-0 text-sm font-semibold text-ink-soft">{l(row.course.programmeTitle)}</p>
+          <h2 id={id} className="m-0 text-xl">
+            {l(row.course.title)}
+          </h2>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          <StatusLabel tone="done">{t('content.published')}</StatusLabel>
+          <Chip>{t('content.unitsPublished', { published: row.published, total: row.total })}</Chip>
+          <Chip>
+            <Users aria-hidden="true" className="size-4" />
+            {t('content.learnersN', { n: row.learners })}
+          </Chip>
+        </div>
+        <p className="m-0 text-sm text-ink-soft">
+          {t('content.cols.updated')}:{' '}
+          {row.updated ? f.dateTime(row.updated) : t('content.updatedNever')}
+        </p>
+        <OpenLink course={row.course} />
+      </div>
     </article>
   )
 }

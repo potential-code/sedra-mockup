@@ -182,5 +182,10 @@
     "title": "Unit not found",
     "body": "We could not find this unit. Go back to your learning to choose a unit.",
     "back": "Back to learning"
+  },
+  "notPublished": {
+    "title": "This unit is not available right now",
+    "body": "This unit is not available right now. Choose another unit from your programme.",
+    "back": "Back to the programme"
   }
 }

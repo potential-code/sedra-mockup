@@ -8,6 +8,8 @@ import {
   ExternalLink,
   Film,
   Hourglass,
+  Layers,
+  Play,
   Sparkles,
 } from 'lucide-react'
 import { useEffect } from 'react'
@@ -15,18 +17,19 @@ import { useTranslation } from 'react-i18next'
 import {
   completedCount,
   courseUnits,
+  enrolledProgrammes,
   findCourse,
+  isEnrolled,
   isProgrammeId,
   nextStepUnit,
   PROGRAMME_LABEL_KEY,
-  PROGRAMMES,
   UNITS_PER_COURSE,
   type UnitStatus,
   unitLinkParams,
   unitStatus,
 } from '@/components/learner/learning'
+import { NotEnrolled } from '@/components/learner/NotEnrolled'
 import { PageHeading } from '@/components/learner/PageHeading'
-import { ProgressBar } from '@/components/learner/ProgressMeter'
 import { ProgressRing } from '@/components/learner/ProgressRing'
 import { StatusLabel } from '@/components/learner/StatusLabel'
 import { Reveal } from '@/components/motion/Reveal'
@@ -139,17 +142,22 @@ function UnitCard({ u, status, current }: { u: Unit; status: UnitStatus; current
   )
 }
 
-/** Programme (brief §2): purpose, course title, eight-unit list with status and progress. */
+/**
+ * Programme = course detail (brief §2; template course-detail structure): meta chips, title,
+ * purpose, progress ring + one primary Start / Continue, then the course outline of PUBLISHED
+ * units with status chips and the up-next highlight. Enrolled programmes only.
+ */
 export function ProgrammePage() {
   const { t } = useTranslation('learner')
   const { l } = useLocalized()
   const { programmeId } = useParams({ from: '/_learner/programmes/$programmeId' })
   const learner = useLearner()
   const simplified = usePrefs().view === 'simplified'
+  const enrolled = isProgrammeId(programmeId) && isEnrolled(learner, programmeId)
 
   useEffect(() => {
-    if (isProgrammeId(programmeId)) setLastProgramme(programmeId)
-  }, [programmeId])
+    if (enrolled && isProgrammeId(programmeId)) setLastProgramme(programmeId)
+  }, [programmeId, enrolled])
 
   if (!isProgrammeId(programmeId)) {
     return (
@@ -161,75 +169,99 @@ export function ProgrammePage() {
       </div>
     )
   }
+  if (!enrolled) return <NotEnrolled />
 
   const name = t(`common:${PROGRAMME_LABEL_KEY[programmeId]}`)
   const course = findCourse(programmeId)
   const units = courseUnits(programmeId)
+  const total = units.length
   const done = completedCount(learner, units)
-  const other = PROGRAMMES.find((p) => p !== programmeId) ?? 'life-skills'
-  const otherName = t(`common:${PROGRAMME_LABEL_KEY[other]}`)
-  const otherCourse = findCourse(other)
+  const other = enrolledProgrammes(learner).find((p) => p !== programmeId)
+  const otherName = other ? t(`common:${PROGRAMME_LABEL_KEY[other]}`) : ''
+  const otherCourse = other ? findCourse(other) : undefined
   // Highlight the learner's next unit in this course: last location if here, else first incomplete.
   const nextOverall = nextStepUnit(learner)
   const current =
     nextOverall?.programmeId === programmeId
       ? nextOverall.id
       : units.find((u) => unitStatus(getUnitProgress(learner, u.id)) !== 'complete')?.id
+  const currentUnit = units.find((u) => u.id === current)
+  const anyStarted = units.some((u) => unitStatus(getUnitProgress(learner, u.id)) !== 'notStarted')
+  const ctaUnit = currentUnit ?? units[0]
+  const ctaLabel = !ctaUnit
+    ? ''
+    : !currentUnit
+      ? t('programme.reviewUnit', { n: ctaUnit.order })
+      : anyStarted
+        ? t('programme.continueCta')
+        : t('programme.startUnit', { n: ctaUnit.order })
 
   return (
     <div className="container-page grid grid-cols-1 gap-10 py-8 [&_:is(h2,h3,h4)]:break-words [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink">
-      {/* Banner: course photo with a SEDRA-green scrim; white text only over the scrim. */}
+      {/* Course header: meta, title, summary; progress ring and the one primary action. */}
       <Reveal>
-        <div className="relative isolate overflow-hidden rounded-3xl bg-sedra-green-800 shadow-lg">
+        <header className="motif-tree grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-md lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 content-center gap-5 p-6 md:p-10">
+            <ul
+              aria-label={t('programme.metaLabel')}
+              className="m-0 flex list-none flex-wrap gap-2 p-0"
+            >
+              <li className={cn(CHIP, 'border-sedra-pale bg-sedra-pale-100 text-ink')}>
+                <Layers aria-hidden="true" className="size-4 text-sedra-green" />
+                {t('programme.metaUnits', { count: total })}
+              </li>
+              <li className={cn(CHIP, 'border-border bg-white text-ink')}>
+                <Clock aria-hidden="true" className="size-4 text-sedra-green" />
+                {t('programme.metaVideos')}
+              </li>
+            </ul>
+            <PageHeading title={name} lead={course ? l(course.title) : undefined} />
+            {course ? <p className="m-0 text-ink">{l(course.purpose)}</p> : null}
+            <p className="m-0 flex items-start gap-2 text-base text-ink-soft">
+              <Clock aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-sedra-green" />
+              {t('programme.timeNote')}
+            </p>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+              <div className="flex items-center gap-4">
+                <ProgressRing value={done / Math.max(1, total)} size={72} stroke={8}>
+                  <span aria-hidden="true" className="font-bold text-ink">
+                    {done}/{total}
+                  </span>
+                </ProgressRing>
+                <div className="grid">
+                  <span className="text-base text-ink-soft">{t('programme.progressHeading')}</span>
+                  <span className="font-semibold text-ink">
+                    {t('shared.unitsComplete', { done, total })}
+                  </span>
+                </div>
+              </div>
+              {ctaUnit ? (
+                <Button asChild size="lg" className="shadow-md">
+                  <Link to="/courses/$courseId/units/$unitId" params={unitLinkParams(ctaUnit)}>
+                    <Play aria-hidden="true" />
+                    {ctaLabel}
+                    <ArrowRight aria-hidden="true" className="rtl-mirror" />
+                  </Link>
+                </Button>
+              ) : null}
+            </div>
+          </div>
           {course?.image ? (
             <img
               src={asset(course.image)}
               alt={l(course.imageAlt)}
               width={1200}
               height={896}
-              className="aspect-[16/9] w-full object-cover lg:absolute lg:inset-y-0 lg:start-[38%] lg:-z-10 lg:aspect-auto lg:h-full lg:w-[62%]"
+              className="order-first aspect-[16/9] size-full object-cover lg:order-none lg:aspect-auto"
             />
           ) : null}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-10 hidden lg:block lg:ltr:bg-linear-to-r lg:rtl:bg-linear-to-l lg:from-sedra-green-800 lg:from-55% lg:via-sedra-green-800/90 lg:via-65% lg:to-sedra-green-800/0 lg:to-90%"
-          />
-          <div className="grid max-w-2xl grid-cols-1 gap-5 p-6 md:p-10">
-            <PageHeading tone="inverse" title={name} lead={course ? l(course.title) : undefined} />
-            {course ? (
-              <section aria-labelledby="purpose-heading" className="grid grid-cols-1 gap-1">
-                <h2 id="purpose-heading" className="m-0 text-lg text-white">
-                  {t('programme.purposeHeading')}
-                </h2>
-                <p className="m-0 text-white">{l(course.purpose)}</p>
-              </section>
-            ) : null}
-            <p className="m-0 flex items-start gap-2 text-white">
-              <Clock aria-hidden="true" className="mt-1 size-5 shrink-0" />
-              {t('programme.timeNote')}
-            </p>
-            <div className="flex items-center gap-4 rounded-2xl bg-white/10 p-4 ring-1 ring-white/25">
-              <ProgressRing value={done / UNITS_PER_COURSE} size={68} stroke={8} tone="inverse">
-                <span aria-hidden="true" className="font-bold text-white">
-                  {done}/{UNITS_PER_COURSE}
-                </span>
-              </ProgressRing>
-              <div className="grid min-w-0 flex-1 gap-2">
-                <p className="m-0 font-semibold text-white">
-                  {t('programme.progressHeading')}:{' '}
-                  {t('shared.unitsComplete', { done, total: UNITS_PER_COURSE })}
-                </p>
-                <ProgressBar value={done / UNITS_PER_COURSE} tone="inverse" />
-              </div>
-            </div>
-          </div>
-        </div>
+        </header>
       </Reveal>
 
       <section aria-labelledby="units-heading" className="grid grid-cols-1 gap-5">
         <div className="grid gap-1">
           <h2 id="units-heading" className="m-0 text-2xl md:text-3xl">
-            {t('programme.unitsHeading')}
+            {t('programme.outlineHeading')}
           </h2>
           <p className="m-0 text-ink-soft">{t('programme.pathLead')}</p>
         </div>
@@ -270,7 +302,7 @@ export function ProgrammePage() {
         </ol>
       </section>
 
-      {simplified ? null : (
+      {simplified || !other ? null : (
         <section
           aria-labelledby="switch-heading"
           className="card-pop grid grid-cols-1 overflow-hidden sm:grid-cols-[minmax(0,14rem)_1fr]"

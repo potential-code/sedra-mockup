@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button'
 import { EXT01, getCourse } from '@/content'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
+import { CustomResourcesSection } from './CustomResources'
 
 /** In-platform resources: HTML summaries; downloads stay secondary (brief §2 Resources). */
 const INTERNAL_RESOURCES = [
@@ -199,6 +200,8 @@ export function ResourcesAdminPage() {
           })}
         </ul>
       </section>
+
+      <CustomResourcesSection />
     </div>
   )
 }

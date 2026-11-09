@@ -178,7 +178,15 @@
     "durationChip": "30 seconds",
     "upNext": "Up next",
     "progressHeading": "Your progress",
-    "pathLead": "Go in order or choose any unit. You can replay every unit."
+    "pathLead": "Go in order or choose any unit. You can replay every unit.",
+    "metaLabel": "About this course",
+    "metaUnits_one": "{{count}} unit",
+    "metaUnits_other": "{{count}} units",
+    "metaVideos": "30-second videos",
+    "startUnit": "Start unit {{n}}",
+    "continueCta": "Continue",
+    "reviewUnit": "Review unit {{n}}",
+    "outlineHeading": "Course outline"
   },
   "sessions": {
     "pageTitle": "Sessions",
@@ -205,7 +213,9 @@
     "noPenalty": "Missing a session is okay. Recordings are separate from your course progress.",
     "seedNote": "Dates are demo examples.",
     "next": "Next live session",
-    "heroAlt": "A group of young people sit together and share picture cards."
+    "heroAlt": "A group of young people sit together and share picture cards.",
+    "cancelled": "Cancelled",
+    "cancelledBody": "This session is cancelled. There is nothing to join."
   },
   "resources": {
     "pageTitle": "Resources",
@@ -259,7 +269,10 @@
     "downloadsHeading": "Print",
     "downloadsBody": "You can print this page if you like paper.",
     "print": "Print this page",
-    "jumpLabel": "Go to a course"
+    "jumpLabel": "Go to a course",
+    "customHeading": "More from SEDRA",
+    "openLink": "Open link",
+    "opensNewTab": "Opens in a new tab"
   },
   "achievements": {
     "pageTitle": "My achievements",
@@ -330,5 +343,51 @@
   "auth": {
     "panelTitle": "Learn everyday skills, your way.",
     "panelBody": "Short lessons, simple practice and support when you need it."
+  },
+  "invite": {
+    "heading": "Accept your invitation",
+    "hello": "Hello {{name}}.",
+    "invitedTo": "SEDRA has invited you to:",
+    "programmesLabel": "Your programmes",
+    "enrolNote": "SEDRA chose these programmes for you.",
+    "emailLabel": "Your email",
+    "createPassword": "Create a password",
+    "passwordHint": "Use at least 8 letters or numbers.",
+    "confirmPassword": "Type the password again",
+    "showPasswords": "Show passwords",
+    "hidePasswords": "Hide passwords",
+    "passwordsShown": "Passwords are visible.",
+    "passwordsHidden": "Passwords are hidden.",
+    "demoNote": "Demo: the password is not saved and no email is sent.",
+    "accept": "Accept invitation",
+    "acceptedAnnounce": "Invitation accepted.",
+    "errorSummary": "Please fix this to continue:",
+    "errorRequired": "Create a password.",
+    "errorShort": "Use at least 8 letters or numbers.",
+    "errorConfirmRequired": "Type the password again.",
+    "errorMismatch": "The two passwords are not the same. Type them again.",
+    "notFoundTitle": "We could not find this invitation",
+    "notFoundBody": "The link may be old or not complete. You can sign in below, or ask SEDRA for a new link.",
+    "usedTitle": "This invitation was already accepted",
+    "usedBody": "You can sign in below.",
+    "otherWay": "Sign in another way",
+    "disclosure": "I have an invitation link",
+    "disclosureBody": "SEDRA sends you an invitation link by email. Open the link to create your account. This is a demo, so no emails are sent: an admin can open an invitation link from Admin, then Learners."
+  },
+  "enrolment": {
+    "notEnrolledTitle": "You are not enrolled in this programme",
+    "notEnrolledBody": "You are not enrolled in this programme. SEDRA manages enrolment.",
+    "backToDashboard": "Back to my learning",
+    "none": "SEDRA has not enrolled you in a programme yet. Please ask the SEDRA team."
+  },
+  "firstRun": {
+    "lead_one": "SEDRA has enrolled you in {{count}} programme.",
+    "lead_other": "SEDRA has enrolled you in {{count}} programmes.",
+    "taskHeading": "Choose where to start",
+    "taskLead": "Pick a programme. You can switch any time and your progress is kept.",
+    "shortUnits_one": "{{count}} short unit",
+    "shortUnits_other": "{{count}} short units",
+    "start": "Start",
+    "startLabel": "Start {{programme}}"
   }
 }

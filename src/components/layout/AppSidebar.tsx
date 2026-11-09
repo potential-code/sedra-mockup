@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
-import { signOut, useSession } from '@/store/actions'
+import { signOut, useLearner, useSession } from '@/store/actions'
 import { DemoControls } from './DemoControls'
 import { LanguageSwitch } from './LanguageSwitch'
 
@@ -145,7 +145,10 @@ function UserCard({ onLoggedOut }: { onLoggedOut?: () => void }) {
   const { l } = useLocalized()
   const navigate = useNavigate()
   const { persona } = useSession()
+  const learner = useLearner()
   if (!persona) return null
+  // An invited learner sees their own name (demo); otherwise the persona name.
+  const name = (persona.role === 'learner' && learner?.displayName) || l(persona.name)
   return (
     <div className="grid gap-3 rounded-2xl bg-sedra-green p-3 ring-1 ring-white/25">
       <div className="flex items-center gap-3">
@@ -158,7 +161,7 @@ function UserCard({ onLoggedOut }: { onLoggedOut?: () => void }) {
         />
         <div className="min-w-0 flex-1">
           <p className="m-0 text-base text-white">{t('signedInAs')}</p>
-          <p className="m-0 text-lg font-semibold leading-tight break-words">{l(persona.name)}</p>
+          <p className="m-0 text-lg font-semibold leading-tight break-words">{name}</p>
         </div>
       </div>
       <Button

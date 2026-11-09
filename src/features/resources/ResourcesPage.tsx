@@ -1,16 +1,17 @@
 import type { ProgrammeId } from '@shared/types'
 import { useLocation } from '@tanstack/react-router'
-import { ArrowDown, ChevronDown, Printer } from 'lucide-react'
+import { ArrowDown, ChevronDown, ExternalLink, FileText, Printer } from 'lucide-react'
 import { type ReactNode, useDeferredValue, useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { findCourse, PROGRAMME_LABEL_KEY, PROGRAMMES } from '@/components/learner/learning'
+import { enrolledProgrammes, findCourse, PROGRAMME_LABEL_KEY } from '@/components/learner/learning'
 import { Reveal } from '@/components/motion/Reveal'
 import { Button } from '@/components/ui/button'
 import { usePageTitle } from '@/hooks/use-page-title'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
-import { usePrefs } from '@/store/actions'
+import { useLearner, usePrefs } from '@/store/actions'
+import { useDb } from '@/store/db'
 import { ExternalVideoCard } from './ExternalVideoCard'
 import { PlaybookCard } from './PlaybookCard'
 import { StopThinkDoGuide } from './StopThinkDoGuide'
@@ -54,6 +55,55 @@ function CourseHeader({ programmeId }: { programmeId: ProgrammeId }) {
   )
 }
 
+/** SEDRA-added resource cards for a course (admin demo): title, text, optional link. */
+function CustomResources({ programmeId }: { programmeId: ProgrammeId }) {
+  const { t } = useTranslation('learner')
+  const { l } = useLocalized()
+  const courseId = findCourse(programmeId)?.id
+  const all = useDb((db) => db.customResources)
+  const items = all.filter((r) => r.courseId === courseId)
+  if (items.length === 0) return null
+  const headingId = `${SECTION_ID[programmeId]}-more`
+  return (
+    <section aria-labelledby={headingId} className="grid grid-cols-1 gap-4">
+      <h3 id={headingId} className="m-0 text-2xl">
+        {t('resources.customHeading')}
+      </h3>
+      <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2 xl:grid-cols-3">
+        {items.map((r) => (
+          <li key={r.id} className="max-w-none">
+            <article className="card-pop grid h-full content-start gap-3 p-5">
+              <span
+                aria-hidden="true"
+                className="grid size-11 place-items-center rounded-full bg-sedra-pale-100 text-sedra-green"
+              >
+                <FileText className="size-6" />
+              </span>
+              <h4 className="m-0 text-lg font-bold text-sedra-green">{l(r.title)}</h4>
+              <p className="m-0 text-base whitespace-pre-line">{l(r.body)}</p>
+              {r.url ? (
+                <a
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 items-center gap-2 justify-self-start font-semibold text-sedra-green underline underline-offset-4 hover:no-underline"
+                >
+                  <ExternalLink aria-hidden="true" className="size-5 shrink-0" />
+                  {t('resources.openLink')}
+                  <span className="sr-only">: {l(r.title)}</span>
+                  <span className="text-base font-normal text-ink-soft">
+                    ({t('resources.opensNewTab')})
+                  </span>
+                </a>
+              ) : null}
+            </article>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 function CourseSection({
   programmeId,
   children,
@@ -69,19 +119,21 @@ function CourseSection({
     >
       <CourseHeader programmeId={programmeId} />
       {children}
+      <CustomResources programmeId={programmeId} />
     </section>
   )
 }
 
 /** Big buttons that move to a course section and focus its heading (hash routing safe). */
-function JumpLinks() {
+function JumpLinks({ programmes }: { programmes: ProgrammeId[] }) {
   const { t } = useTranslation('learner')
   const { l } = useLocalized()
+  if (programmes.length < 2) return null
   return (
     <nav aria-label={t('resources.jumpLabel')} className="grid gap-2">
       <p className="m-0 text-base font-semibold text-ink">{t('resources.jumpLabel')}</p>
       <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-        {PROGRAMMES.map((p) => {
+        {programmes.map((p) => {
           const course = findCourse(p)
           return (
             <li key={p}>
@@ -120,8 +172,13 @@ export function ResourcesPage() {
   const [showOptional, setShowOptional] = useState(hash === 'ext01')
   const [query, setQuery] = useState('')
   const q = useDeferredValue(query).trim().toLocaleLowerCase()
-  const count =
-    useMatchingUnits('life-skills', q).length + useMatchingUnits('hospitality', q).length
+  // Enrolled programmes only (SEDRA manages enrolment).
+  const programmes = enrolledProgrammes(useLearner())
+  const hasLs = programmes.includes('life-skills')
+  const hasHf = programmes.includes('hospitality')
+  const lsCount = useMatchingUnits('life-skills', q).length
+  const hfCount = useMatchingUnits('hospitality', q).length
+  const count = (hasLs ? lsCount : 0) + (hasHf ? hfCount : 0)
 
   useEffect(() => {
     if (hash === 'ext01') {
@@ -140,41 +197,45 @@ export function ResourcesPage() {
           <p className="m-0 text-lg text-ink">{t('resources.lead')}</p>
         </div>
         <SummarySearch id={id} query={query} onChange={setQuery} count={count} />
-        <JumpLinks />
+        <JumpLinks programmes={programmes} />
       </Reveal>
 
-      <CourseSection programmeId="life-skills">
-        <StopThinkDoGuide />
-        {simplified ? (
-          <Button
-            variant="secondary"
-            className="justify-self-start"
-            aria-expanded={showOptional}
-            aria-controls="optional-resources"
-            onClick={() => setShowOptional((o) => !o)}
-          >
-            <ChevronDown aria-hidden="true" className={cn(showOptional && 'rotate-180')} />
-            {showOptional ? t('resources.hideOptional') : t('resources.showOptional')}
-          </Button>
-        ) : null}
-        <div
-          id="optional-resources"
-          hidden={!optionalOpen}
-          className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
-        >
-          {optionalOpen ? (
-            <>
-              <PlaybookCard />
-              <ExternalVideoCard />
-            </>
+      {hasLs ? (
+        <CourseSection programmeId="life-skills">
+          <StopThinkDoGuide />
+          {simplified ? (
+            <Button
+              variant="secondary"
+              className="justify-self-start"
+              aria-expanded={showOptional}
+              aria-controls="optional-resources"
+              onClick={() => setShowOptional((o) => !o)}
+            >
+              <ChevronDown aria-hidden="true" className={cn(showOptional && 'rotate-180')} />
+              {showOptional ? t('resources.hideOptional') : t('resources.showOptional')}
+            </Button>
           ) : null}
-        </div>
-        <SummaryGrid programmeId="life-skills" q={q} headingId={`${id}-ls`} />
-      </CourseSection>
+          <div
+            id="optional-resources"
+            hidden={!optionalOpen}
+            className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
+          >
+            {optionalOpen ? (
+              <>
+                <PlaybookCard />
+                <ExternalVideoCard />
+              </>
+            ) : null}
+          </div>
+          <SummaryGrid programmeId="life-skills" q={q} headingId={`${id}-ls`} />
+        </CourseSection>
+      ) : null}
 
-      <CourseSection programmeId="hospitality">
-        <SummaryGrid programmeId="hospitality" q={q} headingId={`${id}-hf`} />
-      </CourseSection>
+      {hasHf ? (
+        <CourseSection programmeId="hospitality">
+          <SummaryGrid programmeId="hospitality" q={q} headingId={`${id}-hf`} />
+        </CourseSection>
+      ) : null}
 
       {optionalOpen ? (
         <section

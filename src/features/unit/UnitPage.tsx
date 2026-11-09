@@ -1,4 +1,4 @@
-import type { Course, OptionId, Unit, UnitStep } from '@shared/types'
+import type { Course, OptionId, ProgrammeId, Unit, UnitStep } from '@shared/types'
 import { Link, useBlocker, useNavigate, useParams } from '@tanstack/react-router'
 import {
   ArrowLeft,
@@ -20,6 +20,8 @@ import { motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KnowledgeCheck } from '@/components/check/KnowledgeCheck'
+import { isEnrolled } from '@/components/learner/learning'
+import { NotEnrolled } from '@/components/learner/NotEnrolled'
 import type { VideoPlayerHandle } from '@/components/player/VideoPlayer'
 import { announce } from '@/components/shared/LiveRegion'
 import {
@@ -33,7 +35,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { getCourse, getUnit, nextUnit, previousUnit, unitsForCourse } from '@/content'
+import { getCourse, getUnit, isUnitPublished, unitsForCourse } from '@/content'
 import { usePageTitle } from '@/hooks/use-page-title'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { useLocalized } from '@/i18n'
@@ -58,8 +60,6 @@ const STEP_ICONS: Record<UnitStep, LucideIcon> = {
   check: MessageCircleQuestion,
   practice: Sparkles,
 }
-/** White buttons on the green banner (green text on white: 6.48:1). */
-const BANNER_BTN = 'bg-white text-sedra-green shadow-sm hover:bg-sedra-pale-100'
 const PRIMARY_BTN = 'flex-[1_1_10rem] shadow-md sm:flex-none'
 
 /** Set before in-page navigation to another unit so its h1 receives focus on arrival. */
@@ -67,10 +67,33 @@ let focusHeadingOnMount = false
 
 export function UnitPage() {
   const { courseId, unitId } = useParams({ from: '/_learner/courses/$courseId/units/$unitId' })
+  const learner = useLearner()
   const unit = getUnit(unitId)
   const course = getCourse(courseId)
   if (!unit || !course || unit.courseId !== course.id) return <UnitNotFound />
+  // SEDRA manages enrolment; unpublished units are hidden from learners.
+  if (!isEnrolled(learner, unit.programmeId)) return <NotEnrolled />
+  if (!isUnitPublished(unit.id)) return <UnitNotAvailable programmeId={unit.programmeId} />
   return <UnitView key={unit.id} unit={unit} course={course} />
+}
+
+function UnitNotAvailable({ programmeId }: { programmeId: ProgrammeId }) {
+  const { t } = useTranslation('unit')
+  usePageTitle(t('notPublished.title'))
+  return (
+    <div className="container-page py-8">
+      <div className="flex max-w-xl flex-col gap-4 rounded-2xl border bg-white p-6">
+        <h1 className="m-0 text-3xl">{t('notPublished.title')}</h1>
+        <p className="m-0">{t('notPublished.body')}</p>
+        <Button asChild className="self-start">
+          <Link to="/programmes/$programmeId" params={{ programmeId }}>
+            <ArrowLeft aria-hidden="true" className="rtl-mirror" />
+            {t('notPublished.back')}
+          </Link>
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 function UnitNotFound() {
@@ -101,8 +124,11 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
   const reduce = useReducedMotion()
   const progress = getUnitProgress(learner, unit.id)
   const units = unitsForCourse(unit.courseId)
-  const prev = previousUnit(unit.id)
-  const next = nextUnit(unit.id)
+  // Learners only move through published units: Previous / Next skip unpublished ones.
+  const published = unitsForCourse(unit.courseId, { publishedOnly: true })
+  const at = published.findIndex((u) => u.id === unit.id)
+  const prev = at > 0 ? published[at - 1] : undefined
+  const next = at >= 0 ? published[at + 1] : undefined
   const isLast = !next
   const hasVideo = !!videoFor(unit, lang)
 
@@ -204,11 +230,54 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
     prevStepIndex.current = stepIndex
   }, [stepIndex])
   const StepIcon = STEP_ICONS[step]
-  const doneInCourse = units.filter((u) => isUnitComplete(getUnitProgress(learner, u.id))).length
+  const doneInCourse = published.filter((u) =>
+    isUnitComplete(getUnitProgress(learner, u.id)),
+  ).length
 
   return (
     <div className="container-page py-4 md:py-6">
-      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start xl:gap-8">
+      <div className="lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start lg:gap-8 xl:grid-cols-[20rem_minmax(0,1fr)]">
+        {/* Course outline with course progress on the start side (template unit player). */}
+        <aside
+          aria-labelledby="outline-title"
+          className="sticky top-4 hidden overflow-hidden rounded-3xl bg-white shadow-md lg:block"
+        >
+          <div className="bg-sedra-pale-50 px-4 pt-4 pb-3">
+            <h2 id="outline-title" className="m-0 text-lg">
+              {t('outline.title', { course: l(course.title) })}
+            </h2>
+            {!simplified && (
+              <div className="mt-2">
+                <p className="m-0 text-base font-semibold text-ink-soft">
+                  {t('outline.progress', { done: doneInCourse, total: published.length })}
+                </p>
+                <div
+                  aria-hidden="true"
+                  className="mt-1.5 h-2 overflow-hidden rounded-full bg-white"
+                >
+                  <motion.div
+                    className="h-full rounded-full bg-sedra-mid ltr:origin-left rtl:origin-right"
+                    initial={false}
+                    animate={{ scaleX: doneInCourse / Math.max(1, published.length) }}
+                    transition={
+                      reduce ? { duration: 0 } : { type: 'spring', stiffness: 120, damping: 22 }
+                    }
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto p-2">
+            <UnitOutline
+              units={published}
+              currentId={unit.id}
+              onNavigate={() => {
+                focusHeadingOnMount = true
+              }}
+            />
+          </div>
+        </aside>
+
         <article aria-labelledby="unit-title" className="@container flex min-w-0 flex-col gap-5">
           <header className="overflow-hidden rounded-3xl bg-white shadow-md">
             {/* Unit banner: photo under a SEDRA-green scrim so white text always has contrast. */}
@@ -247,40 +316,6 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
                     {l(unit.title)}
                   </h1>
                   <p className="m-0 text-lg text-white">{l(unit.objective)}</p>
-                  <nav aria-label={t('nav.unitNav')} className="flex flex-wrap gap-2 pt-1">
-                    {prev ? (
-                      <Button size="sm" className={BANNER_BTN} onClick={() => goToUnit(prev)}>
-                        <ArrowLeft aria-hidden="true" className="rtl-mirror" />
-                        {t('nav.previousUnit')}
-                      </Button>
-                    ) : (
-                      <Button asChild size="sm" className={BANNER_BTN}>
-                        <Link
-                          to="/programmes/$programmeId"
-                          params={{ programmeId: unit.programmeId }}
-                        >
-                          <ListOrdered aria-hidden="true" />
-                          {t('nav.courseOverview')}
-                        </Link>
-                      </Button>
-                    )}
-                    {next ? (
-                      <Button size="sm" className={BANNER_BTN} onClick={() => goToUnit(next)}>
-                        {t('nav.nextUnit')}
-                        <ArrowRight aria-hidden="true" className="rtl-mirror" />
-                      </Button>
-                    ) : (
-                      <Button asChild size="sm" className={BANNER_BTN}>
-                        <Link
-                          to="/programmes/$programmeId"
-                          params={{ programmeId: unit.programmeId }}
-                        >
-                          {t('nav.courseSummary')}
-                          <ArrowRight aria-hidden="true" className="rtl-mirror" />
-                        </Link>
-                      </Button>
-                    )}
-                  </nav>
                 </div>
                 <img
                   src={asset(unit.image)}
@@ -382,7 +417,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
               simplified={simplified}
               unitComplete={isUnitComplete(progress)}
               unfinishedInCourse={
-                units.filter((u) => !isUnitComplete(getUnitProgress(learner, u.id))).length
+                published.filter((u) => !isUnitComplete(getUnitProgress(learner, u.id))).length
               }
             />
           )}
@@ -432,7 +467,44 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
             )}
           </div>
 
-          <details className="group rounded-3xl bg-white shadow-md xl:hidden">
+          {/* Bottom row (template unit player): Previous unit, position, Next unit. */}
+          <nav
+            aria-label={t('nav.unitNav')}
+            className="flex flex-wrap items-center gap-2 rounded-2xl bg-white p-3 shadow-sm"
+          >
+            {prev ? (
+              <Button variant="outline" onClick={() => goToUnit(prev)}>
+                <ArrowLeft aria-hidden="true" className="rtl-mirror" />
+                {t('nav.previousUnit')}
+              </Button>
+            ) : (
+              <Button asChild variant="outline">
+                <Link to="/programmes/$programmeId" params={{ programmeId: unit.programmeId }}>
+                  <ListOrdered aria-hidden="true" />
+                  {t('nav.courseOverview')}
+                </Link>
+              </Button>
+            )}
+            <p className="m-0 flex flex-1 basis-32 items-center justify-center gap-2 text-base font-semibold text-ink-soft">
+              <Layers aria-hidden="true" className="size-5" />
+              {t('unitOf', { n: unit.order, total: units.length })}
+            </p>
+            {next ? (
+              <Button variant="outline" onClick={() => goToUnit(next)}>
+                {t('nav.nextUnit')}
+                <ArrowRight aria-hidden="true" className="rtl-mirror" />
+              </Button>
+            ) : (
+              <Button asChild variant="outline">
+                <Link to="/programmes/$programmeId" params={{ programmeId: unit.programmeId }}>
+                  {t('nav.courseSummary')}
+                  <ArrowRight aria-hidden="true" className="rtl-mirror" />
+                </Link>
+              </Button>
+            )}
+          </nav>
+
+          <details className="group rounded-3xl bg-white shadow-md lg:hidden">
             <summary className="flex min-h-14 cursor-pointer items-center gap-3 px-4 font-semibold text-ink">
               <span
                 aria-hidden="true"
@@ -448,7 +520,7 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
             </summary>
             <div className="border-t p-2">
               <UnitOutline
-                units={units}
+                units={published}
                 currentId={unit.id}
                 onNavigate={() => {
                   focusHeadingOnMount = true
@@ -457,46 +529,6 @@ function UnitView({ unit, course }: { unit: Unit; course: Course }) {
             </div>
           </details>
         </article>
-
-        <aside
-          aria-labelledby="outline-title"
-          className="sticky top-4 hidden overflow-hidden rounded-3xl bg-white shadow-md xl:block"
-        >
-          <div className="bg-sedra-pale-50 px-4 pt-4 pb-3">
-            <h2 id="outline-title" className="m-0 text-lg">
-              {t('outline.title', { course: l(course.title) })}
-            </h2>
-            {!simplified && (
-              <div className="mt-2">
-                <p className="m-0 text-base font-semibold text-ink-soft">
-                  {t('outline.progress', { done: doneInCourse, total: units.length })}
-                </p>
-                <div
-                  aria-hidden="true"
-                  className="mt-1.5 h-2 overflow-hidden rounded-full bg-white"
-                >
-                  <motion.div
-                    className="h-full rounded-full bg-sedra-mid ltr:origin-left rtl:origin-right"
-                    initial={false}
-                    animate={{ scaleX: doneInCourse / Math.max(1, units.length) }}
-                    transition={
-                      reduce ? { duration: 0 } : { type: 'spring', stiffness: 120, damping: 22 }
-                    }
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto p-2">
-            <UnitOutline
-              units={units}
-              currentId={unit.id}
-              onNavigate={() => {
-                focusHeadingOnMount = true
-              }}
-            />
-          </div>
-        </aside>
       </div>
 
       <AlertDialog open={blocker.status === 'blocked'}>

@@ -6,7 +6,9 @@ import {
   Captions,
   CircleCheck,
   Eye,
+  EyeOff,
   FileText,
+  FileVideo,
   Hash,
   Languages,
   ListChecks,
@@ -40,6 +42,7 @@ import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 import { getContentDraft, saveContentDraft, useContentDrafts } from '@/store/admin-actions'
+import { publishUnit, setUnitPublished, unitFromFields, useUnitEdits } from '@/store/admin-content'
 import {
   type FieldErrors,
   type FieldKey,
@@ -50,8 +53,18 @@ import {
   validateForPublish,
 } from './content-fields'
 
-function BackLink() {
+function BackLink({ courseId }: { courseId?: string }) {
   const { t } = useTranslation('admin')
+  const cls =
+    'mb-4 inline-flex min-h-12 items-center gap-2 rounded-full bg-white px-4 font-semibold text-sedra-green shadow-sm transition-shadow hover:shadow-md'
+  if (courseId) {
+    return (
+      <Link to="/admin/courses/$courseId" params={{ courseId }} className={cls}>
+        <ArrowLeft aria-hidden="true" className="rtl-mirror size-5" />
+        {t('editor.backToCourse')}
+      </Link>
+    )
+  }
   return (
     <Link
       to="/admin/content"
@@ -96,6 +109,8 @@ function Editor({ unit }: { unit: Unit }) {
   const { l } = useLocalized()
   const f = useUaeFormat()
   const drafts = useContentDrafts()
+  const edits = useUnitEdits()
+  const published = edits[unit.id]?.published ?? true
   // Both language drafts live in state, so switching language never loses entered text.
   const [byLang, setByLang] = useState<Record<Lang, Fields>>(() => ({
     en: initialFields(unit, 'en'),
@@ -141,8 +156,23 @@ function Editor({ unit }: { unit: Unit }) {
       return
     }
     persist()
-    toast.success(t('editor.publishToast'), { description: t('editor.savedToast') })
-    announce(`${t('editor.publishToast')} ${t('editor.savedToast')}`)
+    // Build from the latest live unit so the other language keeps its current text.
+    const current = getUnit(unit.id) ?? unit
+    publishUnit(unitFromFields(current, lang, fields))
+    toast.success(t('editor.publishToast'), { description: t('editor.liveToast') })
+    announce(`${t('editor.publishToast')} ${t('editor.liveToast')}`)
+  }
+
+  function onUnpublish() {
+    setUnitPublished(unit.id as UnitId, false)
+    toast.success(t('editor.unpublishedToast'), { description: t('editor.liveToast') })
+    announce(`${t('editor.unpublishedToast')} ${t('editor.liveToast')}`)
+  }
+
+  function onChooseFile(file: File | undefined) {
+    if (!file) return
+    // Simulated: only the file name is recorded. Nothing is uploaded or played to learners.
+    set('video_url')(file.name)
   }
 
   function switchLang(next: Lang) {
@@ -166,12 +196,21 @@ function Editor({ unit }: { unit: Unit }) {
 
   return (
     <div>
-      <BackLink />
+      <BackLink courseId={unit.courseId} />
       <AdminPageHeader
         title={t('editor.title', { id: unit.id, title: l(unit.title) })}
         intro={t('editor.intro')}
         icon={Pencil}
       >
+        {published ? (
+          <StatusLabel tone="done" icon={Eye}>
+            {t('editor.statusPublished')}
+          </StatusLabel>
+        ) : (
+          <StatusLabel tone="neutral" icon={EyeOff}>
+            {t('editor.statusUnpublished')}
+          </StatusLabel>
+        )}
         <DemoTag label={t('editor.demoTag')} />
       </AdminPageHeader>
 
@@ -271,6 +310,29 @@ function Editor({ unit }: { unit: Unit }) {
 
           <Section id="sec-media" title={t('editor.sections.media')} icon={Video} tint="info">
             {field('video_url', { dir: 'ltr', hint: t('editor.hints.video_url', { id: unit.id }) })}
+            <div className="flex flex-col gap-1.5 rounded-xl border-2 border-dashed border-border bg-sedra-pale-50 p-3">
+              <label
+                htmlFor="f-video_file"
+                className="inline-flex items-center gap-2 font-semibold text-ink"
+              >
+                <FileVideo aria-hidden="true" className="size-5 text-sedra-green" />
+                {t('editor.chooseFile')}
+              </label>
+              <p id="f-video_file-hint" className="m-0 text-sm font-semibold text-notice">
+                {t('editor.fileNotUploaded')}
+              </p>
+              <input
+                id="f-video_file"
+                type="file"
+                accept="video/*"
+                aria-describedby="f-video_file-hint"
+                onChange={(e) => {
+                  onChooseFile(e.target.files?.[0])
+                  e.target.value = ''
+                }}
+                className="min-h-12 w-full max-w-full text-base file:me-3 file:min-h-12 file:cursor-pointer file:rounded-xl file:border-2 file:border-sedra-green file:bg-white file:px-4 file:font-semibold file:text-sedra-green"
+              />
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {field('duration_seconds', {
                 dir: 'ltr',
@@ -377,6 +439,17 @@ function Editor({ unit }: { unit: Unit }) {
               <Save aria-hidden="true" />
               {t('editor.saveDraft')}
             </Button>
+            {published ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onUnpublish}
+                className="flex-1 sm:flex-none"
+              >
+                <EyeOff aria-hidden="true" />
+                {t('editor.unpublish')}
+              </Button>
+            ) : null}
             <Button type="button" onClick={onPublish} className="flex-1 sm:flex-none">
               <Send aria-hidden="true" className="rtl-mirror" />
               {t('editor.publish')}

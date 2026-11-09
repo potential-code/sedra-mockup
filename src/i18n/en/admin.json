@@ -164,18 +164,19 @@
   },
   "content": {
     "title": "Programmes & content",
-    "intro": "Both demo courses and all 16 units. Open a unit to edit its draft.",
+    "intro": "The two SEDRA courses. Open a course to edit its units and publish or unpublish them.",
     "reviewNote": "English text is the content-entry master. Arabic text is a draft for SEDRA review. Only LS02 and HF01 have produced English sample videos.",
     "notLoaded": "Course content is not loaded yet.",
     "courseMeta": "{{units}} units.",
-    "tableLabel": "{{course}} units table",
-    "caption": "{{course}}: units, languages, media and review status (demo).",
+    "tableLabel": "Courses table",
+    "caption": "Courses (demo). Last updated is the latest unit change, in UAE time.",
     "cols": {
-      "unit": "Unit",
-      "languages": "Languages",
-      "media": "Media status",
-      "review": "Review status",
-      "action": "Action"
+      "course": "Course",
+      "status": "Status",
+      "units": "Units",
+      "learners": "Learners enrolled",
+      "updated": "Last updated",
+      "actions": "Actions"
     },
     "unitOrder": "Unit {{order}} of 8",
     "langEn": "English: text and check",
@@ -183,13 +184,21 @@
     "langAr": "Arabic: draft text, needs review",
     "edit": "Edit {{id}}",
     "samplesMeta": "{{n}} sample video produced",
-    "statusLabel": "Status"
+    "statusLabel": "Status",
+    "noNewCourse": "Only the two SEDRA courses are in this demo. Courses and units cannot be added or deleted.",
+    "published": "Published",
+    "unpublished": "Unpublished",
+    "unitsPublished": "{{published}} of {{total}} units published",
+    "learnersN": "{{n}} learners",
+    "updatedNever": "No changes yet",
+    "open": "Open",
+    "openCourse": "Open {{course}}"
   },
   "editor": {
     "back": "Back to programmes & content",
     "title": "Edit {{id}}: {{title}}",
-    "intro": "Fields are filled from the current content. Changes are saved in this demo only.",
-    "demoTag": "Demo editor. Nothing is published.",
+    "intro": "Fields are filled from the current content. Publish makes your change live for learners in this demo only.",
+    "demoTag": "Demo editor. Changes stay in this browser.",
     "notFoundTitle": "Unit not found",
     "notFoundBody": "There is no unit with this ID in the demo content.",
     "sections": {
@@ -265,10 +274,10 @@
     "errorSummaryHelp": "Your text is kept. Select an item to go to it.",
     "saveDraft": "Save draft (demo)",
     "publish": "Publish (demo)",
-    "savedToast": "Saved in this demo only. Nothing is published.",
-    "publishToast": "Simulated: all publishing checks passed.",
-    "simulated": "Simulated. Drafts stay in this browser. Real publishing needs content review, hosting and permissions.",
-    "barEditing": "Editing the {{lang}} draft. Nothing is published.",
+    "savedToast": "Draft saved in this demo. Learners do not see drafts.",
+    "publishToast": "Published in this demo. All publishing checks passed.",
+    "simulated": "Simulated. Changes stay in this browser. Real publishing needs content review, hosting and permissions.",
+    "barEditing": "Editing the {{lang}} text.",
     "preview": {
       "heading": "Unit preview",
       "noTitle": "No title yet",
@@ -276,7 +285,15 @@
       "noQuestion": "No question yet",
       "correct": "Correct answer",
       "note": "Preview of the draft you are editing. Learners do not see it."
-    }
+    },
+    "backToCourse": "Back to course builder",
+    "statusPublished": "Published",
+    "statusUnpublished": "Unpublished: hidden from learners",
+    "liveToast": "Changes are live for learners in this demo.",
+    "unpublish": "Unpublish (demo)",
+    "unpublishedToast": "Unpublished. Learners do not see this unit in this demo.",
+    "chooseFile": "Choose a video file (demo)",
+    "fileNotUploaded": "Demo: the file is not uploaded. Only its name is saved in the video file field."
   },
   "sessions": {
     "title": "Sessions",
@@ -323,7 +340,24 @@
       "title": "Enter a title.",
       "dateTime": "Enter a valid date and time.",
       "link": "Enter a link that starts with https://."
-    }
+    },
+    "new": "New session",
+    "newTitle": "New session (demo)",
+    "newIntro": "Saved in this demo only. No meeting is created.",
+    "newDefaultsNote": "New sessions start as Upcoming, with Pending recording.",
+    "create": "Create session (demo)",
+    "createdToast": "Session created in this demo only.",
+    "cancelSession": "Cancel session",
+    "cancelLabel": "Cancel session: {{title}}",
+    "cancelTitle": "Cancel {{title}}?",
+    "cancelBody": "Learners will see this session as cancelled. No message is sent. You can restore it later.",
+    "cancelConfirm": "Cancel session",
+    "keep": "Keep session",
+    "cancelledLabel": "Cancelled (demo)",
+    "cancelledToast": "Session cancelled in this demo. No message was sent.",
+    "restore": "Restore session",
+    "restoreLabel": "Restore session: {{title}}",
+    "restoredToast": "Session restored in this demo."
   },
   "resources": {
     "title": "Resources",
@@ -361,6 +395,45 @@
           "body": "One welcoming action to try today, from HF08."
         }
       }
+    },
+    "custom": {
+      "heading": "Added resources",
+      "add": "Add resource",
+      "intro": "Short readable resources added in this demo. Learners see them on their Resources page.",
+      "builtInNote": "Built-in guides and EXT01 cannot be edited or removed here.",
+      "empty": "No resources added yet.",
+      "noLink": "No link",
+      "formTitleNew": "Add a resource (demo)",
+      "formTitleEdit": "Edit resource: {{title}}",
+      "formIntro": "Saved in this browser only. Text in both languages is required.",
+      "fields": {
+        "course": "Course",
+        "titleEn": "Title in English",
+        "titleAr": "Title in Arabic",
+        "bodyEn": "Short text in English",
+        "bodyAr": "Short text in Arabic",
+        "url": "Link (optional)"
+      },
+      "urlHint": "Optional. Must start with https://",
+      "errorSummary": "Fix {{n}} things to save the resource",
+      "errors": {
+        "titleEn": "Enter a title in English.",
+        "titleAr": "Enter a title in Arabic.",
+        "bodyEn": "Enter short text in English.",
+        "bodyAr": "Enter short text in Arabic.",
+        "url": "Enter a link that starts with https://, or leave it empty."
+      },
+      "save": "Save resource (demo)",
+      "savedToast": "Resource saved in this demo only.",
+      "savedDescription": "Simulated. Nothing is published outside this browser.",
+      "edit": "Edit",
+      "editLabel": "Edit {{title}}",
+      "remove": "Remove",
+      "removeLabel": "Remove {{title}}",
+      "removeTitle": "Remove {{title}}?",
+      "removeBody": "Learners will no longer see this resource. Built-in guides and EXT01 are not affected.",
+      "keep": "Keep resource",
+      "removedToast": "Resource removed in this demo."
     }
   },
   "reports": {
@@ -418,5 +491,88 @@
       }
     },
     "adminOnly": "Admins only"
+  },
+  "builder": {
+    "back": "Back to courses",
+    "eyebrow": "Course builder",
+    "intro": "Edit the 8 units of this course and publish or unpublish them. Changes are live for learners in this demo.",
+    "structure": "Course structure",
+    "structureHint": "Units are in learning order. In this demo, units cannot be added, moved or deleted.",
+    "updated": "Last change: {{date}} (UAE time)",
+    "unitN": "Unit {{n}}",
+    "edit": "Edit",
+    "editUnit": "Edit {{id}}: {{title}}",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "publishUnit": "Publish {{id}}",
+    "unpublishUnit": "Unpublish {{id}}",
+    "publishedToast": "{{id}} is published.",
+    "unpublishedToast": "{{id}} is unpublished. Learners do not see it.",
+    "liveToast": "Changes are live for learners in this demo.",
+    "settings": "Course settings",
+    "setBySedra": "Set by SEDRA",
+    "settingsHint": "Course details are set by SEDRA. They cannot be changed in this demo.",
+    "titleEn": "Title in English",
+    "titleAr": "Title in Arabic",
+    "purposeEn": "Purpose in English",
+    "purposeAr": "Purpose in Arabic",
+    "glance": "At a glance",
+    "glanceUnits": "Units",
+    "glancePublished": "Published units",
+    "glanceSamples": "Sample videos",
+    "glanceLearners": "Learners enrolled",
+    "notFoundTitle": "Course not found",
+    "notFoundBody": "There is no course with this ID in the demo."
+  },
+  "invite": {
+    "open": "Invite learner",
+    "title": "Invite a learner",
+    "intro": "Create a demo invitation. You get a demo link instead of an email.",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "lang": "Language",
+      "programmes": "Programmes"
+    },
+    "emailHint": "For example: name@example.com. No email is sent.",
+    "programmesHint": "Choose at least one programme.",
+    "noEmail": "Simulated. No email is sent and no account is created outside this browser.",
+    "submit": "Create invitation (demo)",
+    "errorSummary": "Fix {{n}} things to create the invitation",
+    "errors": {
+      "name": "Enter the learner's name.",
+      "email": "Enter an email address, like name@example.com.",
+      "programmes": "Choose at least one programme."
+    },
+    "success": "Invitation ready (demo). No email was sent.",
+    "successBody": "{{name}} can accept it with the demo link below.",
+    "linkLabel": "Demo link",
+    "openLink": "Open invitation link (demo)",
+    "done": "Done",
+    "listHeading": "Invitations",
+    "listIntro": "Invitations created in this demo. Status changes to Accepted when the link is used.",
+    "empty": "No invitations yet. Select Invite learner to create one.",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted"
+    },
+    "openLinkShort": "Open link (demo)",
+    "openLinkFor": "Open invitation link for {{name}} (demo)"
+  },
+  "accounts": {
+    "heading": "Demo learner accounts",
+    "notCounted": "Not counted in the illustrative totals",
+    "intro": "Choose the programmes each demo account is enrolled in. The learner sees only these programmes.",
+    "programmesLabel": "Enrolled programmes",
+    "persona": {
+      "noor": "Noor",
+      "new-learner": "New learner"
+    },
+    "kind": {
+      "noor": "returning learner",
+      "new-learner": "new or invited learner"
+    },
+    "savedToast": "Enrolment for {{name}} saved in this demo.",
+    "none": "Not enrolled in any programme"
   }
 }

@@ -25,6 +25,7 @@ import {
   UNITS_PER_COURSE,
   useAdminLearners,
 } from '@/store/admin-actions'
+import { DemoAccountsPanel, InvitationsPanel, InviteLearnerButton } from './LearnerInvites'
 
 const PROGRAMME_FILTERS: ProgrammeFilter[] = ['all', 'life-skills', 'hospitality', 'both']
 const PROGRESS_FILTERS: ProgressFilter[] = ['all', 'not-started', 'in-progress', 'completed']
@@ -39,7 +40,12 @@ export function LearnersPage() {
 
   return (
     <div>
-      <AdminPageHeader title={t('learners.title')} intro={t('learners.intro')} icon={Users}>
+      <AdminPageHeader
+        title={t('learners.title')}
+        intro={t('learners.intro')}
+        icon={Users}
+        action={<InviteLearnerButton />}
+      >
         <DemoTag label={t('common.illustrative')} />
       </AdminPageHeader>
 
@@ -135,6 +141,11 @@ export function LearnersPage() {
             </tbody>
           </table>
         </TableRegion>
+      </div>
+
+      <div className="mt-10 flex flex-col gap-6">
+        <InvitationsPanel />
+        <DemoAccountsPanel />
       </div>
     </div>
   )

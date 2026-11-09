@@ -1,11 +1,14 @@
 import type { LiveSession, ProgrammeId } from '@shared/types'
 import {
+  Ban,
   CalendarDays,
   Captions,
   ClipboardCheck,
   FileText,
   Link2,
   Pencil,
+  Plus,
+  RotateCcw,
   Save,
   Video,
   X,
@@ -26,10 +29,23 @@ import {
 import { fromUaeParts, toUaeParts, useUaeFormat } from '@/components/admin/format'
 import { Reveal, stagger } from '@/components/motion/Reveal'
 import { announce } from '@/components/shared/LiveRegion'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { saveSession, useAdminSessions } from '@/store/admin-actions'
+import { createSession, setSessionCancelled } from '@/store/admin-content'
+
+const NEW = '__new__'
 
 /** /admin/sessions: demo session records and editor (brief §9 Sessions editor). */
 export function SessionsAdminPage() {
@@ -55,6 +71,23 @@ export function SessionsAdminPage() {
         <p>{t('sessions.integrationNote')}</p>
       </Notice>
 
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <Button
+          ref={(el) => {
+            openers.current[NEW] = el
+          }}
+          type="button"
+          onClick={() => setEditing(NEW)}
+          aria-expanded={editing === NEW}
+        >
+          <Plus aria-hidden="true" />
+          {t('sessions.new')}
+        </Button>
+        <p className="m-0 text-sm text-ink-soft">{t('sessions.newDefaultsNote')}</p>
+      </div>
+
+      {editing === NEW ? <SessionForm key={NEW} onClose={close} /> : null}
+
       <ul className="m-0 grid list-none gap-5 p-0 lg:grid-cols-2">
         {sessions.map((s, i) => (
           <Reveal as="li" key={s.id} delay={stagger(i)} className="max-w-none">
@@ -70,7 +103,9 @@ export function SessionsAdminPage() {
         ))}
       </ul>
 
-      {current ? <SessionForm key={current.id} session={current} onClose={close} /> : null}
+      {current && editing !== NEW ? (
+        <SessionForm key={current.id} session={current} onClose={close} />
+      ) : null}
     </div>
   )
 }
@@ -130,6 +165,11 @@ function SessionCard({
             <span className="py-1.5 text-3xl font-bold text-ink tabular-nums">{day}</span>
           </div>
           <Chip className="mb-1">{t(`programme.${s.programmeId}`)}</Chip>
+          {s.cancelled ? (
+            <StatusLabel tone="warning" icon={Ban} className="mb-1">
+              {t('sessions.cancelledLabel')}
+            </StatusLabel>
+          ) : null}
         </div>
         <h2 id={headingId} className="m-0 text-xl">
           {l(s.title)}
@@ -209,7 +249,7 @@ function SessionCard({
           ))}
         </section>
 
-        <div className="mt-auto">
+        <div className="mt-auto flex flex-wrap gap-3">
           <Button
             ref={openerRef}
             type="button"
@@ -221,9 +261,70 @@ function SessionCard({
             <Pencil aria-hidden="true" />
             {t('sessions.edit')}
           </Button>
+          <CancelRestore session={s} />
         </div>
       </div>
     </article>
+  )
+}
+
+/** Cancel (with confirmation) or restore a demo session. No message is sent to learners. */
+function CancelRestore({ session: s }: { session: LiveSession }) {
+  const { t } = useTranslation('admin')
+  const { l } = useLocalized()
+  const [confirm, setConfirm] = useState(false)
+  if (s.cancelled) {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        aria-label={t('sessions.restoreLabel', { title: l(s.title) })}
+        onClick={() => {
+          setSessionCancelled(s.id, false)
+          toast.success(t('sessions.restoredToast'))
+          announce(t('sessions.restoredToast'))
+        }}
+      >
+        <RotateCcw aria-hidden="true" />
+        {t('sessions.restore')}
+      </Button>
+    )
+  }
+  return (
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        aria-label={t('sessions.cancelLabel', { title: l(s.title) })}
+        onClick={() => setConfirm(true)}
+      >
+        <Ban aria-hidden="true" />
+        {t('sessions.cancelSession')}
+      </Button>
+      <AlertDialog open={confirm} onOpenChange={setConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('sessions.cancelTitle', { title: l(s.title) })}</AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-ink">
+              {t('sessions.cancelBody')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="min-h-12">{t('sessions.keep')}</AlertDialogCancel>
+            <AlertDialogAction
+              className="min-h-12"
+              onClick={() => {
+                setSessionCancelled(s.id, true)
+                toast.success(t('sessions.cancelledToast'))
+                announce(t('sessions.cancelledToast'))
+              }}
+            >
+              {t('sessions.cancelConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
 
@@ -240,20 +341,21 @@ interface FormState {
 
 type FormErrors = Partial<Record<keyof FormState, string>>
 
-function SessionForm({ session, onClose }: { session: LiveSession; onClose: () => void }) {
+function SessionForm({ session, onClose }: { session?: LiveSession; onClose: () => void }) {
   const { t } = useTranslation('admin')
   const { l } = useLocalized()
   const headingRef = useRef<HTMLHeadingElement>(null)
-  const { date, time } = toUaeParts(session.startsAt)
+  const isNew = !session
+  const { date, time } = session ? toUaeParts(session.startsAt) : { date: '', time: '16:00' }
   const [s, setS] = useState<FormState>({
-    programmeId: session.programmeId,
-    titleEn: session.title.en,
-    titleAr: session.title.ar,
+    programmeId: session?.programmeId ?? 'life-skills',
+    titleEn: session?.title.en ?? '',
+    titleAr: session?.title.ar ?? '',
     date,
     time,
-    accessLink: session.accessLink,
-    attendanceStatus: session.attendanceStatus,
-    recordingStatus: session.recordingStatus,
+    accessLink: session?.accessLink ?? '',
+    attendanceStatus: session?.attendanceStatus ?? 'upcoming',
+    recordingStatus: session?.recordingStatus ?? 'pending',
   })
   const [errors, setErrors] = useState<FormErrors>({})
 
@@ -277,6 +379,18 @@ function SessionForm({ session, onClose }: { session: LiveSession; onClose: () =
     if (Object.keys(e).length > 0 || !startsAt) {
       const first = Object.keys(e)[0]
       requestAnimationFrame(() => document.getElementById(`s-${first}`)?.focus())
+      return
+    }
+    if (!session) {
+      createSession({
+        programmeId: s.programmeId,
+        title: { en: s.titleEn.trim(), ar: s.titleAr.trim() },
+        startsAt,
+        accessLink: s.accessLink.trim(),
+      })
+      toast.success(t('sessions.createdToast'), { description: t('sessions.savedDescription') })
+      announce(t('sessions.createdToast'))
+      onClose()
       return
     }
     saveSession({
@@ -306,9 +420,13 @@ function SessionForm({ session, onClose }: { session: LiveSession; onClose: () =
         <IconCircle icon={Pencil} size="lg" />
         <div className="min-w-0">
           <h2 id="session-editor-title" ref={headingRef} tabIndex={-1} className="m-0 text-2xl">
-            {t('sessions.editTitle', { title: l(session.title) })}
+            {session
+              ? t('sessions.editTitle', { title: l(session.title) })
+              : t('sessions.newTitle')}
           </h2>
-          <p className="m-0 text-ink-soft">{t('sessions.editIntro')}</p>
+          <p className="m-0 text-ink-soft">
+            {isNew ? t('sessions.newIntro') : t('sessions.editIntro')}
+          </p>
         </div>
       </div>
       <form
@@ -395,34 +513,36 @@ function SessionForm({ session, onClose }: { session: LiveSession; onClose: () =
           dir="ltr"
           required
         />
-        <div className="grid gap-4 md:grid-cols-2">
-          <SelectField
-            id="s-attendanceStatus"
-            label={t('sessions.fields.attendance')}
-            value={s.attendanceStatus}
-            onChange={set('attendanceStatus')}
-            hint={t('sessions.attendanceHint')}
-            options={(['upcoming', 'attended', 'not-attended'] as const).map((v) => ({
-              value: v,
-              label: t(`sessions.attendance.${v}`),
-            }))}
-          />
-          <SelectField
-            id="s-recordingStatus"
-            label={t('sessions.fields.recording')}
-            value={s.recordingStatus}
-            onChange={set('recordingStatus')}
-            hint={t('sessions.recordingHint')}
-            options={(['pending', 'available'] as const).map((v) => ({
-              value: v,
-              label: t(`sessions.recording.${v}`),
-            }))}
-          />
-        </div>
+        {isNew ? null : (
+          <div className="grid gap-4 md:grid-cols-2">
+            <SelectField
+              id="s-attendanceStatus"
+              label={t('sessions.fields.attendance')}
+              value={s.attendanceStatus}
+              onChange={set('attendanceStatus')}
+              hint={t('sessions.attendanceHint')}
+              options={(['upcoming', 'attended', 'not-attended'] as const).map((v) => ({
+                value: v,
+                label: t(`sessions.attendance.${v}`),
+              }))}
+            />
+            <SelectField
+              id="s-recordingStatus"
+              label={t('sessions.fields.recording')}
+              value={s.recordingStatus}
+              onChange={set('recordingStatus')}
+              hint={t('sessions.recordingHint')}
+              options={(['pending', 'available'] as const).map((v) => ({
+                value: v,
+                label: t(`sessions.recording.${v}`),
+              }))}
+            />
+          </div>
+        )}
         <div className="flex flex-wrap gap-3">
           <Button type="submit">
             <Save aria-hidden="true" />
-            {t('sessions.save')}
+            {isNew ? t('sessions.create') : t('sessions.save')}
           </Button>
           <Button type="button" variant="outline" onClick={onClose}>
             <X aria-hidden="true" />

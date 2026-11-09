@@ -1,6 +1,7 @@
 import { Link, Outlet } from '@tanstack/react-router'
 import { Award, FolderOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { enrolledProgrammes } from '@/components/learner/learning'
 import { PageTransition } from '@/components/motion/PageTransition'
 import { LEARNER_NAV } from '@/config/nav'
 import { cn } from '@/lib/utils'
@@ -15,7 +16,10 @@ export function LearnerShell() {
   const { t } = useTranslation()
   const tl = useTranslation('learner').t
   const learner = useLearner()
-  const programmeId = learner?.lastProgramme ?? 'life-skills'
+  // Learn opens the last programme the learner used, else their first enrolled programme.
+  const enrolled = enrolledProgrammes(learner)
+  const last = learner?.lastProgramme
+  const programmeId = last && enrolled.includes(last) ? last : (enrolled[0] ?? 'life-skills')
 
   const core: SidebarItem[] = LEARNER_NAV.map((item) => ({
     key: item.key,

@@ -9,7 +9,7 @@ import type {
   UnitId,
   UnitProgress,
 } from '@shared/types'
-import { COURSES, getUnit, unitsForCourse } from '@/content'
+import { COURSES, getUnit, isUnitPublished, unitsForCourse } from '@/content'
 import { getUnitProgress, isUnitComplete } from '@/store/actions'
 
 /** Shared learner helpers: unit status, course progress, next step, UAE time. */
@@ -32,9 +32,32 @@ export function findCourse(programmeId: ProgrammeId): Course | undefined {
   return COURSES.find((c) => c.programmeId === programmeId)
 }
 
+/** Published units of a programme's course (learners never see unpublished units). */
 export function courseUnits(programmeId: ProgrammeId): Unit[] {
   const course = findCourse(programmeId)
-  return course ? unitsForCourse(course.id) : []
+  return course ? unitsForCourse(course.id, { publishedOnly: true }) : []
+}
+
+/** Programmes SEDRA enrolled this learner in, in a stable order (no self-enrolment). */
+export function enrolledProgrammes(learner: LearnerState | null): ProgrammeId[] {
+  if (!learner) return []
+  const enrolled = learner.enrolled ?? PROGRAMMES
+  return PROGRAMMES.filter((p) => enrolled.includes(p))
+}
+
+export function isEnrolled(learner: LearnerState | null, programmeId: ProgrammeId): boolean {
+  return enrolledProgrammes(learner).includes(programmeId)
+}
+
+/** First visit: no unit opened or started in any enrolled programme yet. */
+export function hasStartedLearning(learner: LearnerState | null): boolean {
+  if (!learner) return false
+  const enrolled = enrolledProgrammes(learner)
+  const last = learner.lastLocation ? getUnit(learner.lastLocation.unitId) : undefined
+  if (last && enrolled.includes(last.programmeId)) return true
+  return enrolled.some((p) =>
+    courseUnits(p).some((u) => unitStatus(getUnitProgress(learner, u.id)) !== 'notStarted'),
+  )
 }
 
 export type UnitStatus = 'notStarted' | 'inProgress' | 'complete'
@@ -55,13 +78,16 @@ export function isComplete(learner: LearnerState | null, unitId: UnitId): boolea
 
 /**
  * Continue learning (brief §2 journeys): restore the last unit; otherwise the first incomplete
- * unit of the last programme, then of the other programme.
+ * unit of the last programme, then of the other enrolled programme. Enrolled + published only.
  */
 export function nextStepUnit(learner: LearnerState | null): Unit | undefined {
-  const last = learner?.lastLocation ? getUnit(learner.lastLocation.unitId) : undefined
-  if (last) return last
-  const first = learner?.lastProgramme ?? 'life-skills'
-  const order: ProgrammeId[] = first === 'life-skills' ? PROGRAMMES : [...PROGRAMMES].reverse()
+  const enrolled = enrolledProgrammes(learner)
+  const lastId = learner?.lastLocation?.unitId
+  const last = lastId ? getUnit(lastId) : undefined
+  if (last && enrolled.includes(last.programmeId) && isUnitPublished(last.id)) return last
+  const first = learner?.lastProgramme
+  const order: ProgrammeId[] =
+    first && enrolled.includes(first) ? [first, ...enrolled.filter((p) => p !== first)] : enrolled
   for (const p of order) {
     const u = courseUnits(p).find((x) => !isUnitComplete(getUnitProgress(learner, x.id)))
     if (u) return u

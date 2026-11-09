@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next'
 import {
   completedCount,
   courseUnits,
+  enrolledProgrammes,
   findCourse,
   isComplete,
   nextStepUnit,
   PROGRAMME_LABEL_KEY,
-  PROGRAMMES,
   UNITS_PER_COURSE,
   unitLinkParams,
 } from '@/components/learner/learning'
@@ -32,13 +32,17 @@ export function AchievementsPage() {
   const { t } = useTranslation('learner')
   const { l } = useLocalized()
   const learner = useLearner()
+  // Enrolled programmes only (SEDRA manages enrolment).
+  const programmes = enrolledProgrammes(learner)
+  const hasLs = programmes.includes('life-skills')
+  const hasHf = programmes.includes('hospitality')
   const hfDone = isComplete(learner, 'HF08')
   const badges = BADGE_UNITS.filter((id) => isComplete(learner, id)).length
   const hfCourse = findCourse('hospitality')
   const hfUnits = courseUnits('hospitality')
 
   // Journey: finished units in course order, then the next step.
-  const finished: Unit[] = PROGRAMMES.flatMap((p) =>
+  const finished: Unit[] = programmes.flatMap((p) =>
     courseUnits(p).filter((u) => isComplete(learner, u.id)),
   )
   const nextUnit = nextStepUnit(learner)
@@ -59,18 +63,20 @@ export function AchievementsPage() {
             aria-label={t('achievements.summaryLabel')}
             className="m-0 flex list-none flex-wrap gap-3 p-0"
           >
-            <li className="flex max-w-none items-center gap-3 rounded-2xl bg-notice-soft px-4 py-3">
-              <Award aria-hidden="true" className="size-7 text-notice" />
-              <span className="text-lg font-bold text-ink">
-                {t('achievements.badgesCount', { count: badges })}
-              </span>
-            </li>
+            {hasLs ? (
+              <li className="flex max-w-none items-center gap-3 rounded-2xl bg-notice-soft px-4 py-3">
+                <Award aria-hidden="true" className="size-7 text-notice" />
+                <span className="text-lg font-bold text-ink">
+                  {t('achievements.badgesCount', { count: badges })}
+                </span>
+              </li>
+            ) : null}
             <li className="flex max-w-none items-center gap-3 rounded-2xl bg-success-soft px-4 py-3">
               <CircleCheck aria-hidden="true" className="size-7 text-success" />
               <span className="text-lg font-bold text-ink">
                 {t('shared.unitsComplete', {
                   done: finished.length,
-                  total: PROGRAMMES.length * UNITS_PER_COURSE,
+                  total: programmes.reduce((n, p) => n + courseUnits(p).length, 0),
                 })}
               </span>
             </li>
@@ -78,53 +84,57 @@ export function AchievementsPage() {
         </div>
       </Reveal>
 
-      {/* Badges: static medallions, no Reveal or hover motion (brief §2). */}
-      <section aria-labelledby="ach-badges" className="grid grid-cols-1 gap-5">
-        <div className="grid grid-cols-1 gap-1">
-          <h2 id="ach-badges" className="m-0 text-2xl md:text-3xl">
-            {t('achievements.badgesHeading')}
-          </h2>
-          <p className="m-0 text-ink-soft">{t('achievements.badgesLead')}</p>
-        </div>
-        <ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:gap-4 lg:grid-cols-4">
-          {BADGE_UNITS.map((id) => {
-            const earned = isComplete(learner, id)
-            const unit = getUnit(id)
-            const n = unit?.order ?? Number(id.slice(2))
-            const name = unit?.badge ? l(unit.badge) : t(`achievements.badges.${id}`)
-            return (
-              <li
-                key={id}
-                className={cn(
-                  'grid min-w-0 max-w-none grid-cols-1 content-start justify-items-center gap-3 rounded-2xl p-3 text-center sm:p-6',
-                  earned
-                    ? 'bg-white shadow-md ring-2 ring-sedra-green'
-                    : 'border-2 border-dashed border-border bg-white/60',
-                )}
-              >
-                <BadgeMedallion unitId={id} earned={earned} />
-                <h3 className="m-0 text-lg">{name}</h3>
-                <p className="m-0 text-base text-ink-soft">{t('achievements.badgeAfter', { n })}</p>
-                <p
+      {/* Badges: static medallions, no Reveal or hover motion (brief §2). Life Skills only. */}
+      {hasLs ? (
+        <section aria-labelledby="ach-badges" className="grid grid-cols-1 gap-5">
+          <div className="grid grid-cols-1 gap-1">
+            <h2 id="ach-badges" className="m-0 text-2xl md:text-3xl">
+              {t('achievements.badgesHeading')}
+            </h2>
+            <p className="m-0 text-ink-soft">{t('achievements.badgesLead')}</p>
+          </div>
+          <ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:gap-4 lg:grid-cols-4">
+            {BADGE_UNITS.map((id) => {
+              const earned = isComplete(learner, id)
+              const unit = getUnit(id)
+              const n = unit?.order ?? Number(id.slice(2))
+              const name = unit?.badge ? l(unit.badge) : t(`achievements.badges.${id}`)
+              return (
+                <li
+                  key={id}
                   className={cn(
-                    'm-0 inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1 text-center text-base font-semibold',
+                    'grid min-w-0 max-w-none grid-cols-1 content-start justify-items-center gap-3 rounded-2xl p-3 text-center sm:p-6',
                     earned
-                      ? 'border-success bg-success-soft text-success'
-                      : 'border-border bg-white text-ink',
+                      ? 'bg-white shadow-md ring-2 ring-sedra-green'
+                      : 'border-2 border-dashed border-border bg-white/60',
                   )}
                 >
-                  {earned ? (
-                    <CircleCheck aria-hidden="true" className="size-5" />
-                  ) : (
-                    <CircleDashed aria-hidden="true" className="size-5" />
-                  )}
-                  {earned ? t('achievements.earned') : t('achievements.notYet', { n })}
-                </p>
-              </li>
-            )
-          })}
-        </ul>
-      </section>
+                  <BadgeMedallion unitId={id} earned={earned} />
+                  <h3 className="m-0 text-lg">{name}</h3>
+                  <p className="m-0 text-base text-ink-soft">
+                    {t('achievements.badgeAfter', { n })}
+                  </p>
+                  <p
+                    className={cn(
+                      'm-0 inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1 text-center text-base font-semibold',
+                      earned
+                        ? 'border-success bg-success-soft text-success'
+                        : 'border-border bg-white text-ink',
+                    )}
+                  >
+                    {earned ? (
+                      <CircleCheck aria-hidden="true" className="size-5" />
+                    ) : (
+                      <CircleDashed aria-hidden="true" className="size-5" />
+                    )}
+                    {earned ? t('achievements.earned') : t('achievements.notYet', { n })}
+                  </p>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         {/* Milestone timeline */}
@@ -205,38 +215,40 @@ export function AchievementsPage() {
 
         <div className="grid content-start grid-cols-1 gap-6">
           {/* Hospitality completion acknowledgement (no qualification claim). */}
-          <section
-            aria-labelledby="ach-hf"
-            className={cn(
-              'grid grid-cols-1 overflow-hidden rounded-3xl shadow-md',
-              hfDone ? 'bg-sedra-green-800' : 'bg-white',
-            )}
-          >
-            {hfCourse?.image ? (
-              <img
-                src={asset(hfCourse.image)}
-                alt=""
-                width={1200}
-                height={896}
-                className="aspect-[2/1] w-full object-cover"
-              />
-            ) : null}
-            <div className="grid grid-cols-1 gap-3 p-6">
-              <h2 id="ach-hf" className={cn('m-0 text-2xl', hfDone && 'text-white')}>
-                {t('achievements.hospitalityHeading')}
-              </h2>
-              <p
-                className={cn(
-                  'm-0 flex items-start gap-2 text-lg',
-                  hfDone ? 'text-white' : 'text-ink',
-                )}
-              >
-                {hfDone ? <Sprout aria-hidden="true" className="mt-1 size-6 shrink-0" /> : null}
-                {hfDone ? t('achievements.hospitalityDone') : t('achievements.hospitalityNotYet')}
-              </p>
-              {!hfDone ? <ProgressMeter done={completedCount(learner, hfUnits)} /> : null}
-            </div>
-          </section>
+          {hasHf ? (
+            <section
+              aria-labelledby="ach-hf"
+              className={cn(
+                'grid grid-cols-1 overflow-hidden rounded-3xl shadow-md',
+                hfDone ? 'bg-sedra-green-800' : 'bg-white',
+              )}
+            >
+              {hfCourse?.image ? (
+                <img
+                  src={asset(hfCourse.image)}
+                  alt=""
+                  width={1200}
+                  height={896}
+                  className="aspect-[2/1] w-full object-cover"
+                />
+              ) : null}
+              <div className="grid grid-cols-1 gap-3 p-6">
+                <h2 id="ach-hf" className={cn('m-0 text-2xl', hfDone && 'text-white')}>
+                  {t('achievements.hospitalityHeading')}
+                </h2>
+                <p
+                  className={cn(
+                    'm-0 flex items-start gap-2 text-lg',
+                    hfDone ? 'text-white' : 'text-ink',
+                  )}
+                >
+                  {hfDone ? <Sprout aria-hidden="true" className="mt-1 size-6 shrink-0" /> : null}
+                  {hfDone ? t('achievements.hospitalityDone') : t('achievements.hospitalityNotYet')}
+                </p>
+                {!hfDone ? <ProgressMeter done={completedCount(learner, hfUnits)} /> : null}
+              </div>
+            </section>
+          ) : null}
 
           {/* Course progress */}
           <section aria-labelledby="ach-progress" className="grid grid-cols-1 gap-4">
@@ -244,7 +256,7 @@ export function AchievementsPage() {
               {t('achievements.progressHeading')}
             </h2>
             <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0">
-              {PROGRAMMES.map((p) => {
+              {programmes.map((p) => {
                 const course = findCourse(p)
                 const done = completedCount(learner, courseUnits(p))
                 return (

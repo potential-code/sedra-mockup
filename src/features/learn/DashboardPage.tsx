@@ -1,3 +1,4 @@
+import type { ProgrammeId } from '@shared/types'
 import { Link } from '@tanstack/react-router'
 import {
   ArrowRight,
@@ -9,6 +10,7 @@ import {
   CircleHelp,
   Clock,
   FolderOpen,
+  Layers,
   type LucideIcon,
   Play,
   Settings2,
@@ -19,12 +21,13 @@ import { DemoTag } from '@/components/learner/DemoTag'
 import {
   completedCount,
   courseUnits,
+  enrolledProgrammes,
   findCourse,
   formatUaeDateTime,
+  hasStartedLearning,
   isComplete,
   nextStepUnit,
   PROGRAMME_LABEL_KEY,
-  PROGRAMMES,
   programmeStatus,
   sortByStart,
   UNITS_PER_COURSE,
@@ -35,7 +38,7 @@ import { PageHeading } from '@/components/learner/PageHeading'
 import { ProgressMeter } from '@/components/learner/ProgressMeter'
 import { ProgressRing } from '@/components/learner/ProgressRing'
 import { StatusLabel } from '@/components/learner/StatusLabel'
-import { Reveal } from '@/components/motion/Reveal'
+import { Reveal, stagger } from '@/components/motion/Reveal'
 import { Button } from '@/components/ui/button'
 import { getCourse, getUnit } from '@/content'
 import { BADGE_UNITS, BadgeMedallion } from '@/features/achievements/BadgeMedallion'
@@ -98,6 +101,70 @@ function StatTile({
   )
 }
 
+/** First visit (no unit started): the one task is choosing where to start (brief §2, §3). */
+function ChooseStart({ programmes }: { programmes: ProgrammeId[] }) {
+  const { t } = useTranslation('learner')
+  const { l } = useLocalized()
+  return (
+    <section aria-labelledby="start-heading" className="grid grid-cols-1 gap-4">
+      <div className="grid gap-1">
+        <h2 id="start-heading" className="m-0 text-2xl md:text-3xl">
+          {t('firstRun.taskHeading')}
+        </h2>
+        <p className="m-0 text-ink-soft">{t('firstRun.taskLead')}</p>
+      </div>
+      {programmes.length === 0 ? (
+        <p className="m-0 rounded-2xl bg-white p-5 shadow-sm">{t('enrolment.none')}</p>
+      ) : null}
+      <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 md:grid-cols-2">
+        {programmes.map((p, i) => {
+          const course = findCourse(p)
+          const name = t(`common:${PROGRAMME_LABEL_KEY[p]}`)
+          return (
+            <li key={p} className="max-w-none">
+              <Reveal delay={stagger(i)} className="h-full">
+                <article className="card-pop flex h-full flex-col overflow-hidden">
+                  {course?.image ? (
+                    <img
+                      src={asset(course.image)}
+                      alt={l(course.imageAlt)}
+                      width={1200}
+                      height={896}
+                      className="aspect-[16/9] w-full object-cover"
+                    />
+                  ) : null}
+                  <div className="grid flex-1 grid-cols-1 content-start gap-3 p-5 md:p-6">
+                    <h3 className="m-0 text-2xl">{name}</h3>
+                    {course ? (
+                      <p className="m-0 font-semibold text-ink">{l(course.title)}</p>
+                    ) : null}
+                    {course ? <p className="m-0 text-ink-soft">{l(course.purpose)}</p> : null}
+                    <p className="m-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-sedra-pale-100 px-3 py-1 text-base font-semibold text-ink">
+                      <Layers aria-hidden="true" className="size-4 text-sedra-green" />
+                      {t('firstRun.shortUnits', { count: courseUnits(p).length })}
+                    </p>
+                    <Button asChild size="lg" className="justify-self-start shadow-md">
+                      <Link
+                        to="/programmes/$programmeId"
+                        params={{ programmeId: p }}
+                        aria-label={t('firstRun.startLabel', { programme: name })}
+                      >
+                        <Play aria-hidden="true" />
+                        {t('firstRun.start')}
+                        <ArrowRight aria-hidden="true" className="rtl-mirror" />
+                      </Link>
+                    </Button>
+                  </div>
+                </article>
+              </Reveal>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
+
 /** Dashboard (brief §2): Continue learning first; programmes; next session; achievements; Help. */
 export function DashboardPage() {
   const { t } = useTranslation('learner')
@@ -108,25 +175,38 @@ export function DashboardPage() {
   const sessions = useDb((db) => db.sessions)
   const simplified = view === 'simplified'
 
+  // Enrolled programmes only: SEDRA manages enrolment (no self-enrolment).
+  const programmes = enrolledProgrammes(learner)
+  const started = hasStartedLearning(learner)
   const next = nextStepUnit(learner)
   const allDone =
     !next &&
-    PROGRAMMES.every((p) => {
+    programmes.length > 0 &&
+    programmes.every((p) => {
       const units = courseUnits(p)
       return units.length > 0 && completedCount(learner, units) === units.length
     })
-  const nextSession = sortByStart(sessions.filter((s) => s.attendanceStatus === 'upcoming'))[0]
-  const badges = BADGE_UNITS.filter((id) => isComplete(learner, id)).length
-  const greeting =
-    persona?.id === 'noor'
-      ? t('dashboard.welcomeName', { name: l(persona.name) })
-      : t('dashboard.welcomeGeneric')
+  const nextSession = sortByStart(
+    sessions.filter(
+      (s) =>
+        s.attendanceStatus === 'upcoming' && !s.cancelled && programmes.includes(s.programmeId),
+    ),
+  )[0]
+  const badges = programmes.includes('life-skills')
+    ? BADGE_UNITS.filter((id) => isComplete(learner, id)).length
+    : 0
+  const name = learner?.displayName || (persona?.id === 'noor' ? l(persona.name) : '')
+  const greeting = name ? t('dashboard.welcomeName', { name }) : t('dashboard.welcomeGeneric')
 
-  const totalUnits = PROGRAMMES.length * UNITS_PER_COURSE
-  const totalDone = PROGRAMMES.reduce((n, p) => n + completedCount(learner, courseUnits(p)), 0)
+  const totalUnits = programmes.reduce((n, p) => n + courseUnits(p).length, 0)
+  const totalDone = programmes.reduce((n, p) => n + completedCount(learner, courseUnits(p)), 0)
 
   // Hero: the unit Continue learning opens, or the last programme when everything is done.
-  const heroProgramme = next?.programmeId ?? learner?.lastProgramme ?? 'life-skills'
+  const heroProgramme =
+    next?.programmeId ??
+    (learner?.lastProgramme && programmes.includes(learner.lastProgramme)
+      ? learner.lastProgramme
+      : (programmes[0] ?? 'life-skills'))
   const heroCourse = next ? getCourse(next.courseId) : findCourse(heroProgramme)
   const heroUnits = courseUnits(heroProgramme)
   const heroDone = completedCount(learner, heroUnits)
@@ -138,6 +218,46 @@ export function DashboardPage() {
       ? t('dashboard.allDone')
       : t('dashboard.startStep')
   const session = nextSession ? uaeDateParts(nextSession.startsAt, lang) : null
+
+  if (!started) {
+    return (
+      <div className="container-page grid grid-cols-1 gap-8 py-8 [&_:is(h2,h3,h4)]:break-words [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink">
+        <div className="flex items-center gap-4">
+          {persona?.avatar ? (
+            <img
+              src={asset(persona.avatar)}
+              alt=""
+              width={72}
+              height={72}
+              className="size-16 shrink-0 rounded-full object-cover shadow-md ring-4 ring-white md:size-18"
+            />
+          ) : null}
+          <PageHeading title={greeting} pageTitle={t('dashboard.pageTitle')} className="gap-1">
+            <p className="m-0 text-lg text-ink-soft md:text-xl">
+              {t('firstRun.lead', { count: programmes.length })}
+            </p>
+          </PageHeading>
+        </div>
+        <ChooseStart programmes={programmes} />
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <Panel title={t('dashboard.helpHeading')} icon={CircleHelp}>
+            <p className="m-0">{t('dashboard.helpBody')}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline">
+                <Link to="/help">{t('dashboard.openHelp')}</Link>
+              </Button>
+              <Button asChild variant="ghost">
+                <Link to="/preferences">
+                  <Settings2 aria-hidden="true" />
+                  {t('dashboard.prefsLink')}
+                </Link>
+              </Button>
+            </div>
+          </Panel>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container-page grid grid-cols-1 gap-8 py-8 [&_:is(h2,h3,h4)]:break-words [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink">
@@ -199,15 +319,15 @@ export function DashboardPage() {
               </h2>
             </div>
             <div className="flex items-center gap-4">
-              <ProgressRing value={heroDone / UNITS_PER_COURSE} size={76} stroke={9}>
+              <ProgressRing value={heroDone / Math.max(1, heroUnits.length)} size={76} stroke={9}>
                 <span className="text-lg font-bold text-ink" aria-hidden="true">
-                  {heroDone}/{UNITS_PER_COURSE}
+                  {heroDone}/{heroUnits.length}
                 </span>
               </ProgressRing>
               <div className="grid">
                 <span className="text-base text-ink-soft">{t('dashboard.courseProgress')}</span>
                 <span className="font-semibold text-ink">
-                  {t('shared.unitsComplete', { done: heroDone, total: UNITS_PER_COURSE })}
+                  {t('shared.unitsComplete', { done: heroDone, total: heroUnits.length })}
                 </span>
               </div>
             </div>
@@ -244,14 +364,16 @@ export function DashboardPage() {
                 tint="bg-success-soft text-success"
               />
             </li>
-            <li className="max-w-none">
-              <StatTile
-                icon={Award}
-                label={t('dashboard.statBadges')}
-                value={t('dashboard.statBadgesValue', { count: badges })}
-                tint="bg-notice-soft text-notice"
-              />
-            </li>
+            {programmes.includes('life-skills') ? (
+              <li className="max-w-none">
+                <StatTile
+                  icon={Award}
+                  label={t('dashboard.statBadges')}
+                  value={t('dashboard.statBadgesValue', { count: badges })}
+                  tint="bg-notice-soft text-notice"
+                />
+              </li>
+            ) : null}
             <li className="max-w-none">
               <StatTile
                 icon={CalendarClock}
@@ -270,7 +392,7 @@ export function DashboardPage() {
           {t('dashboard.programmesHeading')}
         </h2>
         <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 md:grid-cols-2">
-          {PROGRAMMES.map((p) => {
+          {programmes.map((p) => {
             const course = findCourse(p)
             const units = courseUnits(p)
             const name = t(`common:${PROGRAMME_LABEL_KEY[p]}`)
@@ -353,7 +475,7 @@ export function DashboardPage() {
         </Panel>
 
         {/* Achievements teaser: static badge outlines (brief §2: no badge animation). */}
-        {!simplified ? (
+        {!simplified && programmes.includes('life-skills') ? (
           <Panel title={t('dashboard.achievementsHeading')} icon={Award}>
             <p className="m-0 font-semibold text-ink">
               {t('dashboard.badgesEarned', { count: badges })}
