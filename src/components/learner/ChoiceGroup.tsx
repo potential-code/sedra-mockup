@@ -1,4 +1,3 @@
-import { Check } from 'lucide-react'
 import { useId } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -73,7 +72,7 @@ export function ChoiceGroup<T extends string>({
             <label
               key={c.value}
               className={cn(
-                'flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 bg-white px-4 py-2 text-ink',
+                'flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 bg-white px-3 py-2 text-ink sm:px-4',
                 'has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink',
                 checked
                   ? 'border-sedra-green bg-sedra-pale-50'
@@ -91,15 +90,12 @@ export function ChoiceGroup<T extends string>({
                 className="size-5 shrink-0 accent-sedra-green focus-visible:outline-none"
                 aria-invalid={error ? true : undefined}
               />
-              <span className="grid flex-1">
+              <span className="grid min-w-0 flex-1">
                 <span className="font-semibold" lang={c.lang}>
                   {c.label}
                 </span>
                 {c.hint ? <span className="text-base text-ink-soft">{c.hint}</span> : null}
               </span>
-              {checked ? (
-                <Check aria-hidden="true" className="size-5 shrink-0 text-sedra-green" />
-              ) : null}
             </label>
           )
         })}

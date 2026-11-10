@@ -1,0 +1,18 @@
+SEDRA HF01 A warm welcome (English, v4, 16:9 motion graphics, 17.6 s)
+Descriptive transcript
+
+[00.0-04.3 s] A label reads: Hospitality. A door appears, then three cards: Welcome (a door), Safe (a shield with a tick) and Comfortable (an armchair).
+Narrator: Hospitality means helping people feel welcome, safe and comfortable.
+
+[04.3-07.6 s] The first step in the strip at the bottom fills in. A label reads: 1 Hello. A large card reads Hello. Two cards follow: a speech bubble and a hand holding a communication card.
+Narrator: Say hello in a way that works for you.
+
+[07.6-12.3 s] The second step fills in. A label reads: 2 Ask. A card reads How can I help? A clock appears and slowly fills next to a card reading Time to respond. A direction sign with an arrow appears.
+Narrator: Ask, How can I help? Then give the guest time to respond.
+
+[12.3-17.6 s] The third step fills in. A label reads: 3 Welcome. A simple map appears and a path is drawn to a pin. A card with a heart reads A kind welcome and is ticked. The final scene holds for 2 seconds.
+Narrator: A kind welcome can make a difference.
+
+A large step strip at the bottom (1 Hello, 2 Ask, 3 Welcome) fills in during the short pause before each step.
+Thumbnail alt text: A card reads A kind welcome next to a simple map.
+Narration: synthetic voice (Kokoro TTS, voice af_heart), exact English script from the brief. No music or sound effects.

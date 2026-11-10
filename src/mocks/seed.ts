@@ -64,6 +64,7 @@ function doneUnit(selected: OptionId): UnitProgress {
     selected,
     attempts: 1,
     practice: 'done',
+    seen: ['media', 'summary', 'read'],
   }
 }
 

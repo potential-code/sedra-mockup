@@ -137,7 +137,10 @@ function collectErrors(f: Fields): FieldErrors {
   if (blank('feedback_retry')) e.feedback_retry = 'editor.errors.feedbackRetry'
   if (blank('image_alt')) e.image_alt = 'editor.errors.imageAlt'
   if (blank('transcript')) e.transcript = 'editor.errors.transcript'
-  if (f.duration_seconds.trim() !== '30') e.duration_seconds = 'editor.errors.duration'
+  // Short videos: any length up to two minutes (LS02 v4 is 19 s; no longer fixed at 30).
+  const secs = Number(f.duration_seconds.trim())
+  if (!Number.isFinite(secs) || secs <= 0 || secs > 120)
+    e.duration_seconds = 'editor.errors.duration'
   const id = f.unit_id.toUpperCase()
   for (const k of ['video_url', 'captions_url'] as const) {
     if (!blank(k) && !fileName(f[k]).toUpperCase().includes(id)) e[k] = 'editor.errors.assetId'

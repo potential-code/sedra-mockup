@@ -248,7 +248,7 @@
     },
     "hints": {
       "video_url": "The file name must contain the unit ID {{id}}. Leave empty while the video is pending.",
-      "duration_seconds": "Unit videos are 30 seconds.",
+      "duration_seconds": "Keep unit videos short (up to 2 minutes).",
       "captions_url": "The file name must contain the unit ID {{id}}."
     },
     "errors": {
@@ -260,7 +260,7 @@
       "correct": "Choose the correct option.",
       "imageAlt": "Enter an image description.",
       "transcript": "Enter a transcript.",
-      "duration": "Unit videos must be 30 seconds.",
+      "duration": "Enter the video length in seconds (up to 120).",
       "assetId": "Asset ID does not match this unit.",
       "sampleNeedsVideo": "A sample video needs a video file. Or set media status to Video pending production.",
       "feedbackCorrect": "Enter the message learners see when they choose the correct answer.",
@@ -562,7 +562,7 @@
     "eyebrow": "Course builder",
     "intro": "Edit the 8 units of this course. Publishing applies to the whole course. Changes are live for learners in this demo.",
     "structure": "Course structure",
-    "structureHint": "Units are in learning order. Each unit has three learning blocks: Watch or read, Question and Practice.",
+    "structureHint": "Units are in learning order. Each unit has five learning blocks: Video, Summary, Read, Question and Practice.",
     "updated": "Last change: {{date}} (UAE time)",
     "unitN": "Unit {{n}}",
     "edit": "Edit",
@@ -594,7 +594,9 @@
     "showBlocks": "Show learning blocks",
     "optional": "optional",
     "block": {
-      "media": "Watch or read",
+      "media": "Video",
+      "summary": "Summary",
+      "read": "Read",
       "check": "Question",
       "practice": "Practice"
     },
@@ -603,7 +605,8 @@
     "courseImageHint": "Choose a photo for the course card. Learners see it on their dashboard and course pages.",
     "imgLifeSkills": "Life Skills photo",
     "imgHospitality": "Hospitality photo",
-    "imgGroup": "Group photo"
+    "imgGroup": "Group photo",
+    "readText": "The lesson as {{count}} short scenes to read"
   },
   "invite": {
     "open": "Invite learner",

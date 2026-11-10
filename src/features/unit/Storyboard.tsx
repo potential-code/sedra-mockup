@@ -3,13 +3,10 @@ import { Clock, Eye, MessageSquareQuote, MonitorSmartphone } from 'lucide-react'
 import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocalized } from '@/i18n'
-import { DoneControl } from './DoneControl'
 import { UnitImage } from './UnitImage'
 
 interface Props {
   unit: Unit
-  done: boolean
-  onDone: () => void
   /** Hide the image when the pending panel above already shows it. */
   showImage?: boolean
 }
@@ -20,7 +17,7 @@ interface Props {
  * "Read lesson" actions can move focus here.
  */
 export const Storyboard = forwardRef<HTMLHeadingElement, Props>(function Storyboard(
-  { unit, done, onDone, showImage = true },
+  { unit, showImage = true },
   headingRef,
 ) {
   const { t } = useTranslation('unit')
@@ -28,7 +25,13 @@ export const Storyboard = forwardRef<HTMLHeadingElement, Props>(function Storybo
 
   return (
     <section aria-labelledby={`${unit.id}-read`} className="flex flex-col gap-4">
-      <h3 id={`${unit.id}-read`} ref={headingRef} tabIndex={-1} className="m-0 text-2xl">
+      {/* As its own learning block the block heading names it; elsewhere it carries its own. */}
+      <h3
+        id={`${unit.id}-read`}
+        ref={headingRef}
+        tabIndex={-1}
+        className={showImage ? 'm-0 text-2xl' : 'sr-only'}
+      >
         {t('read.title')}
       </h3>
       {showImage && (
@@ -42,7 +45,8 @@ export const Storyboard = forwardRef<HTMLHeadingElement, Props>(function Storybo
         {unit.scenes.map((s, i) => (
           <li key={s.time} className="relative flex max-w-none gap-3">
             {/* Timeline node + connector (decorative; the heading says "Scene n"). */}
-            <div aria-hidden="true" className="flex shrink-0 flex-col items-center">
+            {/* Hidden on narrow screens so the scene text keeps its width ("Scene n" says the order). */}
+            <div aria-hidden="true" className="hidden shrink-0 flex-col items-center @md:flex">
               <span className="flex size-10 items-center justify-center rounded-full bg-sedra-green text-lg font-bold text-white shadow-md">
                 {i + 1}
               </span>
@@ -95,12 +99,6 @@ export const Storyboard = forwardRef<HTMLHeadingElement, Props>(function Storybo
           </li>
         ))}
       </ol>
-      <DoneControl
-        done={done}
-        onDone={onDone}
-        doneText={t('read.doneStatus')}
-        actionText={t('read.markRead')}
-      />
     </section>
   )
 })

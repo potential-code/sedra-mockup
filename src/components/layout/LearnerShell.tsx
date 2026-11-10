@@ -66,7 +66,8 @@ export function LearnerShell() {
                 to={to}
                 params={params as never}
                 className={cn(
-                  'flex min-h-16 flex-col items-center justify-center gap-1 px-1 text-sm font-semibold text-ink',
+                  // Fluid label size so 'Sessions' never splits mid-word on a narrow phone or at large text.
+                  'flex min-h-16 flex-col items-center justify-center gap-1 px-0.5 text-center text-[min(0.875rem,4vw)] leading-tight font-semibold text-ink [overflow-wrap:normal]',
                   'aria-[current=page]:text-sedra-green [&[aria-current=page]_svg]:scale-110',
                 )}
               >

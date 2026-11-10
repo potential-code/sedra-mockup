@@ -292,7 +292,8 @@ function TopicTiles({
             <label
               key={v}
               className={cn(
-                'relative flex min-h-12 cursor-pointer items-center gap-4 rounded-2xl border-2 bg-white p-4 text-ink sm:flex-col sm:items-start sm:p-5',
+                // Stacked (icon, then label) at every width so the label never gets squeezed.
+                'relative flex min-h-12 cursor-pointer flex-col items-start gap-3 rounded-2xl border-2 bg-white p-4 pe-14 text-ink sm:p-5 sm:pe-14',
                 'transition-shadow hover:shadow-md',
                 'has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink',
                 checked
@@ -320,11 +321,11 @@ function TopicTiles({
               >
                 <Icon className="size-7" />
               </span>
-              <span className="flex-1 text-lg font-bold">{t(TOPIC_KEY[v])}</span>
+              <span className="text-lg font-bold">{t(TOPIC_KEY[v])}</span>
               <span
                 aria-hidden="true"
                 className={cn(
-                  'flex size-7 shrink-0 items-center justify-center rounded-full border-2 sm:absolute sm:end-4 sm:top-4',
+                  'absolute end-4 top-4 flex size-7 shrink-0 items-center justify-center rounded-full border-2',
                   checked
                     ? 'border-sedra-green bg-sedra-green text-white'
                     : 'border-input bg-white',

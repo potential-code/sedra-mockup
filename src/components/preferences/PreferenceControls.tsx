@@ -70,12 +70,9 @@ function OptionCards<T extends string>({
       <div
         className={cn(
           'grid gap-2',
-          compact
-            ? // Narrow panel: options with hints or long labels stack; short ones sit side by side.
-              options.some((o) => o.hint || o.label.length > 14)
-              ? 'grid-cols-1'
-              : 'grid-cols-[repeat(auto-fit,minmax(min(100%,8.5rem),1fr))]'
-            : 'grid-cols-1 gap-3',
+          // One option per row: side-by-side cards squeezed the labels into the check mark on
+          // phones and at larger text sizes.
+          compact ? 'grid-cols-1' : 'grid-cols-1 gap-3',
         )}
       >
         {options.map((o) => {

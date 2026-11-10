@@ -67,16 +67,21 @@ function check(
   }
 }
 
+/** Latest delivered version per sample video (both v4: 16:9, ~18 s, Arabic captions). */
+const SAMPLE_VERSION = { LS02: 'v4', HF01: 'v4' } as const
+
 function sample(id: 'LS02' | 'HF01', posterAlt: Localized): VideoAsset {
-  const base = `media/${id}/SEDRA_${id}_EN_v2`
+  const v = SAMPLE_VERSION[id]
+  const base = `media/${id}/SEDRA_${id}_EN_${v}`
   return {
     video: `${base}_clean.mp4`,
     captions: `${base}.vtt`,
+    captionsAr: `media/${id}/SEDRA_${id}_AR-captions_${v}.vtt`,
     transcript: `${base}_transcript.txt`,
     descriptiveTranscript: `${base}_descriptive_transcript.txt`,
     poster: `${base}_thumbnail.png`,
     posterAlt,
-    version: 'v2',
+    version: v,
   }
 }
 
@@ -111,7 +116,8 @@ function build(u: UnitInput, courseId: CourseId, programmeId: ProgrammeId): Unit
     title: u.title,
     objective: u.objective,
     sourcePages: u.sourcePages,
-    durationSeconds: 30,
+    // LS02 v4 runs 18.9 s, HF01 v4 17.6 s; the others are scripted for about 30 s until made.
+    durationSeconds: u.id === 'LS02' ? 19 : u.id === 'HF01' ? 18 : 30,
     mediaStatus: u.media ? 'sample' : 'pending',
     ...(u.media ? { media: u.media } : {}),
     scenes: u.scenes,
@@ -715,8 +721,8 @@ const HF01 = hf({
     en: sample(
       'HF01',
       l(
-        'A host offers a welcome card to a guest at reception.',
-        'مضيف يقدّم بطاقة ترحيب لضيف في منطقة الاستقبال.',
+        'A card reads A kind welcome next to a simple map.',
+        'بطاقة مكتوب عليها ترحيب لطيف بجانب خريطة بسيطة.',
       ),
     ),
   },

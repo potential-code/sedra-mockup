@@ -273,7 +273,7 @@ export function HomePage() {
       {/* Accessibility promise: dark green band, heading on one side, tiles on the other. */}
       {simplified ? null : (
         <section aria-labelledby="access-heading" className="container-page py-10 md:py-14">
-          <Reveal className="motif-tree-light grid gap-8 rounded-3xl bg-sedra-green-800 p-6 text-white shadow-lg md:p-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:items-center">
+          <Reveal className="motif-tree-light grid gap-8 rounded-3xl bg-sedra-green-800 p-4 text-white shadow-lg sm:p-6 md:p-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:items-center">
             <div className="grid gap-3">
               <p className="m-0 inline-flex w-fit items-center gap-2 rounded-full bg-sedra-green-700 px-3 py-1 text-base font-semibold text-white">
                 <HandHeart aria-hidden="true" className="size-5" />
@@ -288,12 +288,12 @@ export function HomePage() {
               {access.map(({ icon: Icon, text }) => (
                 <li
                   key={text}
-                  className="flex max-w-none items-center gap-4 rounded-2xl bg-sedra-green-700 p-4 ring-1 ring-white/20"
+                  className="flex max-w-none items-center gap-3 rounded-2xl bg-sedra-green-700 p-3 ring-1 ring-white/20 sm:gap-4 sm:p-4"
                 >
-                  <span className="grid size-12 shrink-0 place-items-center rounded-full bg-white text-sedra-green-800">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-sedra-green-800 sm:size-12">
                     <Icon aria-hidden="true" className="size-6" />
                   </span>
-                  <span className="font-semibold text-white">{text}</span>
+                  <span className="min-w-0 flex-1 font-semibold text-white">{text}</span>
                 </li>
               ))}
             </ul>

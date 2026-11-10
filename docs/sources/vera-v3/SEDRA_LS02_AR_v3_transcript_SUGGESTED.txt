@@ -1,0 +1,7 @@
+SEDRA LS02 - Arabic caption text (suggested Arabic narration from the brief, pending SEDRA review)
+قد يجعل الشعور القوي اختيار ما نفعله أمراً صعباً.
+توقّف. تمهّل ولاحظ شعورك.
+فكّر. ماذا يمكنك أن تقول أو تفعل بطريقة لطيفة وآمنة؟
+افعل. جرّب اختيارك. يمكنك أن تتوقّف وتفكّر من جديد.
+
+Note: the audio is English. The Arabic captions follow the same scene timing as the English captions. They are a translation track for the mockup, not a match to Arabic audio.

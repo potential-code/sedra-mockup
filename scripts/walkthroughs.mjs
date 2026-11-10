@@ -40,6 +40,24 @@ const MEDIA_SPY = () => {
   document.addEventListener('play', () => window.__media.playEvents++, true)
 }
 
+/** Walk the content blocks (Video, Summary, Read) with the one Next button until the Question. */
+async function toQuestion(page) {
+  // Wait for the unit to render (its one primary Next button), then step through to the Question.
+  await page
+    .getByRole('button', { name: /^Next: (summary|read|question)$/ })
+    .first()
+    .waitFor({ timeout: 8000 })
+    .catch(() => {})
+  for (const name of ['Next: summary', 'Next: read', 'Next: question']) {
+    const b = page.getByRole('button', { name, exact: true })
+    if (await b.isVisible().catch(() => false)) {
+      await b.click()
+      await page.waitForTimeout(200)
+    }
+  }
+  await page.locator('input[type=radio]').first().waitFor({ timeout: 8000 }).catch(() => {})
+}
+
 async function newPage(width = 1280) {
   const ctx = await browser.newContext({ viewport: { width, height: 900 }, acceptDownloads: true })
   await blockThirdParty(ctx)
@@ -166,14 +184,11 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     )
     await vid.evaluate((v) => v.pause())
 
-    await page.getByRole('button', { name: 'Read transcript' }).click()
+    await page.getByRole('button', { name: 'Prefer to read? Go to Read' }).click()
     await page.waitForTimeout(500)
-    R.ok(
-      await visible(page, 'Pause and notice how you feel'),
-      'Transcript opens and shows LS02 narration',
-    )
+    R.ok(await visible(page, 'Scene 1'), '"Prefer to read" opens the Read block')
 
-    await page.getByRole('button', { name: 'Next: question' }).click()
+    await toQuestion(page)
     await page.getByRole('radio', { name: /Think/ }).check()
     await page.getByRole('button', { name: 'Check answer' }).click()
     await page.waitForTimeout(300)
@@ -182,7 +197,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
       'Answer B shows correct feedback',
     )
 
-    await page.getByRole('button', { name: 'Practise (optional)' }).click()
+    await page.getByRole('button', { name: 'Next: practice' }).click()
     await page.getByRole('button', { name: 'Later', exact: true }).click()
     await page.waitForTimeout(200)
     let db = await readDb(page)
@@ -192,7 +207,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
       JSON.stringify(db.learners.noor.progress.LS02),
     )
 
-    await page.getByRole('button', { name: /^Next/ }).first().click()
+    await page.getByRole('button', { name: /^Done\. Go to Unit 3$/ }).click()
     await page.waitForURL(/units\/LS03/, { timeout: 5000 }).catch(() => {})
     R.ok(/units\/LS03/.test(page.url()), 'Next opens LS03', page.url())
     const step3 = await page.locator('#step-title').innerText()
@@ -200,13 +215,13 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
       [...document.querySelectorAll('video')].some((v) => !v.paused),
     )
     R.ok(
-      step3 === 'Watch or read' && !anyPlaying,
+      step3 === 'Watch the video' && !anyPlaying,
       'LS03 opens at the start step, nothing playing',
       `step=${step3}`,
     )
 
     // Move to the question step so resume restores a non-default step.
-    await page.getByRole('button', { name: 'Next: question' }).click()
+    await toQuestion(page)
     await page.waitForTimeout(200)
     await page.reload()
     await page.waitForTimeout(500)
@@ -221,6 +236,12 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     )
 
     await page.goto(url('/learn'))
+    // Video done but question not reviewed: leaving shows Keep learning / Leave and save.
+    const leave = page.getByRole('alertdialog')
+    if (await leave.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await leave.getByRole('button').last().click()
+      await page.waitForTimeout(300)
+    }
     await page.getByRole('link', { name: 'Continue learning' }).first().click()
     await page.waitForURL(/units\/LS03/, { timeout: 5000 }).catch(() => {})
     const resumed = await page
@@ -290,8 +311,9 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     R.ok(menuHf >= 8, 'Unit view shows the Hospitality course menu', `links=${menuHf}`)
 
     // Read the text alternative.
-    const readBtn = await tabTo(page, (i) => i.tag === 'BUTTON' && /اقرأ الدرس/.test(i.text))
-    R.ok(!!readBtn, 'Arabic "Read lesson" button reachable')
+    // HF01 now has a video with Arabic captions; the text route is the "Prefer to read" button.
+    const readBtn = await tabTo(page, (i) => i.tag === 'BUTTON' && /تفضّل القراءة/.test(i.text))
+    R.ok(!!readBtn, 'Arabic "Prefer to read? Go to Read" button reachable')
     await page.keyboard.press('Enter')
     await page.waitForTimeout(300)
     const focusAfterRead = await page.evaluate(() => ({
@@ -300,16 +322,11 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     }))
     R.ok(
       /^H[1-6]$/.test(focusAfterRead.tag),
-      'Read lesson moves focus to the text alternative heading',
+      'Going to Read moves focus to the Read block heading',
       JSON.stringify(focusAfterRead),
     )
-    const markRead = await tabTo(page, (i) => i.tag === 'BUTTON' && /قرأتُ هذا/.test(i.text))
-    R.ok(!!markRead, '"I have read this" reachable by Tab')
-    if (markRead) await page.keyboard.press('Space')
-    await page.waitForTimeout(200)
-
     const toQ = await tabTo(page, (i) => i.tag === 'BUTTON' && /التالي: السؤال/.test(i.text))
-    R.ok(!!toQ, '"Next: question" reachable by Tab')
+    R.ok(!!toQ, '"I\'m done. Next: question" reachable by Tab (also marks reading done)')
     await page.keyboard.press('Enter')
     await page.waitForTimeout(300)
     const radio = await tabTo(page, (i) => i.tag === 'INPUT' && i.type === 'radio')
@@ -391,16 +408,17 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
   try {
     await signIn(page, 'Noor')
     await page.goto(url(unitPath('HF01')))
-    await page.getByRole('button', { name: 'Next: question' }).click()
+    await toQuestion(page)
     const radios = page.locator('input[type=radio]')
     await radios.nth(0).check()
     await page.getByRole('button', { name: 'Check answer' }).click()
     await page.waitForTimeout(300)
-    R.ok(await visible(page, 'Here is a hint'), 'Hint shown')
-    for (const name of ['Replay from the start|Replay', 'Read the lesson', 'Try again']) {
-      const n = await page.getByRole('button', { name: new RegExp(`^(${name})$`) }).count()
-      R.ok(n > 0, `Offers "${name.split('|').pop()}"`)
-    }
+    R.ok(await visible(page, 'Not quite'), "'Not quite' shown")
+    R.ok(await visible(page, 'Answer: '), 'Correct answer shown at once')
+    R.ok(
+      (await page.getByRole('button', { name: /^(Try again|Check answer)$/ }).count()) === 0,
+      'No retry: question is locked after one try',
+    )
     const sel = await page.evaluate(
       () => document.querySelector('input[type=radio]:checked')?.value,
     )
@@ -418,6 +436,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     const next = page.getByRole('button', { name: /^Next/ }).first()
     R.ok(await next.isEnabled().catch(() => false), 'Next available after reviewing feedback')
     await next.click()
+    await page.getByRole('button', { name: /^Done\. Go to Unit 2$/ }).click()
     await page.waitForURL(/units\/HF02/, { timeout: 5000 }).catch(() => {})
     R.ok(/units\/HF02/.test(page.url()), 'Next goes to HF02', page.url())
   } catch (e) {
@@ -442,8 +461,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
       await page.waitForTimeout(300)
       const readMode = page.getByRole('button', { name: 'Read lesson' }).first()
       if (await readMode.isVisible().catch(() => false)) await readMode.click()
-      await page.getByRole('button', { name: 'I have read this' }).click()
-      await page.getByRole('button', { name: 'Next: question' }).click()
+      await toQuestion(page)
       const ans = correct ?? (await readDb(page), null)
       const radios = page.locator('input[type=radio]')
       if (ans) await page.locator(`input[type=radio][value=${ans}]`).check()
@@ -581,6 +599,11 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
   const { ctx, page } = await newPage()
   try {
     await signIn(page, 'Noor')
+    // The seed has Noor's LS02 finished (locked question); this flow answers it, so reset LS02.
+    await patchDb(page, (db) => {
+      delete db.learners.noor.progress.LS02
+      return db
+    })
     // Fresh document load (after an in-app route change the Tab start point is past the skip link).
     await page.goto('about:blank')
     await page.goto(url('/learn'))
@@ -596,7 +619,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
 
     // Live region: feedback announced once.
     await page.goto(url(unitPath('LS02')))
-    await page.getByRole('button', { name: 'Next: question' }).click()
+    await toQuestion(page)
     await page.evaluate(() => {
       window.__live = []
       const lr = document.querySelector('[aria-live="polite"][aria-atomic="true"]')
@@ -616,7 +639,7 @@ async function tabTo(page, pred, max = 120, key = 'Tab') {
     // Leave prompt: unfinished (selected but unchecked) answer; dialog restores focus on Keep learning.
     // HF02: not started for Noor, so selecting an answer leaves an unchecked draft.
     await page.goto(url(unitPath('HF02')))
-    await page.getByRole('button', { name: 'Next: question' }).click()
+    await toQuestion(page)
     await page.locator('input[type=radio]').first().check()
     const home = page.locator('a[href$="#/learn"]').first()
     await home.focus()

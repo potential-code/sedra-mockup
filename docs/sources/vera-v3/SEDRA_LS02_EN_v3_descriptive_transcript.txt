@@ -1,0 +1,18 @@
+SEDRA LS02 Stop Think Do (English, v3, 16:9 motion graphics)
+Descriptive transcript
+
+[00.0-07.5 s] A label reads: A big feeling. A heart icon appears, then three arrows pointing in different directions and a question mark.
+Narrator: A big feeling can make it hard to choose what to do.
+
+[07.5-15.0 s] A label reads: 1 Stop. A stop sign appears, then a card with a pause symbol reading Pause, then a card with a heart reading Notice how you feel.
+Narrator: Stop. Pause and notice how you feel.
+
+[15.0-22.5 s] A label reads: 2 Think. A thought bubble appears, then two choice cards: Ask calmly, and Take a break. Two small cards follow: Kind and Safe.
+Narrator: Think. What could you say or do that is kind and safe?
+
+[22.5-30.0 s] A label reads: 3 Do. The Ask calmly card appears and is ticked. Three cards then read 1 Stop, 2 Think, 3 Do, with a circular arrow showing you can go back to the start. The final scene holds.
+Narrator: Do. Try your choice. You can stop and think again.
+
+A step strip at the top (1 Stop, 2 Think, 3 Do) fills in as each step is reached.
+Thumbnail alt text: Three labelled cards show Stop Think Do.
+Narration: synthetic voice (Kokoro TTS, voice af_heart), steady conversational pace. No music or sound effects.

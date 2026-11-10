@@ -1,4 +1,4 @@
-import type { Unit, UnitStep } from '@shared/types'
+import type { Unit } from '@shared/types'
 import { Link } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -6,8 +6,6 @@ import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 import { getUnitProgress, isUnitComplete, useLearner } from '@/store/actions'
-
-const BLOCKS: UnitStep[] = ['media', 'check', 'practice']
 
 /**
  * Compact course outline (brief §3: desktop shows the same sequence with an outline), drawn as
@@ -19,16 +17,14 @@ export function UnitOutline({
   currentId,
   onNavigate,
   thumbnails = true,
-  step,
-  onStep,
+  nextId,
 }: {
   units: Unit[]
   currentId: string
   onNavigate?: () => void
   thumbnails?: boolean
-  /** Current learning block and its setter: shows the blocks under the current unit. */
-  step?: UnitStep
-  onStep?: (s: UnitStep) => void
+  /** The suggested next unit (demo: all units stay open). */
+  nextId?: string
 }) {
   const { t } = useTranslation('unit')
   const { l } = useLocalized()
@@ -44,7 +40,9 @@ export function UnitOutline({
           ? t('outline.complete')
           : started
             ? t('outline.inProgress')
-            : t('outline.notStarted')
+            : u.id === nextId
+              ? t('outline.upNext')
+              : t('outline.notStarted')
         const current = u.id === currentId
         const nextUnit = units[i + 1]
         const nextDone = !!nextUnit && isUnitComplete(getUnitProgress(learner, nextUnit.id))
@@ -65,6 +63,7 @@ export function UnitOutline({
               params={{ courseId: u.courseId, unitId: u.id }}
               onClick={onNavigate}
               aria-current={current ? 'page' : undefined}
+              title={l(u.title)}
               className={cn(
                 'relative flex min-h-12 items-center gap-3 rounded-2xl px-2 py-2 text-base text-ink transition-colors',
                 current ? 'bg-sedra-pale-100 shadow-sm' : 'hover:bg-sedra-pale-50',
@@ -85,8 +84,9 @@ export function UnitOutline({
               </span>
               <span className="min-w-0 flex-1">
                 <span className={cn('block leading-snug', current && 'font-bold text-sedra-green')}>
-                  <span className="sr-only">{u.order}. </span>
-                  {l(u.title)}
+                  {/* Short visible label; the full title is in the main content and read out here. */}
+                  {t('outline.unitN', { n: u.order })}
+                  <span className="sr-only">: {l(u.title)}</span>
                 </span>
                 <span
                   className={cn(
@@ -112,51 +112,6 @@ export function UnitOutline({
                 />
               )}
             </Link>
-            {current && step && onStep && (
-              <div className="ms-14 mt-1 mb-2">
-                <p id={`blocks-${u.id}`} className="m-0 text-base font-semibold text-ink-soft">
-                  {t('outline.blocks')}
-                </p>
-                <ul
-                  aria-labelledby={`blocks-${u.id}`}
-                  className="m-0 flex list-none flex-col gap-1 p-0"
-                >
-                  {BLOCKS.map((b) => {
-                    const text =
-                      b === 'media'
-                        ? p.watchedOrRead
-                          ? t('steps.done')
-                          : t('steps.notYet')
-                        : b === 'check'
-                          ? p.checkReviewed
-                            ? t('steps.reviewed')
-                            : t('steps.notYet')
-                          : p.practice
-                            ? t(`practice.status.${p.practice}`)
-                            : t('steps.optional')
-                    const here = b === step
-                    return (
-                      <li key={b} className="max-w-none">
-                        <button
-                          type="button"
-                          onClick={() => onStep(b)}
-                          aria-current={here ? 'step' : undefined}
-                          className={cn(
-                            'flex min-h-12 w-full items-center justify-between gap-2 rounded-xl px-3 py-1 text-start text-base text-ink transition-colors',
-                            here
-                              ? 'bg-white font-bold text-sedra-green ring-2 ring-sedra-green'
-                              : 'hover:bg-sedra-pale-50',
-                          )}
-                        >
-                          <span>{t(`steps.${b}`)}</span>
-                          <span className="text-ink-soft">{text}</span>
-                        </button>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )}
           </li>
         )
       })}

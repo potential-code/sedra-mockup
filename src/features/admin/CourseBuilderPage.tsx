@@ -3,12 +3,14 @@ import { Link, useParams } from '@tanstack/react-router'
 import {
   ArrowLeft,
   BarChart3,
+  BookOpen,
   Check,
   ChevronDown,
   Clapperboard,
   Eye,
   EyeOff,
   Layers,
+  Lightbulb,
   MessageCircleQuestion,
   Pencil,
   Save,
@@ -47,12 +49,20 @@ import {
 /** Every unit has the same three learning blocks (brief: video/text, one check, optional practice). */
 const BLOCKS = [
   { key: 'media', icon: Clapperboard },
+  { key: 'summary', icon: Lightbulb },
+  { key: 'read', icon: BookOpen },
   { key: 'check', icon: MessageCircleQuestion },
   { key: 'practice', icon: Sparkles },
 ] as const
 
 /** Unit editor section for each built-in block (Edit opens the editor there). */
-const BLOCK_SECTION = { media: 'sec-media', check: 'sec-check', practice: 'sec-practice' } as const
+const BLOCK_SECTION = {
+  media: 'sec-media',
+  summary: 'sec-lesson',
+  read: 'sec-media',
+  check: 'sec-check',
+  practice: 'sec-practice',
+} as const
 
 function BackLink() {
   const { t } = useTranslation('admin')
@@ -233,6 +243,8 @@ function UnitItem({ unit, lang }: { unit: Unit; lang: Lang }) {
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
   const blockText: Record<(typeof BLOCKS)[number]['key'], string> = {
     media: unit.mediaStatus === 'sample' ? t('media.sample') : t('media.pending'),
+    summary: unit.summary[lang],
+    read: t('builder.readText', { count: unit.scenes.length }),
     check: unit.check.question[lang],
     practice: unit.practice.prompt[lang],
   }

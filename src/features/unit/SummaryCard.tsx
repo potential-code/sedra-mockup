@@ -13,7 +13,7 @@ import { usePrefs } from '@/store/actions'
  * control. If the device has no voice it falls back to the silent highlight demo (brief §3
  * Preferences). It never starts on its own, so it does not clash with a screen reader.
  */
-export function SummaryCard({ unit }: { unit: Unit }) {
+export function SummaryCard({ unit, hideTitle = false }: { unit: Unit; hideTitle?: boolean }) {
   const { t } = useTranslation('unit')
   const { l, lang } = useLocalized()
   const prefs = usePrefs()
@@ -110,7 +110,10 @@ export function SummaryCard({ unit }: { unit: Unit }) {
     >
       <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 bg-sedra-mid" />
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 id={`${unit.id}-summary`} className="m-0 flex items-center gap-2 text-xl">
+        <h3
+          id={`${unit.id}-summary`}
+          className={hideTitle ? 'sr-only' : 'm-0 flex items-center gap-2 text-xl'}
+        >
           <Lightbulb aria-hidden="true" className="size-5 shrink-0" />
           {t('summary.title')}
         </h3>

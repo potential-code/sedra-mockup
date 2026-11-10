@@ -1,16 +1,7 @@
 import type { KnowledgeCheck as Check, OptionId } from '@shared/types'
-import {
-  AlertCircle,
-  BookOpen,
-  CheckCircle2,
-  Check as CheckIcon,
-  HandHelping,
-  Lightbulb,
-  RotateCcw,
-  Undo2,
-} from 'lucide-react'
+import { AlertCircle, CheckCircle2, Check as CheckIcon, Lightbulb } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { announce } from '@/components/shared/LiveRegion'
 import { Button } from '@/components/ui/button'
@@ -30,16 +21,12 @@ interface Props {
   onReview: (selected: OptionId, outcome: CheckOutcome) => void
   /** Selection changed but not yet checked (used for the leave prompt). */
   onDraftChange?: (selected: OptionId | undefined, unchecked: boolean) => void
-  /** Hint actions. Replay is omitted when no video is available. */
-  onReplay?: () => void
-  onReadLesson: () => void
-  /** Rendered under the "Continue with support" message (e.g. a help link). */
-  supportExtra?: React.ReactNode
 }
 
 /**
- * One untimed question (brief §3 Checks): unlimited attempts, no points, the selection is kept
- * after a wrong answer, feedback uses icon + text (never colour alone) and is announced once.
+ * One untimed question: one try, no points. After Check answer the choice is locked and the
+ * learner sees Right or Not quite; if not quite, the correct answer is shown at once so they can
+ * move on (no retry loop). Feedback uses icon + text (never colour alone) and is announced once.
  */
 export function KnowledgeCheck({
   check,
@@ -47,35 +34,26 @@ export function KnowledgeCheck({
   initialOutcome,
   onReview,
   onDraftChange,
-  onReplay,
-  onReadLesson,
-  supportExtra,
 }: Props) {
   const { t } = useTranslation('unit')
   const { l } = useLocalized()
   const [selected, setSelected] = useState<OptionId | undefined>(initialSelected)
   const [outcome, setOutcome] = useState<CheckOutcome | undefined>(initialOutcome)
   const [error, setError] = useState(false)
-  const [support, setSupport] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const reduce = useReducedMotion()
   const ids = useId()
   const summaryRef = useRef<HTMLDivElement>(null)
-  const supportRef = useRef<HTMLDivElement>(null)
   const firstRadioRef = useRef<HTMLInputElement>(null)
   const legendId = `${ids}-legend`
   const errorId = `${ids}-error`
 
-  useEffect(() => {
-    if (support) supportRef.current?.focus()
-  }, [support])
+  const locked = outcome !== undefined
 
   function select(id: OptionId) {
+    if (locked) return
     setSelected(id)
     setError(false)
-    setSupport(false)
-    // Changing the answer hides old feedback; the next Check answer gives new feedback.
-    setOutcome(undefined)
     onDraftChange?.(id, true)
   }
 
@@ -89,22 +67,16 @@ export function KnowledgeCheck({
     const result: CheckOutcome = selected === check.correct ? 'correct' : 'incorrect'
     setOutcome(result)
     setAttempt((a) => a + 1)
-    setSupport(false)
     onReview(selected, result)
     onDraftChange?.(selected, false)
-    const text = result === 'correct' ? l(check.feedbackCorrect) : l(check.feedbackRetry)
+    const answer = check.options.find((o) => o.id === check.correct)
+    const text =
+      result === 'correct'
+        ? `${t('check.correctTitle')}. ${l(check.feedbackCorrect)}`
+        : `${t('check.notQuiteTitle')}. ${t('check.supportAnswer', { id: check.correct, text: answer ? l(answer.text) : '' })}`
     // One polite announcement; no "wrong"/"failed" wording.
     // Focus stays on Check answer; the live region reads the feedback once.
     announce(text)
-  }
-
-  function tryAgain() {
-    setOutcome(undefined)
-    setSupport(false)
-    const target =
-      document.querySelector<HTMLInputElement>(`input[name="${ids}-q"]:checked`) ??
-      firstRadioRef.current
-    target?.focus()
   }
 
   const correctOption = check.options.find((o) => o.id === check.correct)
@@ -156,6 +128,7 @@ export function KnowledgeCheck({
         )}
         {check.options.map((o, i) => {
           const checked = selected === o.id
+          const isAnswer = locked && o.id === check.correct
           return (
             <label
               key={o.id}
@@ -164,7 +137,12 @@ export function KnowledgeCheck({
                 'group relative flex min-h-16 cursor-pointer items-center gap-3 rounded-2xl border-2 bg-white px-3 py-3 text-lg shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 sm:px-4',
                 'hover:border-sedra-green hover:shadow-md',
                 'has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink',
-                checked ? 'border-sedra-green bg-sedra-pale-50 shadow-md' : 'border-border',
+                isAnswer
+                  ? 'border-success bg-success-soft shadow-md'
+                  : checked
+                    ? 'border-sedra-green bg-sedra-pale-50 shadow-md'
+                    : 'border-border',
+                locked && 'cursor-default hover:shadow-sm',
               )}
             >
               <span
@@ -178,12 +156,21 @@ export function KnowledgeCheck({
               >
                 {o.id}
               </span>
-              <span className="min-w-0 flex-1 font-medium">{l(o.text)}</span>
-              {checked && (
-                <span className="hidden shrink-0 rounded-full bg-white px-2.5 py-0.5 text-base font-semibold text-sedra-green ring-1 ring-sedra-green min-[26rem]:inline">
-                  {t('check.yourChoice')}
-                </span>
-              )}
+              {/* Text and its tag stack, so a tag never squeezes the answer on a narrow screen. */}
+              <span className="flex min-w-0 flex-1 flex-col items-start gap-1">
+                <span className="font-medium">{l(o.text)}</span>
+                {isAnswer && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-success px-2.5 py-0.5 text-base font-semibold text-white">
+                    <CheckIcon aria-hidden="true" className="size-4" strokeWidth={3} />
+                    {t('check.rightAnswer')}
+                  </span>
+                )}
+                {checked && !isAnswer && (
+                  <span className="rounded-full bg-white px-2.5 py-0.5 text-base font-semibold text-sedra-green ring-1 ring-sedra-green">
+                    {t('check.yourChoice')}
+                  </span>
+                )}
+              </span>
               <input
                 ref={i === 0 ? firstRadioRef : undefined}
                 id={`${ids}-${o.id}`}
@@ -191,6 +178,7 @@ export function KnowledgeCheck({
                 name={`${ids}-q`}
                 value={o.id}
                 checked={checked}
+                disabled={locked && !checked}
                 onChange={() => select(o.id)}
                 className={cn(
                   'grid size-7 shrink-0 cursor-pointer appearance-none place-content-center rounded-full border-2 bg-white transition-colors focus-visible:outline-none',
@@ -204,10 +192,12 @@ export function KnowledgeCheck({
         })}
       </fieldset>
 
-      <Button type="submit" size="lg" className="self-start shadow-md">
-        <CheckCircle2 aria-hidden="true" />
-        {t('common:checkAnswer')}
-      </Button>
+      {locked ? null : (
+        <Button type="submit" size="lg" className="self-start shadow-md">
+          <CheckCircle2 aria-hidden="true" />
+          {t('common:checkAnswer')}
+        </Button>
+      )}
 
       {outcome === 'correct' && (
         <motion.div
@@ -233,65 +223,26 @@ export function KnowledgeCheck({
         </motion.div>
       )}
 
-      {outcome === 'incorrect' && (
+      {outcome === 'incorrect' && correctOption && (
         <motion.div
-          key={`hint-${attempt}`}
+          key={`no-${attempt}`}
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={spring}
-          className="flex flex-col gap-4 rounded-3xl border-2 border-notice/40 bg-notice-soft p-3 shadow-md @md:p-5"
+          className="flex flex-col items-start gap-3 rounded-3xl border-2 border-notice/40 bg-notice-soft p-3 shadow-md @md:flex-row @md:gap-4 @md:p-5"
         >
-          <div className="flex flex-col items-start gap-3 @md:flex-row @md:gap-4">
-            <span
-              aria-hidden="true"
-              className="flex size-14 shrink-0 items-center justify-center rounded-full bg-white text-notice shadow-sm ring-2 ring-notice/30"
-            >
-              <Lightbulb className="size-7" />
-            </span>
-            <div className="min-w-0">
-              <h3 className="m-0 text-2xl text-notice">{t('check.hintTitle')}</h3>
-              <p className="m-0 mt-1 text-lg">{l(check.feedbackRetry)}</p>
-            </div>
+          <span
+            aria-hidden="true"
+            className="flex size-14 shrink-0 items-center justify-center rounded-full bg-white text-notice shadow-sm ring-2 ring-notice/30"
+          >
+            <Lightbulb className="size-7" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="m-0 text-2xl text-notice">{t('check.notQuiteTitle')}</h3>
+            <p className="m-0 mt-1 text-lg font-semibold text-ink">
+              {t('check.supportAnswer', { id: correctOption.id, text: l(correctOption.text) })}
+            </p>
           </div>
-          <div className="grid gap-2 @xl:grid-cols-2">
-            {onReplay && (
-              <Button type="button" variant="outline" onClick={onReplay}>
-                <RotateCcw aria-hidden="true" />
-                {t('common:replay')}
-              </Button>
-            )}
-            <Button type="button" variant="outline" onClick={onReadLesson}>
-              <BookOpen aria-hidden="true" />
-              {t('check.readLesson')}
-            </Button>
-            <Button type="button" variant="outline" onClick={tryAgain}>
-              <Undo2 aria-hidden="true" />
-              {t('common:tryAgain')}
-            </Button>
-            <Button type="button" variant="outline" onClick={() => setSupport(true)}>
-              <HandHelping aria-hidden="true" />
-              {t('check.continueWithSupport')}
-            </Button>
-          </div>
-          {support && correctOption && (
-            <div
-              ref={supportRef}
-              tabIndex={-1}
-              className="rounded-2xl border bg-white p-4 shadow-sm"
-            >
-              <h4 id={`${ids}-support`} className="m-0 text-lg font-bold text-ink">
-                {t('check.supportTitle')}
-              </h4>
-              <p className="m-0 mt-1">
-                {t('check.supportAnswer', {
-                  id: correctOption.id,
-                  text: l(correctOption.text),
-                })}
-              </p>
-              <p className="m-0 mt-1">{t('check.supportBody')}</p>
-              {supportExtra}
-            </div>
-          )}
         </motion.div>
       )}
     </form>

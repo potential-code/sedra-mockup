@@ -1,4 +1,4 @@
-// Media checks: ffprobe duration 30.0 s, VTT parses (and ends <= 30 s), captions <track default>
+// Media checks: ffprobe duration (short: 5-120 s), VTT parses (and ends within the video), captions <track default>
 // follows prefs.captions. Usage: node scripts/media.mjs
 import { execFileSync } from 'node:child_process'
 import { readdirSync, readFileSync } from 'node:fs'
@@ -30,7 +30,7 @@ for (const unit of readdirSync(root)) {
         .toString()
         .trim(),
     )
-    R.ok(Math.abs(d - 30) < 0.05, `${f} duration 30.0 s`, `${d}s`)
+    R.ok(d >= 5 && d <= 120, `${f} short video (5-120 s)`, `${d}s`)
   }
   for (const f of files.filter((f) => f.endsWith('.vtt'))) {
     const txt = readFileSync(join(dir, f), 'utf8').replace(/^﻿/, '')
@@ -55,7 +55,7 @@ for (const unit of readdirSync(root)) {
     if (arrowLines !== cues.length)
       errors.push(`${arrowLines - cues.length} malformed timing lines`)
     if (!cues.length) errors.push('no cues')
-    if (maxEnd > 30.05) errors.push(`last cue ends ${maxEnd}s > 30s`)
+    if (maxEnd > 120.05) errors.push(`last cue ends ${maxEnd}s > 120s`)
     R.ok(!errors.length, `${f} parses (${cues.length} cues, ends ${maxEnd}s)`, errors.join('; '))
   }
 }

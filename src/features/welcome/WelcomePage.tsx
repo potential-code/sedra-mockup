@@ -90,7 +90,7 @@ export function WelcomePage() {
             className="grid grid-cols-1 gap-5 rounded-3xl bg-white p-5 shadow-md ring-1 ring-border sm:p-7"
           >
             <div className="flex items-center gap-3">
-              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-sedra-pale-100 text-sedra-green">
+              <span className="hidden size-12 shrink-0 place-items-center rounded-full bg-sedra-pale-100 sm:grid text-sedra-green">
                 <Mail aria-hidden="true" className="size-6" />
               </span>
               <h2 id={`${id}-form`} className="m-0 text-2xl">
@@ -170,7 +170,8 @@ export function WelcomePage() {
                       onClick={() => choose(p)}
                       aria-label={`${t('welcome.choose', { name })}. ${l(p.description)}`}
                       className={cn(
-                        'group flex min-h-24 w-full items-center gap-4 rounded-2xl border-2 bg-white p-3 pe-4 text-start shadow-md sm:gap-5 sm:p-4',
+                        // Phones: photo above the text so the name and description keep the full width.
+                        'group flex min-h-24 w-full flex-col items-start gap-3 rounded-2xl border-2 bg-white p-3 pe-4 text-start shadow-md sm:flex-row sm:items-center sm:gap-5 sm:p-4',
                         'transition-[box-shadow,border-color] duration-200 ease-out',
                         'hover:border-sedra-green hover:shadow-pop focus-visible:border-sedra-green',
                         staff ? 'border-border' : 'border-transparent',
@@ -182,7 +183,7 @@ export function WelcomePage() {
                           alt=""
                           width={96}
                           height={96}
-                          className="size-16 rounded-2xl bg-sedra-pale-100 object-cover sm:size-20"
+                          className="size-12 rounded-2xl bg-sedra-pale-100 object-cover sm:size-20"
                         />
                       </span>
                       <span className="grid min-w-0 flex-1 gap-0.5">

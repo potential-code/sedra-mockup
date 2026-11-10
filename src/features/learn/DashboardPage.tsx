@@ -18,7 +18,6 @@ import {
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BRAND_CARDS, type BrandCard } from '@/components/admin/AdminUi'
-import { DemoTag } from '@/components/learner/DemoTag'
 import {
   completedCount,
   courseUnits,
@@ -453,7 +452,7 @@ export function DashboardPage() {
         {/* Next live session as a calendar tile */}
         <Panel title={t('dashboard.sessionHeading')} icon={CalendarClock}>
           {nextSession && session ? (
-            <div className="flex items-start gap-4">
+            <div className="flex flex-wrap items-start gap-4">
               <div
                 aria-hidden="true"
                 className="grid w-20 shrink-0 overflow-hidden rounded-2xl text-center shadow-md"
@@ -468,7 +467,7 @@ export function DashboardPage() {
                   {session.weekday}
                 </span>
               </div>
-              <div className="grid min-w-0 gap-1.5">
+              <div className="grid min-w-0 flex-1 basis-48 gap-1.5">
                 <p className="m-0 font-semibold text-ink">{l(nextSession.title)}</p>
                 <p className="m-0 flex items-start gap-1.5 text-base text-ink-soft">
                   <Clock aria-hidden="true" className="mt-1 size-4 shrink-0" />
@@ -476,7 +475,6 @@ export function DashboardPage() {
                     {formatUaeDateTime(nextSession.startsAt, lang)} ({t('shared.uaeTime')})
                   </span>
                 </p>
-                <DemoTag />
               </div>
             </div>
           ) : (

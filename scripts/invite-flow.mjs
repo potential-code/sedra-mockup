@@ -144,7 +144,7 @@ const INVITE = {
     R.ok(/units\/HF01/.test(page.url()), 'Start opens Hospitality unit 1', page.url())
     R.ok(
       await page
-        .getByRole('heading', { name: /: units$/ })
+        .getByRole('heading', { name: /^Units$/ })
         .waitFor({ timeout: 5000 })
         .then(() => true)
         .catch(() => false),

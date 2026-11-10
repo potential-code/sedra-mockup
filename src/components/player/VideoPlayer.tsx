@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useLocalized } from '@/i18n'
 import { asset } from '@/lib/asset'
 import { cn } from '@/lib/utils'
 
@@ -42,6 +43,10 @@ interface Props {
   /** Paths relative to public/. */
   src: string
   captions: string
+  /** Optional Arabic caption track; shown instead of English when the app is in Arabic. */
+  captionsAr?: string
+  /** Vertical 9:16 video (older deliveries). Default is 16:9. */
+  portrait?: boolean
   poster: string
   posterAlt: string
   /** Accessible name of the player region, e.g. "Video: Stop Think Do". */
@@ -67,7 +72,18 @@ function formatTime(s: number) {
  * the page is hidden or the window loses focus. Player controls are not mirrored in RTL.
  */
 export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPlayer(
-  { src, captions, poster, posterAlt, label, mediaLang, captionsDefault, onEnded },
+  {
+    src,
+    captions,
+    captionsAr,
+    portrait = false,
+    poster,
+    posterAlt,
+    label,
+    mediaLang,
+    captionsDefault,
+    onEnded,
+  },
   ref,
 ) {
   const { t } = useTranslation('unit')
@@ -76,6 +92,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
   const playRef = useRef<HTMLButtonElement>(null)
   const [playing, setPlaying] = useState(false)
   const [captionsOn, setCaptionsOn] = useState(captionsDefault)
+  const { lang: uiLang } = useLocalized()
   const [muted, setMuted] = useState(false)
   const [volume, setVolume] = useState(1)
   const [speed, setSpeed] = useState<number>(1)
@@ -107,14 +124,16 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
     const v = videoRef.current
     if (!v) return
     const apply = () => {
+      // One track shows at a time: Arabic captions in the Arabic UI when supplied, else English.
+      const want = uiLang === 'ar' && captionsAr ? 'ar' : mediaLang
       for (const track of Array.from(v.textTracks)) {
-        track.mode = captionsOn ? 'showing' : 'hidden'
+        track.mode = captionsOn && track.language === want ? 'showing' : 'hidden'
       }
     }
     apply()
     v.textTracks.addEventListener?.('addtrack', apply)
     return () => v.textTracks.removeEventListener?.('addtrack', apply)
-  }, [captionsOn])
+  }, [captionsOn, uiLang, captionsAr, mediaLang])
 
   useEffect(() => {
     const v = videoRef.current
@@ -181,7 +200,8 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
     <section
       aria-label={label}
       className={cn(
-        'mx-auto w-full max-w-[24rem] overflow-hidden rounded-3xl bg-sedra-green-800 text-white shadow-lg ring-1 ring-black/5',
+        portrait ? 'max-w-[24rem]' : 'max-w-4xl',
+        'mx-auto w-full overflow-hidden rounded-3xl bg-sedra-green-800 text-white shadow-lg ring-1 ring-black/5',
         fullscreen && 'flex max-w-none flex-col rounded-none',
       )}
       ref={wrapRef}
@@ -195,7 +215,9 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
         <video
           ref={videoRef}
           className={cn(
-            'block aspect-[9/16] max-h-[68vh] w-full object-contain',
+            portrait
+              ? 'block aspect-[9/16] max-h-[68vh] w-full object-contain'
+              : 'block aspect-video w-full object-contain',
             '[&::cue]:bg-[rgb(0_0_0/0.82)] [&::cue]:text-[1.05em] [&::cue]:leading-snug [&::cue]:text-white',
             fullscreen && 'h-full max-h-none w-auto',
           )}
@@ -224,8 +246,17 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
             src={asset(captions)}
             srcLang={mediaLang}
             label={t('player.captionsTrack')}
-            default={captionsDefault}
+            default={captionsDefault && !(uiLang === 'ar' && captionsAr)}
           />
+          {captionsAr ? (
+            <track
+              kind="captions"
+              src={asset(captionsAr)}
+              srcLang="ar"
+              label={t('player.captionsTrackAr')}
+              default={captionsDefault && uiLang === 'ar'}
+            />
+          ) : null}
         </video>
         {/* Decorative play cue over the paused frame; clicks pass through to the video. */}
         {!playing && (
@@ -320,22 +351,10 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
           >
             {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
           </Button>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className={cn(roundBtn, 'ms-auto')}
-            onClick={toggleFullscreen}
-            aria-label={fullscreen ? t('player.exitFullscreen') : t('player.fullscreen')}
-          >
-            {fullscreen ? <Minimize aria-hidden="true" /> : <Maximize aria-hidden="true" />}
-          </Button>
-        </div>
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-black/20 px-3">
+          {/* Volume sits next to mute (phones use their own volume buttons, so it hides there). */}
           <label htmlFor={`${ids}-vol`} className="sr-only">
             {t('player.volume')}
           </label>
-          <Volume2 aria-hidden="true" className="size-5 shrink-0 opacity-80" />
           <input
             id={`${ids}-vol`}
             type="range"
@@ -348,7 +367,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
               setMuted(Number(e.target.value) === 0)
             }}
             aria-valuetext={`${Math.round((muted ? 0 : volume) * 100)}%`}
-            className="h-12 min-w-0 flex-1 basis-24 cursor-pointer accent-white"
+            className="hidden h-12 w-28 shrink-0 cursor-pointer accent-white sm:block"
           />
           <label htmlFor={`${ids}-speed`} className="sr-only">
             {t('player.speed')}
@@ -356,7 +375,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
           <Select value={String(speed)} onValueChange={(v) => setSpeed(Number(v))}>
             <SelectTrigger
               id={`${ids}-speed`}
-              className="my-1 w-auto min-w-24 rounded-full border-white/50 bg-sedra-green-800 px-4 font-semibold text-white hover:border-white [&_svg]:text-white"
+              className="ms-auto h-12 w-auto min-w-20 rounded-full border-white/50 bg-sedra-green-800 px-4 font-semibold text-white hover:border-white [&_svg]:text-white"
             >
               <SelectValue>{speed}×</SelectValue>
             </SelectTrigger>
@@ -368,6 +387,16 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, Props>(function VideoPl
               ))}
             </SelectContent>
           </Select>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className={roundBtn}
+            onClick={toggleFullscreen}
+            aria-label={fullscreen ? t('player.exitFullscreen') : t('player.fullscreen')}
+          >
+            {fullscreen ? <Minimize aria-hidden="true" /> : <Maximize aria-hidden="true" />}
+          </Button>
         </div>
       </div>
     </section>

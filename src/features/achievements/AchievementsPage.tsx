@@ -64,15 +64,15 @@ export function AchievementsPage() {
             className="m-0 flex list-none flex-wrap gap-3 p-0"
           >
             {hasLs ? (
-              <li className="flex max-w-none items-center gap-3 rounded-2xl bg-notice-soft px-4 py-3">
-                <Award aria-hidden="true" className="size-7 text-notice" />
+              <li className="flex w-full max-w-none items-center gap-3 rounded-2xl bg-notice-soft px-4 py-3 sm:w-auto">
+                <Award aria-hidden="true" className="size-7 shrink-0 text-notice" />
                 <span className="text-lg font-bold text-ink">
                   {t('achievements.badgesCount', { count: badges })}
                 </span>
               </li>
             ) : null}
-            <li className="flex max-w-none items-center gap-3 rounded-2xl bg-success-soft px-4 py-3">
-              <CircleCheck aria-hidden="true" className="size-7 text-success" />
+            <li className="flex w-full max-w-none items-center gap-3 rounded-2xl bg-success-soft px-4 py-3 sm:w-auto">
+              <CircleCheck aria-hidden="true" className="size-7 shrink-0 text-success" />
               <span className="text-lg font-bold text-ink">
                 {t('shared.unitsComplete', {
                   done: finished.length,
@@ -93,7 +93,8 @@ export function AchievementsPage() {
             </h2>
             <p className="m-0 text-ink-soft">{t('achievements.badgesLead')}</p>
           </div>
-          <ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:gap-4 lg:grid-cols-4">
+          {/* One badge per row on phones (two squeezed the status text); four across on wide screens. */}
+          <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3 p-0 sm:gap-4 lg:grid-cols-4">
             {BADGE_UNITS.map((id) => {
               const earned = isComplete(learner, id)
               const unit = getUnit(id)
@@ -116,7 +117,7 @@ export function AchievementsPage() {
                   </p>
                   <p
                     className={cn(
-                      'm-0 inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1 text-center text-base font-semibold',
+                      'm-0 inline-flex items-center justify-center gap-1.5 rounded-2xl border px-3 py-1 text-center text-base font-semibold',
                       earned
                         ? 'border-success bg-success-soft text-success'
                         : 'border-border bg-white text-ink',

@@ -2,40 +2,46 @@
   "unitOf": "Unit {{n}} of {{total}}",
   "nav": {
     "backToCourse": "Back to {{course}}",
-    "unitNav": "Units",
-    "previousUnit": "Previous unit",
-    "nextUnit": "Next unit",
-    "courseOverview": "Course overview",
     "courseSummary": "Course summary",
     "finishCourse": "Finish course"
   },
   "steps": {
     "label": "Unit steps",
-    "media": "Watch or read",
+    "media": "Video",
     "check": "Question",
     "practice": "Practice",
-    "mediaTitle": "Watch or read",
+    "mediaTitle": "Watch the video",
     "checkTitle": "Try one question",
     "practiceTitle": "Practise if you wish",
     "done": "Done",
     "reviewed": "Reviewed",
     "notYet": "Not yet",
-    "optional": "Optional"
+    "optional": "Optional",
+    "summary": "Summary",
+    "read": "Read",
+    "summaryTitle": "Summary",
+    "readTitle": "Read the lesson",
+    "position": "{{n}} of {{total}}"
   },
   "actions": {
-    "toQuestion": "Next: question",
-    "toPractice": "Practise (optional)",
-    "backToLesson": "Back to the lesson",
-    "backToQuestion": "Back to the question",
     "checkHint": "Take your time. There is no time limit.",
-    "stepOf": "Step {{n}} of 3"
+    "stepOf": "Step {{n}} of {{total}}",
+    "takeTime": "Take your time.",
+    "doneToUnit": "Done. Go to Unit {{n}}",
+    "next": {
+      "summary": "Next: summary",
+      "read": "Next: read",
+      "check": "Next: question",
+      "practice": "Next: practice"
+    }
   },
   "media": {
     "routeLabel": "How would you like to learn?",
     "watch": "Watch video",
     "markWatched": "I have watched",
     "watchedStatus": "Watched. You can watch again at any time.",
-    "doneAnnounce": "Saved: watch or read done."
+    "doneAnnounce": "Saved: watch or read done.",
+    "preferRead": "Prefer to read? Go to Read"
   },
   "player": {
     "label": "Video: {{title}}",
@@ -52,7 +58,8 @@
     "exitFullscreen": "Exit full screen",
     "position": "Video position",
     "time": "Time",
-    "timeOf": "{{current}} of {{total}}"
+    "timeOf": "{{current}} of {{total}}",
+    "captionsTrackAr": "Arabic"
   },
   "transcript": {
     "descriptive": "Read descriptive transcript",
@@ -65,7 +72,8 @@
     "body": "The video for this unit is being prepared. Read the lesson below. It has the same steps.",
     "bodyArabic": "The Arabic video is being prepared. Read the lesson below. It has the same steps.",
     "storyboard": "The lesson has {{count}} short scenes. Each scene is about 7 seconds.",
-    "chip": "30 second lesson"
+    "chip": "Short lesson",
+    "short": "The video is not ready yet. You can read the lesson instead."
   },
   "read": {
     "action": "Read lesson",
@@ -88,13 +96,10 @@
     "errorChoose": "Choose one answer, then select Check answer.",
     "yourChoice": "Your choice",
     "correctTitle": "Well done",
-    "hintTitle": "Here is a hint",
-    "readLesson": "Read the lesson",
-    "continueWithSupport": "Continue with support",
-    "supportTitle": "You can continue",
-    "supportAnswer": "The answer is {{id}}: {{text}}",
-    "supportBody": "You can select Next when you are ready, or ask a supporter for help.",
-    "pick": "Choose one answer"
+    "supportAnswer": "Answer: {{id}}. {{text}}",
+    "pick": "Choose one answer, then select Check answer.",
+    "notQuiteTitle": "Not quite",
+    "rightAnswer": "Right answer"
   },
   "practice": {
     "chooseOne": "Choose one",
@@ -171,7 +176,11 @@
     "inProgress": "In progress",
     "notStarted": "Not started",
     "progress": "{{done}} of {{total}} units complete",
-    "blocks": "Learning blocks"
+    "units": "Units",
+    "hide": "Hide list",
+    "show": "Show units",
+    "upNext": "Up next",
+    "unitN": "Unit {{n}}"
   },
   "leave": {
     "title": "Leave this unit?",

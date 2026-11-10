@@ -61,11 +61,15 @@ export interface Practice {
 export interface VideoAsset {
   video: string
   captions: string
+  /** Arabic caption track on the same timing (English audio), when supplied. */
+  captionsAr?: string
   transcript: string
   descriptiveTranscript: string
   poster: string
   posterAlt: Localized
   version: string
+  /** Older deliveries (v1/v2) are vertical 9:16; v3 onwards are 16:9. */
+  portrait?: boolean
 }
 
 export type MediaStatus = 'sample' | 'pending'
@@ -80,7 +84,8 @@ export interface Unit {
   objective: Localized
   /** e.g. "Life Skills pp 5 and 11" */
   sourcePages: string
-  durationSeconds: 30
+  /** Media length in seconds (short videos; no longer fixed at 30). */
+  durationSeconds: number
   /** 'sample' = LS02/HF01 produced by Vera; 'pending' = "Video being prepared". */
   mediaStatus: MediaStatus
   /** Only English sample video exists; Arabic shows the pending panel + Arabic storyboard. */
@@ -120,7 +125,9 @@ export interface ExternalResource {
 
 /* ---------- Learner progress (saved locally, demo only) ---------- */
 
-export type UnitStep = 'media' | 'check' | 'practice'
+/** Five learning blocks per unit: Video, Summary, Read, Question, Practice (one thing per screen). */
+export type UnitStep = 'media' | 'summary' | 'read' | 'check' | 'practice'
+export type ContentStep = 'media' | 'summary' | 'read'
 export type PracticeStatus = 'done' | 'later' | 'with-help'
 
 export interface UnitProgress {
@@ -134,6 +141,8 @@ export interface UnitProgress {
   attempts: number
   practice?: PracticeStatus
   practiceChoices?: number[]
+  /** Content blocks the learner has finished (Video, Summary, Read). */
+  seen?: ContentStep[]
 }
 
 export interface LastLocation {

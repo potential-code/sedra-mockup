@@ -18,7 +18,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ChoiceGroup } from '@/components/learner/ChoiceGroup'
-import { DemoTag } from '@/components/learner/DemoTag'
 import {
   enrolledProgrammes,
   formatUaeDateTime,
@@ -98,7 +97,8 @@ function UpcomingCard({ s, primary }: { s: LiveSession; primary: boolean }) {
   return (
     <article
       className={cn(
-        'grid h-full grid-cols-[auto_1fr] overflow-hidden rounded-2xl bg-white shadow-md',
+        // Phones: the date becomes a strip on top so the session text keeps the full width.
+        'grid h-full grid-cols-1 overflow-hidden rounded-2xl bg-white shadow-md sm:grid-cols-[auto_1fr]',
         cancelled && 'shadow-sm ring-1 ring-border',
       )}
     >
@@ -106,16 +106,18 @@ function UpcomingCard({ s, primary }: { s: LiveSession; primary: boolean }) {
       <div
         aria-hidden="true"
         className={cn(
-          'flex w-20 flex-col items-center justify-center gap-0.5 px-2 py-5 sm:w-28',
+          'flex flex-row items-baseline justify-start gap-2 px-5 py-3 sm:w-28 sm:flex-col sm:items-center sm:justify-center sm:gap-0.5 sm:px-2 sm:py-5',
           cancelled ? 'bg-muted text-ink' : 'bg-sedra-green text-white',
         )}
       >
         <span className="text-base font-semibold">{p.weekday}</span>
-        <span className="text-4xl leading-none font-bold sm:text-5xl">{p.day}</span>
+        <span className="text-2xl leading-none font-bold sm:text-5xl">{p.day}</span>
         <span className="text-base font-semibold">{p.month}</span>
-        {cancelled ? null : <span className="mt-2 h-1.5 w-8 rounded-full bg-sedra-lime" />}
+        {cancelled ? null : (
+          <span className="mt-2 hidden h-1.5 w-8 rounded-full bg-sedra-lime sm:block" />
+        )}
       </div>
-      <div className="grid min-w-0 content-start gap-3 p-5">
+      <div className="grid min-w-0 content-start gap-3 p-4 sm:p-5">
         <div className="flex flex-wrap items-center gap-2">
           <ProgrammeChip programmeId={s.programmeId} />
           {cancelled ? (
@@ -221,15 +223,17 @@ function Hero({ next, simplified }: { next: LiveSession | undefined; simplified:
         !simplified && 'lg:grid-cols-[1.15fr_1fr]',
       )}
     >
-      <div className="grid content-center gap-4 p-6 md:p-10">
-        <h1 className="m-0 text-4xl break-words md:text-5xl">{t('sessions.heading')}</h1>
+      <div className="grid min-w-0 grid-cols-1 content-center gap-4 p-5 sm:p-6 md:p-10">
+        <h1 className="m-0 text-3xl break-words sm:text-4xl md:text-5xl">
+          {t('sessions.heading')}
+        </h1>
         <p className="m-0 text-lg text-ink">{t('sessions.lead')}</p>
         <p className="m-0 flex w-fit items-start gap-2 rounded-2xl bg-success-soft px-4 py-2 text-base font-semibold text-success">
           <HeartHandshake aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
           {t('sessions.noPenalty')}
         </p>
         {next && p && !simplified ? (
-          <div className="mt-2 flex items-center gap-4 rounded-2xl border-2 border-sedra-pale bg-sedra-pale-50 p-3">
+          <div className="mt-2 flex flex-wrap items-center gap-4 rounded-2xl border-2 border-sedra-pale bg-sedra-pale-50 p-3">
             <div
               aria-hidden="true"
               className="flex size-16 shrink-0 flex-col items-center justify-center rounded-xl bg-sedra-green text-white shadow-md"
@@ -237,7 +241,7 @@ function Hero({ next, simplified }: { next: LiveSession | undefined; simplified:
               <span className="text-2xl leading-none font-bold">{p.day}</span>
               <span className="text-base font-semibold">{p.month}</span>
             </div>
-            <div className="grid min-w-0 gap-0.5">
+            <div className="grid min-w-0 flex-1 basis-40 gap-0.5">
               <p className="m-0 text-base font-bold text-sedra-green">{t('sessions.next')}</p>
               <p className="m-0 font-semibold text-ink">{l(next.title)}</p>
               <p className="m-0 text-base text-ink-soft">
@@ -296,7 +300,7 @@ export function SessionsPage() {
     <div className="container-page grid grid-cols-1 [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink [&_:is(h2,h3,h4)]:break-words gap-8 py-8">
       <Hero next={next} simplified={simplified} />
 
-      <div className="rounded-2xl bg-white p-5 shadow-sm md:p-6">
+      <div className="rounded-2xl bg-white p-3 shadow-sm sm:p-5 md:p-6">
         <ChoiceGroup
           legend={t('sessions.filter')}
           name="programme-filter"
@@ -346,10 +350,6 @@ export function SessionsPage() {
           </ul>
         </TabsContent>
       </Tabs>
-      <p className="m-0 flex items-center gap-2 text-base text-ink-soft">
-        <DemoTag />
-        {t('sessions.seedNote')}
-      </p>
     </div>
   )
 }

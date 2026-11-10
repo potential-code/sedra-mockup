@@ -134,7 +134,7 @@ export function StopThinkDoGuide() {
           {WAYS.map(({ n, icon: Icon }) => (
             <li
               key={n}
-              className="flex items-start gap-3 rounded-2xl border-2 border-sedra-pale-100 bg-sedra-pale-50 p-4 sm:grid sm:content-start sm:gap-2"
+              className="grid content-start gap-2 rounded-2xl border-2 border-sedra-pale-100 bg-sedra-pale-50 p-4"
             >
               <span
                 aria-hidden="true"

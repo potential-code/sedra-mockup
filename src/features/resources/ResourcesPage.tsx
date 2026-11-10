@@ -36,14 +36,14 @@ function CourseHeader({ programmeId }: { programmeId: ProgrammeId }) {
   const course = findCourse(programmeId)
   return (
     <div className="motif-tree-light grid grid-cols-1 overflow-hidden rounded-3xl bg-sedra-green-800 shadow-lg md:grid-cols-[1.2fr_1fr]">
-      <div className="grid content-center gap-3 p-6 md:order-none md:p-9">
+      <div className="grid min-w-0 grid-cols-1 content-center gap-3 p-5 sm:p-6 md:order-none md:p-9">
         <p className="m-0 w-fit rounded-full bg-white/15 px-3 py-1 text-base font-semibold text-white ring-1 ring-white/40">
           {t(`common:${PROGRAMME_LABEL_KEY[programmeId]}`)}
         </p>
         <h2
           id={`${SECTION_ID[programmeId]}-h`}
           tabIndex={-1}
-          className="m-0 text-3xl text-white md:text-4xl"
+          className="m-0 text-2xl text-white sm:text-3xl md:text-4xl"
         >
           {course ? l(course.title) : t(`common:${PROGRAMME_LABEL_KEY[programmeId]}`)}
         </h2>
@@ -264,7 +264,9 @@ export function ResourcesPage() {
     <div className="container-page grid grid-cols-1 [&_[data-slot=button]]:max-w-full [&_[data-slot=button]]:shrink [&_:is(h2,h3,h4)]:break-words gap-12 py-8">
       <Reveal className="motif-tree grid grid-cols-1 gap-6 rounded-3xl bg-white p-6 shadow-md md:p-10">
         <div className="grid gap-3">
-          <h1 className="m-0 text-4xl break-words md:text-5xl">{t('resources.heading')}</h1>
+          <h1 className="m-0 text-3xl break-words sm:text-4xl md:text-5xl">
+            {t('resources.heading')}
+          </h1>
           <p className="m-0 text-lg text-ink">{t('resources.lead')}</p>
         </div>
         <SummarySearch id={id} query={query} onChange={setQuery} count={count} />

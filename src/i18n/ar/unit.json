@@ -2,40 +2,46 @@
   "unitOf": "الوحدة {{n}} من {{total}}",
   "nav": {
     "backToCourse": "العودة إلى {{course}}",
-    "unitNav": "الوحدات",
-    "previousUnit": "الوحدة السابقة",
-    "nextUnit": "الوحدة التالية",
-    "courseOverview": "نظرة عامة على الدورة",
     "courseSummary": "ملخّص الدورة",
     "finishCourse": "إنهاء الدورة"
   },
   "steps": {
     "label": "خطوات الوحدة",
-    "media": "شاهد أو اقرأ",
+    "media": "الفيديو",
     "check": "السؤال",
     "practice": "التدريب",
-    "mediaTitle": "شاهد أو اقرأ",
+    "mediaTitle": "شاهد الفيديو",
     "checkTitle": "جرّب سؤالاً واحداً",
     "practiceTitle": "تدرّب إذا أردت",
     "done": "تمّ",
     "reviewed": "تمّت المراجعة",
     "notYet": "ليس بعد",
-    "optional": "اختياري"
+    "optional": "اختياري",
+    "summary": "الملخّص",
+    "read": "اقرأ",
+    "summaryTitle": "الملخّص",
+    "readTitle": "اقرأ الدرس",
+    "position": "{{n}} من {{total}}"
   },
   "actions": {
-    "toQuestion": "التالي: السؤال",
-    "toPractice": "تدرّب (اختياري)",
-    "backToLesson": "العودة إلى الدرس",
-    "backToQuestion": "العودة إلى السؤال",
     "checkHint": "خذ وقتك. لا يوجد وقت محدّد.",
-    "stepOf": "الخطوة {{n}} من 3"
+    "stepOf": "الخطوة {{n}} من {{total}}",
+    "takeTime": "خذ وقتك.",
+    "doneToUnit": "تمّ. انتقل إلى الوحدة {{n}}",
+    "next": {
+      "summary": "التالي: الملخّص",
+      "read": "التالي: اقرأ",
+      "check": "التالي: السؤال",
+      "practice": "التالي: التدريب"
+    }
   },
   "media": {
     "routeLabel": "كيف تحبّ أن تتعلّم؟",
     "watch": "شاهد الفيديو",
     "markWatched": "شاهدتُ الفيديو",
     "watchedStatus": "تمّت المشاهدة. يمكنك المشاهدة مرة أخرى في أي وقت.",
-    "doneAnnounce": "تمّ الحفظ: المشاهدة أو القراءة."
+    "doneAnnounce": "تمّ الحفظ: المشاهدة أو القراءة.",
+    "preferRead": "تفضّل القراءة؟ انتقل إلى اقرأ"
   },
   "player": {
     "label": "فيديو: {{title}}",
@@ -52,7 +58,8 @@
     "exitFullscreen": "الخروج من ملء الشاشة",
     "position": "موضع الفيديو",
     "time": "الوقت",
-    "timeOf": "{{current}} من {{total}}"
+    "timeOf": "{{current}} من {{total}}",
+    "captionsTrackAr": "العربية"
   },
   "transcript": {
     "descriptive": "قراءة النص الوصفي",
@@ -65,7 +72,8 @@
     "body": "فيديو هذه الوحدة قيد الإعداد. اقرأ الدرس أدناه. فيه الخطوات نفسها.",
     "bodyArabic": "الفيديو باللغة العربية قيد الإعداد. اقرأ الدرس أدناه. فيه الخطوات نفسها.",
     "storyboard": "في الدرس {{count}} مشاهد قصيرة. كل مشهد نحو 7 ثوانٍ.",
-    "chip": "درس مدته 30 ثانية"
+    "chip": "درس قصير",
+    "short": "الفيديو غير جاهز بعد. يمكنك قراءة الدرس بدلاً منه."
   },
   "read": {
     "action": "اقرأ الدرس",
@@ -88,13 +96,10 @@
     "errorChoose": "اختر إجابة واحدة، ثم اختر تحقّق من الإجابة.",
     "yourChoice": "اختيارك",
     "correctTitle": "أحسنت",
-    "hintTitle": "إليك تلميحاً",
-    "readLesson": "اقرأ الدرس",
-    "continueWithSupport": "تابع مع الدعم",
-    "supportTitle": "يمكنك المتابعة",
-    "supportAnswer": "الإجابة هي {{id}}: {{text}}",
-    "supportBody": "يمكنك اختيار التالي عندما تكون مستعداً، أو طلب المساعدة من شخص يدعمك.",
-    "pick": "اختر إجابة واحدة"
+    "supportAnswer": "الإجابة: {{id}}. {{text}}",
+    "pick": "اختر إجابة واحدة، ثم اختر تحقّق من الإجابة.",
+    "notQuiteTitle": "ليس تماماً",
+    "rightAnswer": "الإجابة الصحيحة"
   },
   "practice": {
     "chooseOne": "اختر واحداً",
@@ -175,7 +180,11 @@
     "inProgress": "قيد التقدّم",
     "notStarted": "لم تبدأ",
     "progress": "{{done}} من {{total}} وحدات مكتملة",
-    "blocks": "أقسام التعلّم"
+    "units": "الوحدات",
+    "hide": "إخفاء القائمة",
+    "show": "عرض الوحدات",
+    "upNext": "التالية",
+    "unitN": "الوحدة {{n}}"
   },
   "leave": {
     "title": "هل تريد مغادرة هذه الوحدة؟",

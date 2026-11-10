@@ -121,7 +121,8 @@ export function AppSidebar({
             className="w-[min(20rem,90vw)] border-0 p-0 [&>button:last-child]:hidden"
           >
             <SheetTitle className="sr-only">{t('menu')}</SheetTitle>
-            <div className="relative h-full">
+            {/* The menu scrolls on short screens so Log out is always reachable. */}
+            <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
               <Button
                 variant="ghost"
                 size="icon"

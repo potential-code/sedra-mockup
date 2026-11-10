@@ -23,7 +23,7 @@ import { DEFAULT_PREFS, seedLearners, seedSessions, seedSupportRequests } from '
  * never loses the last step (walkthrough A: refresh and resume).
  */
 const KEY = 'sedra-demo-db'
-const VERSION = 10
+const VERSION = 11
 
 export type LearnerPersonaId = Exclude<PersonaId, 'admin'>
 
